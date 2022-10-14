@@ -1,13 +1,13 @@
 <template>
   <div class="app-container">
     <div>
-      <el-button type="primary" @click="idEdit = true" v-if="idEdit == false"
+      <el-button type="primary" @click="isEdit = true" v-if="isEdit == false"
         >編輯</el-button
       >
-      <el-button type="primary" @click="onEdit()" v-if="idEdit == true"
+      <el-button type="primary" @click="onEdit()" v-if="isEdit == true"
         >存檔</el-button
       >
-      <el-button type="" @click="idEdit = false" v-if="idEdit == true"
+      <el-button type="" @click="onCancel()" v-if="isEdit == true"
         >取消</el-button
       >
     </div>
@@ -21,15 +21,14 @@
     >
       <el-table-column label="站點代碼" width="100" prop="id">
       </el-table-column>
-      <el-table-column label="站點名稱" prop="description">
-      </el-table-column>
+      <el-table-column label="站點名稱" prop="description"> </el-table-column>
       <el-table-column label="入庫作業" width="100" prop="inBound">
         <template slot-scope="scope">
           <el-checkbox
             class="remarks"
             v-model="scope.row.isInboundEnable"
             v-if="scope.row.isInboundShow"
-            :disabled="idEdit == false"
+            :disabled="isEdit == false"
           ></el-checkbox>
         </template>
       </el-table-column>
@@ -39,7 +38,7 @@
             class="remarks"
             v-model="scope.row.isOutboundEnable"
             v-if="scope.row.isOutboundShow"
-            :disabled="idEdit == false"
+            :disabled="isEdit == false"
           ></el-checkbox>
         </template>
       </el-table-column>
@@ -48,7 +47,7 @@
           <el-checkbox
             v-model="scope.row.isProcessEnable"
             v-if="scope.row.isProcessShow"
-            :disabled="idEdit == false"
+            :disabled="isEdit == false"
           ></el-checkbox>
         </template>
       </el-table-column>
@@ -57,7 +56,7 @@
           <el-checkbox
             v-model="scope.row.isInventoryEnable"
             v-if="scope.row.isInventoryShow"
-            :disabled="idEdit == false"
+            :disabled="isEdit == false"
           ></el-checkbox>
         </template>
       </el-table-column>
@@ -104,7 +103,7 @@ export default {
   mixins: [pageMixin],
   data() {
     return {
-      idEdit: false,
+      isEdit: false,
       workStations: [],
     };
   },
@@ -118,22 +117,48 @@ export default {
       this.workStations = resp.message;
     },
     async onEdit() {
+      this.isEdit = false;
       const response = await setWorkStations(this.workStations);
-      console.log(response);
       if (response.status == "OK") {
         this.success("站點異動成功");
       }
       await this.onLoad();
     },
+    async onCancel() {
+      console.log("onCancel");
+      this.isEdit = false;
+      await this.onLoad();
+    },
   },
 };
 </script>
-<style lang="scss" scoped>
-.remarks,
-.el-checkbox__input,
-.is-disabled,
-.is-checked,
-.el-checkbox__inner {
-  border-color: black;
+<style type="sass" scoped>
+el-checkbox {
+  color: #fff;
+  background-color: black;
+}
+::v-deep.el-checkbox__input.is-checked .el-checkbox__inner::after {
+  content: "";
+  border: 1px solid #ffc342;
+  border-left: 0;
+  border-top: 0;
+}
+::v-deep.el-checkbox__input.is-checked + .el-checkbox__label {
+  color: #ffc342;
+  margin-top: 1px;
+}
+::v-deep .el-checkbox__inner {
+  background: transparent;
+}
+::v-deep.el-checkbox__input.is-focus .el-checkbox__inner,
+.el-checkbox__inner:hover {
+  border-color: #fff;
+}
+::v-deep.el-checkbox__input.is-checked .el-checkbox__inner {
+  background: transparent;
+  border-color: #ffc342;
+}
+::v-deep .el-checkbox__inner:hover {
+  border-color: #fff;
 }
 </style>
