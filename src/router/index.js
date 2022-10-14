@@ -69,7 +69,7 @@ export const constantRoutes = [
       {
         path: "/TND7006",
         name: "TND7006",
-        component: () => import("@/views/A1/A106"),
+        component: () => import("@/views/TND7006"),
         meta: { title: "站點管理" },
       },
       {
@@ -104,7 +104,7 @@ export const constantRoutes = [
 
 const createRouter = () =>
   new Router({
-    mode: "history", // require service support
+   // mode: "history", // require service support
     scrollBehavior: () => ({ y: 0 }),
     routes: constantRoutes,
   });

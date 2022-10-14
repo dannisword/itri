@@ -1,7 +1,12 @@
 import request from "@/utils/request";
 import { parseMessage } from "@/utils/app";
 
-export function settWorkStations(data) {
+/**
+ * A1-19 批次修改站點
+ * @param {*} data 
+ * @returns 
+ */
+export function setWorkStations(data) {
   return new Promise((resolve) => {
     request({
       url: `/api/workStation/batch`,
@@ -13,7 +18,10 @@ export function settWorkStations(data) {
     });
   });
 }
-
+/**
+ * A1-22 查詢站點
+ * @returns 
+ */
 export function getWorkStation() {
   return request({
     url: `/api/workStation/search`,
