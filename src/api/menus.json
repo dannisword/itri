@@ -1,0 +1,146 @@
+[
+    {
+      "index": "A101",
+      "name": "簽入/簽出作業",
+      "icon": "el-icon-user-solid",
+      "hasChilds": false,
+      "path": "/A101"
+    },
+    {
+      "index": "A200",
+      "name": "入庫作業",
+      "icon": "el-icon-download",
+      "hasChilds": true,
+      "path": "/example",
+      "subs": [
+        {
+          "index": "A201",
+          "name": "入庫工作",
+          "icon": "",
+          "hasChilds": false,
+          "path": "/entryINV"
+        },
+        {
+          "index": "22",
+          "name": "空箱入庫",
+          "icon": "",
+          "hasChilds": false,
+          "path": "/entryBox"
+        }]
+    },
+    {
+      "index": "A300",
+      "name": "出庫作業",
+      "icon": "el-icon-upload2",
+      "hasChilds": true,
+      "subs": [
+        {
+          "name": "出庫工作"
+        },
+        {
+          "name": "空箱出庫"
+        }]
+    },
+    {
+      "index": "40",
+      "name": "加工作業",
+      "icon": "el-icon-document",
+      "hasChilds": true,
+      "subs": [
+        {
+          "name": "加工工作"
+        }
+      ]
+    },
+    {
+      "index": "50",
+      "name": "盤點作業",
+      "icon": "el-icon-document",
+      "hasChilds": true,
+      "subs": [
+        {
+          "name": "盤點工作"
+        },
+        {
+          "name": "庫存異動工作"
+        }
+      ]
+    },
+    {
+      "index": "60",
+      "name": "庫存查詢",
+      "icon": "el-icon-document",
+      "hasChilds": false
+    },
+    {
+      "index": "70",
+      "name": "設定",
+      "icon": "el-icon-document",
+      "hasChilds": true,
+      "subs": [
+        {
+          "index": "A102",
+          "name": "入庫開工設定",
+          "icon": "",
+          "hasChilds": false,
+          "path": "/A102"
+        },
+        {
+          "index": "A103",
+          "name": "出庫開工設定",
+          "icon": "",
+          "hasChilds": false,
+          "path": "/A103"
+        },
+        {
+          "index": "A104",
+          "name": "加工開工設定",
+          "icon": "",
+          "hasChilds": false,
+          "path": "/A104"
+        },
+        {
+          "index": "A105",
+          "name": "盤點開工設定",
+          "icon": "",
+          "hasChilds": false,
+          "path": "/A105"
+        },
+        {
+          "index": "A106",
+          "name": "站點管理",
+          "icon": "",
+          "hasChilds": false,
+          "path": "/A106"
+        },
+        {
+          "index": "A107",
+          "name": "儲位管理",
+          "icon": "",
+          "hasChilds": false,
+          "path": "/A107"
+        },
+        {
+          "index": "A108",
+          "name": "物流箱管理",
+          "icon": "",
+          "hasChilds": false,
+          "path": "/A108"
+        },
+        {
+          "index": "A109",
+          "name": "使用者帳號管理",
+          "icon": "",
+          "hasChilds": false,
+          "path": "/A109"
+        },
+        {
+          "index": "A110",
+          "name": "角色權限設定",
+          "icon": "",
+          "hasChilds": false,
+          "path": "/A110"
+        }
+      ]
+    }
+  ]

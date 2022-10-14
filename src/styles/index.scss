@@ -1,0 +1,105 @@
+@import './variables.scss';
+@import './mixin.scss';
+@import './transition.scss';
+@import './element-ui.scss';
+@import './sidebar.scss';
+@import './form.scss';
+
+body {
+  height: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+}
+
+label {
+  font-weight: 700;
+}
+
+html {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+#app {
+  height: 100%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+a:focus,
+a:active {
+  outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+div:focus {
+  outline: none;
+}
+
+.clearfix {
+  &:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+  }
+}
+
+// main-container global css
+.app-container {
+  padding: 20px;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  background: grey;
+  width: 100vw;
+  height: 100vh;
+}
+// 登入首頁
+.login-content {
+  position: relative;
+  width: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .login-form {
+    position: relative;
+    width: 80%;
+    max-width: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+    background-color: white;
+    border-radius: 8px;
+    padding: 18px;
+  }
+
+  .tips {
+    font-size: 10px;
+    color: gray;
+    margin-bottom: 10px;
+
+    span {
+      display:block;
+      align-self: center;
+      text-align: center;
+    }
+  }
+}

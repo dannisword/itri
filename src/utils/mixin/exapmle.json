@@ -1,0 +1,263 @@
+{
+    "roles": [
+        {
+            "label": "請選擇",
+            "value": 0
+        },
+        {
+            "label": "課長",
+            "value": 1
+        },
+        {
+            "label": "組長",
+            "value": 2
+        },
+        {
+            "label": "作業員",
+            "value": 3
+        }
+    ],
+    "status": [
+        {
+            "label": "啟用",
+            "value": true
+        },
+        {
+            "label": "停用",
+            "value": false
+        }
+    ],
+    "A109": [
+        {
+            "id": 1,
+            "account": "A001",
+            "name": "A001",
+            "roleId": 3,
+            "roleName": "作業員",
+            "statusId": 1,
+            "statusName": "啟用",
+            "startAt": "2022-10-05",
+            "endAt": "2999-12-31"
+        },
+        {
+            "id": 2,
+            "account": "A002",
+            "name": "A002",
+            "roleId": 1,
+            "roleName": "課長",
+            "statusId": 2,
+            "statusName": "啟用",
+            "startAt": "2022-10-05",
+            "endAt": "2999-12-31"
+        }
+    ],
+    "A110": [
+        {
+            "id": 1,
+            "code": "S001",
+            "name": "經理",
+            "statusId": 1,
+            "statusName": "啟用"
+        },
+        {
+            "id": 2,
+            "code": "S002",
+            "name": "技師",
+            "statusId": 1,
+            "statusName": "啟用"
+        },
+        {
+            "id": 3,
+            "code": "S003",
+            "name": "外包",
+            "statusId": 1,
+            "statusName": "啟用"
+        },
+        {
+            "id": 4,
+            "code": "S004",
+            "name": "組長",
+            "statusId": 1,
+            "statusName": "啟用"
+        }
+    ],
+    "A110_menus": [
+        {
+            "id": 1,
+            "name": "簽入/簽出作業",
+            "selected": true
+        },
+        {
+            "id": 2,
+            "name": "入庫作業",
+            "selected": false
+        },
+        {
+            "id": 3,
+            "name": " >入庫工作",
+            "selected": true
+        }
+    ],
+    "A106": [
+        {
+            "code": "A001",
+            "name": "1F 第1站",
+            "inBound": true,
+            "outBound": false,
+            "process": true,
+            "inventory": false,
+            "boxLimit": 3,
+            "bufferLinit": 6,
+            "ipAddress": "60.248.52.21:8000"
+        },
+        {
+            "code": "A002",
+            "name": "1F 第2站",
+            "inBound": true,
+            "outBound": false,
+            "process": false,
+            "inventory": false,
+            "boxLimit": 3,
+            "bufferLinit": 6,
+            "ipAddress": "60.248.52.21:8000"
+        },
+        {
+            "code": "A003",
+            "name": "1F 第3站",
+            "inBound": true,
+            "outBound": false,
+            "process": false,
+            "inventory": true,
+            "boxLimit": 3,
+            "bufferLinit": 6,
+            "ipAddress": "60.248.52.21:8000"
+        },
+        {
+            "code": "A004",
+            "name": "1F 第4站",
+            "inBound": true,
+            "outBound": true,
+            "process": false,
+            "inventory": false,
+            "boxLimit": 3,
+            "bufferLinit": 6,
+            "ipAddress": "60.248.52.21:8000"
+        },
+        {
+            "code": "A005",
+            "name": "2F 第1站",
+            "inBound": true,
+            "outBound": false,
+            "process": false,
+            "inventory": true,
+            "boxLimit": 3,
+            "bufferLinit": 6,
+            "ipAddress": "60.248.52.21:8000"
+        },
+        {
+            "code": "A006",
+            "name": "2F 第2站",
+            "inBound": true,
+            "outBound": false,
+            "process": false,
+            "inventory": false,
+            "boxLimit": 3,
+            "bufferLinit": 6,
+            "ipAddress": "60.248.52.21:8000"
+        },
+        {
+            "code": "A007",
+            "name": "2F 第3站",
+            "inBound": true,
+            "outBound": false,
+            "process": false,
+            "inventory": false,
+            "boxLimit": 3,
+            "bufferLinit": 6,
+            "ipAddress": "60.248.52.21:8000"
+        },
+        {
+            "code": "A008",
+            "name": "2F 第4站",
+            "inBound": false,
+            "outBound": false,
+            "process": false,
+            "inventory": false,
+            "boxLimit": 3,
+            "bufferLinit": 6,
+            "ipAddress": "60.248.52.21:8000"
+        }
+    ],
+    "A107": [
+        {
+            "id": 1,
+            "locationId": "M1",
+            "aisle": "1",
+            "level": 1,
+            "bay": 1,
+            "deep": 1,
+            "storageId": "M11111",
+            "aisleCode":"M1111",
+            "boxNumber":"",
+            "isEmpt": true,
+            "statusId": 1,
+            "statusName": "可用"
+        },
+        {
+            "id": 2,
+            "locationId": "M1",
+            "aisle": "1",
+            "level": 1,
+            "bay": 2,
+            "deep": 1,
+            "storageId": "M11121",
+            "aisleCode":"M1112",
+            "boxNumber":"",
+            "isEmpt": true,
+            "statusId": 1,
+            "statusName": "可用"
+        },
+        {
+            "id": 3,
+            "locationId": "M1",
+            "aisle": "1",
+            "level": 1,
+            "bay": 3,
+            "deep": 1,
+            "storageId": "M11131",
+            "aisleCode":"M1113",
+            "boxNumber":"",
+            "isEmpt": true,
+            "statusId": 1,
+            "statusName": "可用"
+        },
+        {
+            "id": 4,
+            "locationId": "M1",
+            "aisle": "1",
+            "level": 1,
+            "bay": 4,
+            "deep": 1,
+            "storageId": "M11141",
+            "aisleCode":"M1114",
+            "boxNumber":"",
+            "isEmpt": true,
+            "statusId": 1,
+            "statusName": "可用"
+        },
+        {
+            "id": 5,
+            "locationId": "M1",
+            "aisle": "1",
+            "level": 1,
+            "bay": 5,
+            "deep": 1,
+            "storageId": "M11151",
+            "aisleCode":"M1115",
+            "boxNumber":"",
+            "isEmpt": true,
+            "statusId": 2,
+            "statusName": "鎖定"
+        }
+    ]
+}

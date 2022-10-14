@@ -1,0 +1,49 @@
+.form-container {
+    border: solid;
+    border-radius: 12px;
+    border-color: #eeeeee;
+    border-width: 1px;
+
+    .el-form-item {
+        margin: 13px;
+    }
+}
+
+.form-divider {
+    display: block;
+    height: 0px;
+    margin: 0px;
+}
+
+.table-container {
+    margin-top: 8px;
+    width: 100%;
+    min-height: 380px;
+
+    .thead,
+    tr {
+        color: #304156;
+        background-color: #707070 !important;
+    }
+
+    tbody,
+    th,
+    tr {
+        color: #304156;
+        background-color: #bdbdbd !important;
+    }
+
+    tr:hover>td {
+        background-color: transparent !important;
+    }
+}
+
+
+.table-header {
+    background: #304156 !important; // !important needed here to override default style
+    width: 100%;
+}
+
+.mt-1 {
+    margin-top: 10px;
+}
