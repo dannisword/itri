@@ -270,7 +270,6 @@ export default {
       this.dialogs.account.visible = true;
     },
     onModalClose(ref) {
-      console.log(ref);
       if (ref.name == "ACCOUNT") {
         this.dialogs.account.visible = false;
 

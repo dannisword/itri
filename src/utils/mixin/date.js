@@ -23,14 +23,28 @@ export default {
   methods: {
     /**
      * 月初
-     * @param {*} format 
-     * @returns 
+     * @param {*} format
+     * @returns
      */
     startOfMonth: function (format = "YYYY-MM-DD") {
       return moment().startOf("month").format(format);
     },
+    /**
+     *
+     * @param {*} format
+     * @returns
+     */
     endOfMonth: function (format = "YYYY-MM-DD") {
       return moment().endOf("month").format(format);
+    },
+    /**
+     * 
+     * @param {*} nip 
+     * @param {*} format 
+     * @returns 
+     */
+    addDay: function (amount, format = "YYYY-MM-DD") {
+      return moment().add(amount, "days").format(format);
     },
     toDate: function (nip, format = "YYYY-MM-DD") {
       return getDateTime(nip, format);

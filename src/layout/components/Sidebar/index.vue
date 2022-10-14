@@ -88,7 +88,6 @@ export default {
   methods: {
     async onLoad() {
       this.menus = await getMenus(this.routes);
-      console.log(this.menus);
     },
     handleSelect(key, keyPath) {},
     onNav(menu) {

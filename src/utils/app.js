@@ -144,7 +144,6 @@ export async function getPrivileges() {
  */
 export async function getMenus() {
   const source = await getPrivileges();
-  console.log(source);
   // 父選單
   let menus = source.filter((x) => x.level == 0);
   // 子選單

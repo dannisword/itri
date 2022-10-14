@@ -125,7 +125,6 @@ export default {
       await this.onLoad();
     },
     async onCancel() {
-      console.log("onCancel");
       this.isEdit = false;
       await this.onLoad();
     },

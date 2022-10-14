@@ -5,7 +5,7 @@
       <el-form :model="params" label-width="100px" :inline="true">
         <el-form-item label="簽入日期">
           <el-date-picker
-            v-model="params.nowDate"
+            v-model="nowDate"
             type="daterange"
             range-separator="至"
             start-placeholder="開始日期"
@@ -14,16 +14,16 @@
           </el-date-picker>
         </el-form-item>
 
-        <el-form-item label="品料號">
-          <el-input v-model="params.roleName"></el-input>
+        <el-form-item label="料品號">
+          <el-input v-model="params.prodCode"></el-input>
         </el-form-item>
 
         <el-form-item label="供應商">
-          <el-input v-model="params.roleName"></el-input>
+          <el-input v-model="params.supplier"></el-input>
         </el-form-item>
 
         <el-form-item label="物流箱編號">
-          <el-input v-model="params.roleName"></el-input>
+          <el-input v-model="params.carrierCode"></el-input>
         </el-form-item>
 
         <el-divider class="form-divider"></el-divider>
@@ -59,11 +59,14 @@
       </el-table-column>
       <el-table-column label="料品號" width="100" prop="prodCode" fixed>
       </el-table-column>
-      <el-table-column label="入庫時間" width="120" prop="entryDate"> </el-table-column>
+      <el-table-column label="入庫時間" width="120" prop="entryDate">
+      </el-table-column>
       <el-table-column label="供應商" prop="supplier"> </el-table-column>
       <el-table-column label="數量" prop="availableQty"> </el-table-column>
-      <el-table-column label="儲位編號" width="150" prop="stationId"> </el-table-column>
-      <el-table-column label="物流箱編號" width="150" prop="carrierId"> </el-table-column>
+      <el-table-column label="儲位編號" width="150" prop="stationId">
+      </el-table-column>
+      <el-table-column label="物流箱編號" width="150" prop="carrierId">
+      </el-table-column>
     </el-table>
   </div>
 </template>
@@ -79,8 +82,13 @@ export default {
   mixins: [pageMixin],
   data() {
     return {
+      nowDate: [],
       params: {
-        carrierCode: "",
+        carrierCode: "", // 物流箱編號
+        prodCode: "", // 商品代號
+        supplier: "", //供應商代號
+        startDate: "", // 入庫日期(起)
+        endDate: "", // 入庫日期(訖)
         page: 0,
         size: 10,
         direction: "ASC",
@@ -90,14 +98,16 @@ export default {
     };
   },
   created() {
+    this.nowDate.push(this.addDay(-60));
+    this.nowDate.push(this.toDate(new Date()));
     this.onLoad();
+    
   },
   methods: {
     onLoad() {
       this.query = this.getQuery(this.params);
       getStocks(this.query).then((respone) => {
         this.stocks = respone.message.content;
-        console.log(this.stocks);
       });
     },
     onSizeChange(val) {},
