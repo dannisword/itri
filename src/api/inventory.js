@@ -1,59 +1,80 @@
 import request from "@/utils/request";
+import { parseMessage } from "@/utils/app";
 
 /**
- * 收單作業
+ * A7-17 收單作業
  * @returns
  */
- export function importInventory() {
-    return request({
-      url: `/api/inventory/import`,
-      method: "POST",
+export function importInventory() {
+  const uri = `/api/inventory/import`;
+  const method = "POST";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
     });
-  }
-  /**
-   * 開工預先叫單
-   * @returns
-   */
-  export function preInventory() {
-    return request({
-      url: `/api/inventory/preInvoke`,
-      method: "POST",
+  });
+}
+/**
+ * A7-18 開工預先叫單
+ * @returns
+ */
+export function preInventory(isAssign) {
+  const uri = `/api/inventory/preInvoke/${isAssign}`;
+  const method = "POST";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
     });
-  }
-  
-  /**
-   * 新增加工叫單數
-   * @param {*} data
-   * @returns
-   */
-  export function addInventory(data) {
-    return request({
-      url: `/api/inventory/sysParam`,
-      method: "POST",
-      data,
+  });
+}
+
+/**
+ * 新增加工叫單數
+ * @param {*} data
+ * @returns
+ */
+export function addInventory(data) {
+  return request({
+    url: `/api/inventory/sysParam`,
+    method: "POST",
+    data,
+  });
+}
+/**
+ * A7-20 修改加工叫單數
+ * @param {*} data
+ * @returns
+ */
+export function setInventory(data) {
+  const uri = `/api/inventory/sysParam`;
+  const method = "PUT";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+      data
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
     });
-  }
-  /**
-   * 修改加工叫單數
-   * @param {*} data
-   * @returns
-   */
-  export function setInventory(data) {
-    return request({
-      url: `/api/inventory/sysParam`,
-      method: "PUT",
-      data,
-    });
-  }
-  /**
-   * 查詢出庫叫單數
-   * @param {*} params
-   * @returns
-   */
-  export function getInventories(params) {
-    return request({
-      url: `/api/inventory/sysParam`,
-      method: "GET",
-    });
-  }
-  
+  });
+}
+/**
+ * A7-21 查詢出庫叫單數
+ * @param {*} params
+ * @returns
+ */
+export function getInventories() {
+  return request({
+    url: `/api/inventory/sysParam`,
+    method: "GET",
+  });
+}

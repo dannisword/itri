@@ -8,8 +8,17 @@
     >
       <p><slot></slot></p>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="afterClosed(false)">{{optional.cancel}}</el-button>
-        <el-button type="primary" @click="afterClosed(true)">{{optional.action}}</el-button>
+        <el-button
+          @click="afterClosed(false)"
+          v-if="optional.showAction == true"
+          >{{ optional.cancel }}</el-button
+        >
+        <el-button
+          type="primary"
+          @click="afterClosed(true)"
+          v-if="optional.showAction == true"
+          >{{ optional.action }}</el-button
+        >
       </span>
     </el-dialog>
   </div>
@@ -36,13 +45,15 @@ export default {
       default: () => ({
         size: "Small",
         action: "確認",
-        cancel: "取消"
+        cancel: "取消",
+        showAction: true,
       }),
     },
   },
   data() {
     return {
       width: "50%",
+
       dialogRef: {
         name: "",
         success: false,
@@ -72,3 +83,9 @@ export default {
   },
 };
 </script>
+<style>
+.dialog {
+  width: 50% !important;
+  min-width: 200px !important;
+}
+</style>

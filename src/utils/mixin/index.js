@@ -8,8 +8,8 @@ export default {
   data() {
     return {
       page: {
-        number: 0,
-        size: 10,
+        page: 0,
+        size: 50,
         totalPages: 0,
       },
     };
@@ -56,6 +56,16 @@ export default {
         type: "success",
         duration: duration,
       });
+    },
+    warning(message, duration = 3000) {
+      Message({
+        message: message,
+        type: "warning",
+        duration: duration,
+      });
+    },
+    onNav(uri) {
+      this.$router.push(uri);
     },
   },
 };

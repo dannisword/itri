@@ -34,19 +34,34 @@
 
         <el-divider class="form-divider"></el-divider>
         <el-form-item>
-          <el-button type="primary" @click="onSearch()">查詢</el-button>
-          <el-button type="success" @click="onModalOpen(null)"
+          <el-button type="primary" @click="onLoad()">查詢</el-button>
+          <el-button type="success" @click="onOpenModal(null)"
             >新增帳號</el-button
           >
         </el-form-item>
       </el-form>
     </div>
-
+    <!-- 分頁底部 -->
+    <el-row type="flex">
+      <el-col :span="8"> </el-col>
+      <el-col :span="16" align="end">
+        <el-pagination
+          background
+          @size-change="onSizeChange"
+          @current-change="onCurrentChange"
+          :current-page="page.number"
+          :page-size="page.size"
+          layout="total,jumper,prev, pager, next"
+          :total="page.totalPages"
+        ></el-pagination>
+      </el-col>
+    </el-row>
     <!-- 資料 -->
     <el-table
       :data="users.content"
       class="table-container"
       border
+      stripe
       @cell-dblclick="ondblClick"
     >
       <el-table-column label="項次" width="100" prop="id" fixed>
@@ -61,37 +76,22 @@
       </el-table-column>
       <el-table-column label="帳號啟用日" prop="enableDate" width="180">
         <template slot-scope="scope">
-          <p>{{ scope.row.enableDate | formatDate("YYYY-MM-DD") }}</p>
+          <span>{{ scope.row.enableDate | formatDate("YYYY-MM-DD") }}</span>
         </template>
       </el-table-column>
       <el-table-column label="帳號停用日" prop="disableDate" width="180">
         <template slot-scope="scope">
-          <p>{{ scope.row.disableDate | formatDate("YYYY-MM-DD") }}</p>
+          <span>{{ scope.row.disableDate | formatDate("YYYY-MM-DD") }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="編輯">
+      <el-table-column label="編輯" width="200" align="center">
         <template slot-scope="scope">
-          <el-button @click="onModalOpen(scope.row)" size="mini"
+          <el-button @click="onOpenModal(scope.row)" size="mini" type="primary"
             >編輯
-          </el-button>
-          <el-button v-if="scope.row.statusId == 1" size="mini" type="danger"
-            >停用
           </el-button>
         </template>
       </el-table-column>
     </el-table>
-
-    <!-- 分頁底部 -->
-    <el-pagination
-      background
-      @size-change="onSizeChange"
-      @current-change="onCurrentChange"
-      :current-page="page.currentPage"
-      :page-sizes="[5, 10, 15]"
-      :page-size="page.pagesize"
-      layout="total,jumper,prev, pager, next"
-      :total="page.totalPage"
-    ></el-pagination>
 
     <!-- 新增/編輯帳號 -->
     <ModalDialog
@@ -226,11 +226,20 @@ export default {
     this.status = this.source.status;
     var data = await getRoles();
     this.roles = data.content;
+    await this.onLoad();
+  },
+  watch: {
+    user: {
+      handler: function (newVal, oldVal) {
+        console.log(newVal);
+      },
+      deep: true,
+    },
   },
   methods: {
-    onSearch() {
+    onLoad() {
       // 處理資料轉換
-      let query = this.getQuery(this.params);
+      const query = this.getQuery(this.params);
       getUsers(query)
         .then(async (resp) => {
           this.users = await this.parseMessage(resp);
@@ -255,7 +264,7 @@ export default {
           this.showWarning("執行查詢異常");
         });
     },
-    onModalOpen(val) {
+    onOpenModal(val) {
       this.user = this.newUser();
       this.userRoles = [];
       this.dialogs.account.title = "新增帳號";
@@ -316,7 +325,7 @@ export default {
       this.dialogs.password.visible = true;
     },
     ondblClick(val) {
-      this.onModalOpen(val);
+      this.onOpenModal(val);
     },
     onSizeChange(val) {},
     onCurrentChange(val) {},
@@ -340,4 +349,3 @@ export default {
   },
 };
 </script>
-<style></style>

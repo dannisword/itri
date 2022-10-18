@@ -34,7 +34,56 @@ export const constantRoutes = [
         path: "/TND1000",
         name: "TND1000",
         component: () => import("@/views/TND1000"),
-        meta: { title: "簽入/簽出"},
+        meta: { title: "簽入/簽出" },
+      },
+      {
+        path: "/TND2001",
+        name: "TND2001",
+        component: () => import("@/views/TND2001"),
+        meta: { title: "入庫工作" },
+      },
+      {
+        path: "/TND2002",
+        name: "TND2002",
+        component: () => import("@/views/TND2002"),
+        meta: { title: "空箱入庫" },
+      },
+      {
+        path: "/TND2100",
+        name: "TND2100",
+        component: () => import("@/views/TND2100"),
+        meta: { title: "執行入庫工作" },
+      },
+      
+      {
+        path: "/TND3001",
+        name: "TND3001",
+        component: () => import("@/views/TND3001"),
+        meta: { title: "出庫工作" },
+      },
+      {
+        path: "/TND3002",
+        name: "TND3002",
+        component: () => import("@/views/TND3002"),
+        meta: { title: "空箱出庫" },
+      },
+      {
+        path: "/TND3100",
+        name: "TND3100",
+        component: () => import("@/views/TND3100"),
+        meta: { title: "執行出庫工作" },
+      },
+      {
+        path: "/TND4001",
+        name: "TND4001",
+        component: () => import("@/views/TND4001"),
+        meta: { title: "加工工作" },
+      },
+      {
+        path: "/TND5001",
+        name: "TND5001",
+        component: () => import("@/views/TND5001"),
+        meta: { title: "盤點工作" },
       },
       {
         path: "/TND6000",
@@ -45,25 +94,25 @@ export const constantRoutes = [
       {
         path: "/TND7001",
         name: "TND7001",
-        component: () => import("@/views/A1/A102"),
+        component: () => import("@/views/TND7001"),
         meta: { title: "入庫開工設定" },
       },
       {
         path: "/TND7002",
         name: "TND7002",
-        component: () => import("@/views/A1/A103"),
+        component: () => import("@/views/TND7002"),
         meta: { title: "出庫開工設定" },
       },
       {
         path: "/TND7003",
         name: "TND700",
-        component: () => import("@/views/A1/A104"),
+        component: () => import("@/views/TND7003"),
         meta: { title: "加工開工設定" },
       },
       {
         path: "/TND7004",
         name: "TND7004",
-        component: () => import("@/views/A1/A105"),
+        component: () => import("@/views/TND7004"),
         meta: { title: "盤點開工設定" },
       },
       {
@@ -81,7 +130,7 @@ export const constantRoutes = [
       {
         path: "/TND7008",
         name: "TND7008",
-        component: () => import("@/views/A1/A108"),
+        component: () => import("@/views/TND7008"),
         meta: { title: "物流箱管理" },
       },
       {
@@ -104,7 +153,7 @@ export const constantRoutes = [
 
 const createRouter = () =>
   new Router({
-   // mode: "history", // require service support
+    // mode: "history", // require service support
     scrollBehavior: () => ({ y: 0 }),
     routes: constantRoutes,
   });

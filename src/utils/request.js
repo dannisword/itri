@@ -14,11 +14,23 @@ function parseBody(response) {
   }
 }
 function parseError(response) {
-  if (response.status == 404){
-    return Promise.reject({ message: ["程式不存在"] });
+  if (response.status == 404) {
+    Message({
+      message: "服務不存在",
+      type: "warning",
+      duration: 5000,
+    });
+    return;
+    //return Promise.reject({ message: ["程式不存在"] });
   }
-  if (response.status == 500){
-    return Promise.reject({ message: ["程式發生問題"] });
+  if (response.status == 500) {
+    Message({
+      message: "服務發生問題",
+      type: "warning",
+      duration: 5000,
+    });
+    return;
+    //return Promise.reject({ message: ["程式發生問題"] });
   }
   // error
   if (response.data) {
@@ -27,7 +39,6 @@ function parseError(response) {
       type: "error",
       duration: 5 * 1000,
     });
-
   } else {
     return Promise.reject({ messages: ["發生了錯誤"] });
   }

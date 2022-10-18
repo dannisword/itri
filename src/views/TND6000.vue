@@ -10,6 +10,7 @@
             range-separator="至"
             start-placeholder="開始日期"
             end-placeholder="結束日期"
+            @change="onChang"
           >
           </el-date-picker>
         </el-form-item>
@@ -32,7 +33,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <!--  -->
+
     <el-row type="flex">
       <el-col :span="8"> </el-col>
       <el-col :span="16" align="end">
@@ -54,12 +55,13 @@
       border
       stripe
       height="100%"
+      @sort-change="onSortChange"
     >
       <el-table-column label="項次" width="100" prop="id" fixed>
       </el-table-column>
       <el-table-column label="料品號" width="100" prop="prodCode" fixed>
       </el-table-column>
-      <el-table-column label="入庫時間" width="120" prop="entryDate">
+      <el-table-column label="入庫時間" width="120" prop="entryDate" sortable>
       </el-table-column>
       <el-table-column label="供應商" prop="supplier"> </el-table-column>
       <el-table-column label="數量" prop="availableQty"> </el-table-column>
@@ -71,6 +73,7 @@
   </div>
 </template>
 <script>
+import moment from "moment";
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getStocks } from "@/api/stock";
@@ -99,16 +102,36 @@ export default {
   },
   created() {
     this.nowDate.push(this.addDay(-60));
-    this.nowDate.push(this.toDate(new Date()));
+    this.nowDate.push(this.addDay(0));
     this.onLoad();
-    
   },
   methods: {
     onLoad() {
-      this.query = this.getQuery(this.params);
-      getStocks(this.query).then((respone) => {
+      this.params.startDate = this.toDate(this.nowDate[0]);
+      this.params.endDate = this.toDate(this.nowDate[1]);
+      this.params.page = this.page.page;
+      this.params.size = this.page.size;
+      this.params.totalPages = this.page.totalPages;
+      const query = this.getQuery(this.params);
+      getStocks(query).then((respone) => {
         this.stocks = respone.message.content;
       });
+    },
+    onChang(val) {
+      const diff = moment(val[1]).diff(val[0], "days");
+      if (diff > 60) {
+        this.warning("日期查詢間隔勿超過60天");
+        this.nowDate.push(this.addDay(-60));
+        this.nowDate.push(this.addDay(0));
+      }
+    },
+    onSortChange(val) {
+      if (val.order == null) {
+        return;
+      }
+      this.params.direction = val.order == "ascending" ? "ASC" : "DESC";
+      this.params.properties = val.prop;
+      this.onLoad();
     },
     onSizeChange(val) {},
     onCurrentChange(val) {},

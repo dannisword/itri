@@ -70,66 +70,7 @@ export default {
         nowDate: [],
         station: "",
         dt: "",
-      },
-      options: [
-        {
-          value: "A001",
-          label: "A001",
-        },
-        {
-          value: "A002",
-          label: "A002",
-        },
-        {
-          value: "A003",
-          label: "A003",
-        },
-        {
-          value: "A004",
-          label: "A004",
-        },
-        {
-          value: "A005",
-          label: "A005",
-        },
-      ],
-      tableData: [
-        {
-          seq: 1,
-          date: "2022-05-02",
-          station: "A001",
-          inNum: 10,
-          outNum: 10,
-        },
-        {
-          seq: 2,
-          date: "2022-05-04",
-          station: "A002",
-          inNum: 9,
-          outNum: 9,
-        },
-        {
-          seq: 3,
-          date: "2022-05-01",
-          station: "A003",
-          inNum: 12,
-          outNum: 12,
-        },
-        {
-          seq: 4,
-          date: "2022-05-03",
-          station: "A004",
-          inNum: 10,
-          outNum: 10,
-        },
-        {
-          seq: 5,
-          date: "2022-05-03",
-          station: "A005",
-          inNum: 13,
-          outNum: 12,
-        },
-      ],
+      }
     };
   },
   created() {

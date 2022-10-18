@@ -29,7 +29,7 @@
       </el-form>
     </div>
 
-    <!-- 分頁底部 -->
+    <!-- 分頁 -->
     <el-row type="flex">
       <el-col :span="8"> </el-col>
       <el-col :span="16" align="end">
@@ -50,6 +50,7 @@
       :data="roles.content"
       class="table-container"
       border
+      stripe
       height="100%"
     >
       <el-table-column label="項次" width="100" prop="id" fixed>
@@ -118,6 +119,7 @@
         :data="privileges"
         class="table-container"
         border
+        stripe
         height="400px"
       >
         <el-table-column label="功能名稱" prop="description"> </el-table-column>
@@ -178,13 +180,13 @@ export default {
   computed: {},
   async created() {
     this.status = this.source.status;
-    this.menus = await getPrivileges(); 
+    this.menus = await getPrivileges();
     this.onLoad();
   },
   methods: {
     async onLoad() {
-      this.query = this.getQuery(this.params);
-      this.roles = await getRoles(this.query);
+      const query = this.getQuery(this.params);
+      this.roles = await getRoles(query);
 
       this.setPagination(this.roles);
       // 處理狀態

@@ -1,13 +1,18 @@
 <template>
-  <div class="sidebar-logo-container" :class="{'collapse':collapse}">
+  <div class="sidebar-logo-container" :class="{ collapse: collapse }">
     <transition name="sidebarLogoFade">
-      <router-link v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
-        <img v-if="logo" :src="logo" class="sidebar-logo">
-        <h1 v-else class="sidebar-title">{{ title }} </h1>
+      <router-link
+        v-if="collapse"
+        key="collapse"
+        class="sidebar-logo-link"
+        to="/"
+      >
+        <img v-if="logo" :src="logo" class="sidebar-logo" />
+        <h1 v-else class="sidebar-title">{{ title }}</h1>
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
-        <img v-if="logo" :src="logo" class="sidebar-logo">
-        <h1 class="sidebar-title">{{ title }} </h1>
+        <img v-if="logo" :src="logo" class="sidebar-logo" />
+        <h1 class="sidebar-title">{{ title }}</h1>
       </router-link>
     </transition>
   </div>
@@ -15,20 +20,20 @@
 
 <script>
 export default {
-  name: 'SidebarLogo',
+  name: "SidebarLogo",
   props: {
     collapse: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
-      title: '特耐第',
-      logo: require('@/assets/logo.png') ,
-    }
-  }
-}
+      title: "特耐第",
+      logo: require("@/assets/logo.png"),
+    };
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -46,9 +51,10 @@ export default {
   width: 100%;
   height: 50px;
   line-height: 50px;
-  background: white;
-  text-align: center;
+  background: #6868fd;
+  //text-align: center;
   overflow: hidden;
+  padding-left: 20px;
 
   & .sidebar-logo-link {
     height: 100%;
@@ -64,7 +70,7 @@ export default {
     & .sidebar-title {
       display: inline-block;
       margin: 0;
-      color: gray;
+      color: white;
       font-weight: 600;
       line-height: 50px;
       font-size: 16px;

@@ -1,23 +1,39 @@
 import request from "@/utils/request";
+import { parseMessage } from "@/utils/app";
 
 /**
- * 收單作業
+ * A5-1 收單作業
  * @returns
  */
 export function importProcess() {
-  return request({
-    url: `/api/processing/import`,
-    method: "POST",
+  const uri = `/api/processing/import`;
+  const method = "POST";
+
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
 }
 /**
- * 開工預先叫單
+ * A5-2 開工預先叫單
  * @returns
  */
-export function preProcess() {
-  return request({
-    url: `/api/processing/preInvoke`,
-    method: "POST",
+export function preProcess(isAssign) {
+  const uri = `/api/processing/preInvoke/${isAssign}`;
+  const method = "POST";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
 }
 
@@ -34,23 +50,31 @@ export function addProcess(data) {
   });
 }
 /**
- * 修改加工叫單數
+ * A5-4 修改加工叫單數
  * @param {*} data
  * @returns
  */
 export function setProcess(data) {
-  return request({
-    url: `/api/processing/sysParam`,
-    method: "PUT",
-    data,
+  const uri = `/api/processing/sysParam`;
+  const method = "PUT";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+      data
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
+
 }
 /**
- * 查詢出庫叫單數
+ * A5-5 查詢出庫叫單數
  * @param {*} params
  * @returns
  */
-export function getProcesses(params) {
+export function getProcesses() {
   return request({
     url: `/api/processing/sysParam`,
     method: "GET",

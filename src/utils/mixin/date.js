@@ -53,10 +53,10 @@ export default {
       return getDateTime(nip, format);
     },
     toShortDate: function (format = "YYYY-MM-DD") {
-      return getDateTime(nip, format);
+      return getDateTime(format);
     },
     toShortTime: function (format = "HH:mm") {
-      return getDateTime(nip, format);
+      return getDateTime(format);
     },
   },
 };

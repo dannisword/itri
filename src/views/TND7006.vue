@@ -62,22 +62,8 @@
       </el-table-column>
 
       <el-table-column label="空箱出庫箱數限制" width="180" prop="emptyLimit">
-        <template slot-scope="scope">
-          <el-input
-            v-model="scope.row.emptyLimit"
-            size="mini"
-            style="width: 120px"
-          ></el-input>
-        </template>
       </el-table-column>
       <el-table-column label="緩衝區箱數限制" width="180" prop="bufferLimit">
-        <template slot-scope="scope">
-          <el-input
-            v-model="scope.row.bufferLimit"
-            size="mini"
-            style="width: 120px"
-          ></el-input>
-        </template>
       </el-table-column>
       <el-table-column label="站點對應IP" width="220" prop="ipAddress">
         <template slot-scope="scope">
@@ -85,6 +71,7 @@
             v-model="scope.row.ipAddress"
             size="mini"
             style="width: 180px"
+            :disabled="isEdit == false"
           ></el-input>
         </template>
       </el-table-column>

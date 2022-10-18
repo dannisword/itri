@@ -7,6 +7,7 @@
         auto-complete="on"
         label-position="left"
         :model="loginForm"
+        :rules="loginRules"
       >
         歡迎
         <div class="title-container">
@@ -80,7 +81,7 @@ export default {
       }
     };
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
+      if (value.length < 0) {
         callback(new Error("請輸入密碼"));
       } else {
         callback();

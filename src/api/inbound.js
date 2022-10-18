@@ -1,23 +1,50 @@
 import request from "@/utils/request";
+import { parseMessage } from "@/utils/app";
 
 /**
- * 收單作業
- * @returns
+ * A3-3 查詢入庫單(工單/收料單)
+ * @param {*} params 
+ * @returns 
  */
-export function importInBound() {
+export function getInboundsBySearch(params) {
   return request({
-    url: `/api/inbound/import`,
-    method: "POST",
+    url: `/api/inbound/search${params}`,
+    method: "GET",
   });
 }
 /**
- * 開工預先叫單
+ * A3-11 收單作業
  * @returns
  */
-export function preInBound() {
-  return request({
-    url: `/api/inbound/preInvoke`,
-    method: "POST",
+export function importInBound() {
+  const uri = `/api/inbound/import`;
+  const method = "POST";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
+  });
+}
+/**
+ * A3-12 開工預先叫單
+ * @returns
+ */
+export function preInBound(isAssign) {
+  const uri = `/api/inbound/preInvoke/${isAssign}`;
+  const method = "POST";
+
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
 }
 
@@ -34,23 +61,30 @@ export function addInbound(data) {
   });
 }
 /**
- * 修改入庫叫單數
+ * A3-14 修改入庫叫單數
  * @param {*} data
  * @returns
  */
 export function setInbound(data) {
-  return request({
-    url: `/api/inbound/sysParam`,
-    method: "PUT",
-    data,
+  const uri = `/api/inbound/sysParam`;
+  const method = "PUT";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+      data,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
 }
 /**
- * 查詢入庫叫單數
+ * A3-15 查詢入庫叫單數
  * @param {*} params
  * @returns
  */
-export function getInbounds(params) {
+export function getInbounds() {
   return request({
     url: `/api/inbound/sysParam`,
     method: "GET",
