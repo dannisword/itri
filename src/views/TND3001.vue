@@ -93,7 +93,7 @@
       class="table-container"
       border
       stripe
-      height="100%"
+      height="500"
     >
       <el-table-column type="selection" width="55"> </el-table-column>
       <el-table-column label="項次" width="100" prop="id" fixed>
