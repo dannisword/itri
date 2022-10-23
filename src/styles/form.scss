@@ -15,27 +15,33 @@
     margin: 0px;
 }
 
+
 .table-container {
     margin-top: 8px;
     width: 100%;
-    min-height: 100px;
 
-    .thead,
-    tr {
+    table.el-table__header,
+    table.el-table__header th {
+        color: #000000;
+        background-color: #e2e2e2 !important;
+    }
+
+    table.el-table__header,
+    table.el-table__header th {
         color: #304156;
-        background-color: #707070 !important;
+        background-color: #e2e2e2 !important;
     }
 
-    tbody,
-    th,
-    tr {
-        color: #304156;
-        background-color: #bdbdbd !important;
+    .el-table__body tr.hover-row>td {
+
+        background-color: #e7f2ff !important;
     }
 
-    tr:hover>td {
-        background-color: transparent !important;
+
+    .el-table__body tr.el-table__row--striped td {
+        background: rgb(0 0 0 / 5%) !important;
     }
+
 }
 
 
