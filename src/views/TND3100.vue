@@ -61,6 +61,8 @@
 <script>
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
+import { getSelector, enumInfo } from "@/api/system";
+
 export default {
   components: {
     ModalDialog,
@@ -76,11 +78,11 @@ export default {
       },
     };
   },
-  created() {},
-  methods: {
-    onAction(val){
+  created() {
 
-    }
+  },
+  methods: {
+    onAction(val) {},
   },
 };
 </script>

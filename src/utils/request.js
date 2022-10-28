@@ -14,7 +14,7 @@ function parseBody(response) {
   }
 }
 function parseError(response) {
-  if (response.status == 404) {
+  if (response.status == 404 || response.status == 400) {
     Message({
       message: "服務不存在",
       type: "warning",

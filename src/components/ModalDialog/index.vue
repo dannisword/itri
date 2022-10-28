@@ -40,6 +40,7 @@ export default {
       required: true,
       default: false,
     },
+
     optional: {
       type: Object,
       default: () => ({
@@ -63,12 +64,16 @@ export default {
     };
   },
   created() {
+    console.log(this.width);
     this.dialogRef.name = this.name;
     if (this.optional.size == "Small") {
       this.width = "30%";
     }
+    if (this.optional.size == "Medium") {
+      this.width = "50%";
+    }
     if (this.optional.size == "Large") {
-      this.width = "80%";
+      this.width = "90%";
     }
   },
   methods: {

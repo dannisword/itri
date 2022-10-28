@@ -4,15 +4,15 @@
     <div class="form-container">
       <el-form :model="form" label-width="80px" :inline="true">
         <el-form-item label="儲區編號">
-          <el-input v-model="form.account"></el-input>
+          <el-input v-model="params.locationId"></el-input>
         </el-form-item>
-        <el-form-item label="儲區編號">
-          <el-input v-model="form.account"></el-input>
+        <el-form-item label="儲位編號">
+          <el-input v-model="params.storageId"></el-input>
         </el-form-item>
         <el-form-item label="狀態">
-          <el-select v-model="form.statusId" placeholder="請選擇">
+          <el-select v-model="params.status" placeholder="請選擇">
             <el-option
-              v-for="item in form.status"
+              v-for="item in locationStatus"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -23,14 +23,14 @@
 
         <el-divider class="form-divider"></el-divider>
         <el-form-item label="走道代碼">
-          <el-input v-model="form.account"></el-input>
+          <el-input v-model="params.aisle"></el-input>
         </el-form-item>
         <el-form-item label="第幾層">
-          <el-input v-model="form.account"></el-input>
+          <el-input v-model="params.level"></el-input>
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="onSearch()">查詢</el-button>
+          <el-button type="primary" @click="onLoad()">查詢</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -58,7 +58,7 @@
       </el-col>
     </el-row>
     <!-- TABLE -->
-    <el-table :data="data" class="table-container" border height="100%">
+    <el-table :data="storages" class="table-container" border stripe>
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column label="項次" width="100" prop="id" fixed>
       </el-table-column>
@@ -69,7 +69,7 @@
       <el-table-column label="第幾層" width="100" prop="level">
       </el-table-column>
       <el-table-column label="第幾格" width="100" prop="bay"> </el-table-column>
-      <el-table-column label="所在深度" width="100" prop="deep">
+      <el-table-column label="所在深度" width="100" prop="depth">
       </el-table-column>
       <el-table-column label="儲位編號" width="100" prop="storageId">
       </el-table-column>
@@ -78,10 +78,10 @@
 
       <el-table-column label="物流箱編號" width="200" prop="boxNumber">
       </el-table-column>
-      <el-table-column label="是否為空箱" width="100" prop="isEmpt">
+      <el-table-column label="是否為空箱" width="100" prop="isEmptyCarrier">
         <template> </template>
       </el-table-column>
-      <el-table-column label="狀態" width="100" prop="statusName">
+      <el-table-column label="狀態" width="100" prop="status">
       </el-table-column>
       <el-table-column label="編輯" align="center">
         <template slot-scope="scope">
@@ -157,7 +157,8 @@
 <script>
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
-
+import { getSelector } from "@/api/system";
+import { getStations } from "@/api/station";
 export default {
   components: {
     ModalDialog,
@@ -165,8 +166,23 @@ export default {
   mixins: [pageMixin],
   data() {
     return {
-      form: { status: [] },
+      locationStatus: [],
       storage: {},
+      storages: [],
+      params: {
+        aisle: "",
+        direction: "ASC",
+        level: 0,
+        locationId: "",
+        page: 0,
+        properties: "id",
+        size: 10,
+        status: 0,
+        storageId: "",
+      },
+
+      form: { status: [] },
+
       data: [],
       dialogs: {
         storage: {
@@ -193,7 +209,11 @@ export default {
     };
   },
   computed: {},
-  created() {},
+  created() {
+    getSelector("LOCATION_STATUS").then((resp) => {
+      this.locationStatus = resp.message;
+    });
+  },
   methods: {
     onSimulation() {
       this.form.status = this.source.status;
@@ -222,7 +242,16 @@ export default {
         this.dialogs.assign.visible = false;
       }
     },
-    onSearch() {},
+    onLoad() {
+      const query = this.getQuery(this.params);
+      console.log(query);
+      getStations(query).then((resp) => {
+        console.log(resp);
+        if (resp.status == "OK") {
+          this.storages = resp.message.content;
+        }
+      });
+    },
     onSizeChange(val) {},
     onCurrentChange(val) {},
   },

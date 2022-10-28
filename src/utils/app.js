@@ -19,7 +19,11 @@ export function parseBody(resp) {
     }
   });
 }
-
+/**
+ * 回傳訊息
+ * @param {*} respone 
+ * @returns 
+ */
 export function parseMessage(respone) {
   return new Promise((resolve, reject) => {
     try {
@@ -71,7 +75,7 @@ export function appendSelect(source, name = "請選擇") {
   }
 }
 /**
- *
+ * 複製
  * @param {*} obj
  * @returns
  */

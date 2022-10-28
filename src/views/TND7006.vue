@@ -19,9 +19,10 @@
       border
       height="100vh"
     >
-      <el-table-column label="站點代碼" width="100" prop="id">
+      <el-table-column label="站點代碼" width="100" prop="id" fixed>
       </el-table-column>
-      <el-table-column label="站點名稱" prop="description"> </el-table-column>
+      <el-table-column label="站點名稱" prop="description" fixed>
+      </el-table-column>
       <el-table-column label="入庫作業" width="100" prop="inBound">
         <template slot-scope="scope">
           <el-checkbox

@@ -67,5 +67,27 @@ export default {
     onNav(uri) {
       this.$router.push(uri);
     },
+    getIndex(pageable) {
+      return pageable.pageNumber * 50 + 1;
+    },
+    clone(obj) {
+      var data = JSON.stringify(obj);
+      return JSON.parse(data);
+    },
+    confirm(msg) {
+      return new Promise((resolve) => {
+        this.$confirm(msg, "提示", {
+          confirmButtonText: "確認",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then(() => {
+            resolve(true);
+          })
+          .catch(() => {
+            resolve(false);
+          });
+      });
+    },
   },
 };

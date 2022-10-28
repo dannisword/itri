@@ -124,7 +124,7 @@ export const constantRoutes = [
       {
         path: "/TND7007",
         name: "TND7007",
-        component: () => import("@/views/A1/A107"),
+        component: () => import("@/views/TND7007"),
         meta: { title: "儲位管理" },
       },
       {
