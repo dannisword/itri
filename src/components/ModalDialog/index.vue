@@ -64,7 +64,6 @@ export default {
     };
   },
   created() {
-    console.log(this.width);
     this.dialogRef.name = this.name;
     if (this.optional.size == "Small") {
       this.width = "30%";
@@ -77,6 +76,7 @@ export default {
     }
   },
   methods: {
+
     afterClosed(visible) {
       this.dialogRef.success = visible;
       this.$emit("afterClosed", this.dialogRef);

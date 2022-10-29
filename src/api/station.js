@@ -1,7 +1,67 @@
 import request from "@/utils/request";
 import { parseMessage } from "@/utils/app";
 
-///api/station/search
+// /api/station/status/{storageId}
+/**
+ * A2-4 設定儲位狀態
+ * @param {*} storageId
+ * @param {*} data
+ * @returns
+ */
+export function setStation(storageId, data) {
+  const uri = `/api/station/status/${storageId}`;
+  const method = "PUT";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+      data,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
+  });
+}
+
+/**
+ * A2-5, 批次設定儲位狀態(批次更新狀態)
+ * @param {*} checkOnLock
+ * @returns
+ */
+export function setBatch(checkOnLock, data) {
+  const uri = `/api/station/patch/status/${checkOnLock}`;
+  const method = "PUT";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+      data,
+    }).then((resp) => {
+      resolve(resp);
+    });
+  });
+}
+
+/**
+ * https://www.logistics.org.tw/tenacity/api/station/range/status/true?aisle=2&level=1&status=0
+ * https://www.logistics.org.tw/tenacity/api/station/range/status/true?aisle=2&level=1
+ * @param {*} checkOnLock 
+ * @param {*} data 
+ * @returns 
+ */
+export function setRange(checkOnLock, data) {
+  const uri = `api/station/range/status/${checkOnLock}${data}`;
+  const method = "PUT";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      resolve(resp);
+    });
+  });
+}
+
 /**
  * A2-8 查詢儲位
  * @param {*} params
@@ -32,7 +92,7 @@ export function setSignIn(data) {
  * @param {*} data
  * @returns
  */
- export function setSignOut(data) {
+export function setSignOut(data) {
   return request({
     url: `/api/auth/signOut`,
     method: "POST",
@@ -45,7 +105,7 @@ export function setSignIn(data) {
  * @param {*} params
  * @returns
  */
- export function getSignRecord(params) {
+export function getSignRecord(params) {
   return request({
     url: `/api/signRecord/search${params}`,
     method: "GET",
@@ -57,7 +117,7 @@ export function setSignIn(data) {
  * @param {*} params
  * @returns
  */
- export function getSignStatistics(params) {
+export function getSignStatistics(params) {
   return request({
     url: `/api/signStatisticsRecord/search${params}`,
     method: "GET",

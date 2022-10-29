@@ -338,6 +338,7 @@ export default {
 
           this.records.forEach((elm) => {
             elm.id = index;
+            index++;
           });
         }
       });

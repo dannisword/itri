@@ -116,6 +116,12 @@ export const constantRoutes = [
         meta: { title: "盤點開工設定" },
       },
       {
+        path: "/TND7005",
+        name: "TND7005",
+        component: () => import("@/views/TND7005"),
+        meta: { title: "個人帳號管理" },
+      },
+      {
         path: "/TND7006",
         name: "TND7006",
         component: () => import("@/views/TND7006"),

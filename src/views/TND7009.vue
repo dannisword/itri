@@ -349,3 +349,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+.el-input {
+  width: auto;
+}
+</style>

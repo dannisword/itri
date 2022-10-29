@@ -2,7 +2,7 @@ import { MessageBox, Message } from "element-ui";
 import dateMixin from "@/utils/mixin/date";
 import responeMixin from "@/utils/mixin/respone";
 import example from "@/utils/mixin/exapmle.json";
-
+import { getUserInfo } from "@/utils/localStorage";
 export default {
   mixins: [dateMixin, responeMixin],
   data() {
@@ -24,10 +24,10 @@ export default {
       return example;
     },
     getQuery() {
-      return function (params) {
+      return function (params, num = true) {
         let query = "";
         for (let [key, value] of Object.entries(params)) {
-          if (typeof value == "number" && value == 0) {
+          if (typeof value == "number" && value == 0 && num == true) {
             continue;
           }
           if (typeof value == "string" && value == "") {
@@ -40,6 +40,11 @@ export default {
           }
         }
         return query;
+      };
+    },
+    userInfo() {
+      return function () {
+        return getUserInfo();
       };
     },
   },
@@ -68,7 +73,7 @@ export default {
       this.$router.push(uri);
     },
     getIndex(pageable) {
-      return pageable.pageNumber * 50 + 1;
+      return pageable.offset * 50 + 1;
     },
     clone(obj) {
       var data = JSON.stringify(obj);

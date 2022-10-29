@@ -14,6 +14,7 @@ https://www.logistics.org.tw/tenacity/swagger-ui/index.html
 https://drive.google.com/drive/folders/1TbOsjzd-yjzAxxH3xPZWjAXpygIef0Ke
 ## 畫面
 https://9bem8l.axshare.com
+https://vrwbdo.axsha
 
 ## 完成功能
 - TND1000, 簽入/出作業 

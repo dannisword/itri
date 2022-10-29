@@ -2,7 +2,7 @@
   <div class="app-container">
     <!-- 查詢條件 -->
     <div class="form-container">
-      <el-form :model="form" label-width="80px" :inline="true">
+      <el-form :model="params" label-width="80px" :inline="true">
         <el-form-item label="儲區編號">
           <el-input v-model="params.locationId"></el-input>
         </el-form-item>
@@ -50,7 +50,6 @@
           @size-change="onSizeChange"
           @current-change="onCurrentChange"
           :current-page="page.currentPage"
-          :page-sizes="[5, 10, 15]"
           :page-size="page.pagesize"
           layout="total,jumper,prev, pager, next"
           :total="page.totalPage"
@@ -58,7 +57,13 @@
       </el-col>
     </el-row>
     <!-- TABLE -->
-    <el-table :data="storages" class="table-container" border stripe>
+    <el-table
+      :data="storages"
+      class="table-container"
+      border
+      stripe
+      @selection-change="onSelectionChange"
+    >
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column label="項次" width="100" prop="id" fixed>
       </el-table-column>
@@ -78,10 +83,18 @@
 
       <el-table-column label="物流箱編號" width="200" prop="boxNumber">
       </el-table-column>
-      <el-table-column label="是否為空箱" width="100" prop="isEmptyCarrier">
-        <template> </template>
+      <el-table-column
+        label="是否為空箱"
+        align="center"
+        width="100"
+        prop="isEmptyCarrier"
+      >
+        <template slot-scope="scope">
+          <span v-if="scope.row.isEmptyCarrier == true">是</span>
+          <span v-else>否</span>
+        </template>
       </el-table-column>
-      <el-table-column label="狀態" width="100" prop="status">
+      <el-table-column label="狀態" width="100" prop="statusName">
       </el-table-column>
       <el-table-column label="編輯" align="center">
         <template slot-scope="scope">
@@ -107,22 +120,23 @@
           ></el-input>
         </el-form-item>
         <el-form-item label="別名">
-          <el-input v-model="storage.aisleCode"></el-input>
+          <el-input v-model="storage.aisle"></el-input>
         </el-form-item>
         <el-form-item label="狀態">
-          <el-select v-model="storage.statusId" placeholder="請選擇">
+          <el-select v-model="storage.status" placeholder="請選擇">
             <el-option
-              v-for="item in form.status"
-              :key="item.value"
+              v-for="item in locationStatus"
+              :key="item.id"
               :label="item.label"
-              :value="item.value"
+              :value="item.id"
             >
             </el-option>
           </el-select>
         </el-form-item>
       </el-form>
     </ModalDialog>
-    <!-- 批次更新 -->
+
+    <!-- 批次更新狀態 -->
     <ModalDialog
       :title="dialogs.batch.title"
       :name="dialogs.batch.name"
@@ -130,7 +144,7 @@
       :optional="optional"
       @afterClosed="onModalClose"
     >
-      共選擇
+      共選擇 {{ selected.storages.length }} 筆儲位，請點擊按鍵以更新狀態
     </ModalDialog>
     <!-- 更新指定層 -->
     <ModalDialog
@@ -140,15 +154,12 @@
       :optional="optional"
       @afterClosed="onModalClose"
     >
-      <el-form ref="form" :model="storage" label-width="100px">
+      <el-form :model="storage" label-width="100px">
         <el-form-item label="走道">
-          <el-input
-            v-model="storage.aisle"
-            :disabled="storage.id > 0"
-          ></el-input>
+          <el-input v-model="assign.aisle"></el-input>
         </el-form-item>
         <el-form-item label="層">
-          <el-input v-model="storage.level"></el-input>
+          <el-input v-model="assign.level"></el-input>
         </el-form-item>
       </el-form>
     </ModalDialog>
@@ -158,7 +169,9 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getSelector } from "@/api/system";
-import { getStations } from "@/api/station";
+import { getStations, setStation, setBatch, setRange } from "@/api/station";
+import { SelectTypeEnum, LocationStatusEnum } from "@/utils/enums/index";
+
 export default {
   components: {
     ModalDialog,
@@ -167,27 +180,32 @@ export default {
   data() {
     return {
       locationStatus: [],
+      checkOnLock: true,
       storage: {},
       storages: [],
+      selected: {
+        storages: [],
+      },
+      assign: {
+        aisle: "",
+        level: "",
+      },
       params: {
         aisle: "",
         direction: "ASC",
-        level: 0,
+        level: "",
         locationId: "",
-        page: 0,
+        page: 1,
         properties: "id",
         size: 10,
         status: 0,
         storageId: "",
       },
-
-      form: { status: [] },
-
-      data: [],
+      status: [],
       dialogs: {
         storage: {
           title: "編輯儲位",
-          name: "STROAGE",
+          name: "EDIT",
           visible: false,
         },
         batch: {
@@ -205,19 +223,30 @@ export default {
         size: "Small",
         action: "可用",
         cancel: "保留",
+        showAction: true,
       },
     };
   },
   computed: {},
   created() {
-    getSelector("LOCATION_STATUS").then((resp) => {
+    getSelector(SelectTypeEnum.LOCATION_STATUS).then((resp) => {
       this.locationStatus = resp.message;
     });
   },
   methods: {
-    onSimulation() {
-      this.form.status = this.source.status;
-      this.data = this.source.A107;
+    onLoad() {
+      const query = this.getQuery(this.params, true);
+      getStations(query).then((resp) => {
+        if (resp.status == "OK") {
+          this.storages = resp.message.content;
+          const pageable = resp.message.pageable;
+          let index = this.getIndex(pageable);
+          this.storages.forEach((elm) => {
+            elm.id = index;
+            index++;
+          });
+        }
+      });
     },
     onSetStorage(val) {
       this.storage = val;
@@ -225,32 +254,99 @@ export default {
     },
     onSetStatus(val) {
       if (val == "BATCH") {
+        if (this.selected.storages.length <= 0) {
+          this.warning("請勾選批次變更");
+          return;
+        }
+
         this.dialogs.batch.visible = true;
       }
       if (val == "ASSIGN") {
         this.dialogs.assign.visible = true;
       }
     },
+    getEmpty(val) {
+      if (val == true) {
+        return "是";
+      }
+      return "否,";
+    },
     onModalClose(dialogRef) {
-      if (dialogRef.name == "STROAGE") {
+      //
+      if (dialogRef.name == "EDIT") {
+        console.log(this.storage);
+        //
+        const data = {
+          alias: this.storage.alias,
+          status: this.storage.status,
+        };
+        setStation(this.storage.storageId, data).then((resp) => {
+          if (resp.status == "OK") {
+            this.success("編輯儲位完成!");
+            this.onLoad();
+          }
+        });
         this.dialogs.storage.visible = false;
       }
+      // 批次更新狀態
       if (dialogRef.name == "BATCH") {
+        const storageIds = [];
+        var data = {
+          status:
+            dialogRef.success == true
+              ? LocationStatusEnum.AVAILABLE
+              : LocationStatusEnum.RESERVE,
+          storageIds: [],
+        };
+        this.selected.storages.forEach((elm) => {
+          data.storageIds.push(elm.storageId);
+        });
+
+        setBatch(this.checkOnLock, data).then((resp) => {
+          this.checkOnLock = resp.status == 200 ? false : true;
+          if (resp.status == 200) {
+            this.warning(resp.errorMessage, 5000);
+            return;
+          }
+          if (resp.status == "OK") {
+            this.checkOnLock = true;
+            this.success("批次更新狀態完成");
+            this.onLoad();
+          }
+        });
         this.dialogs.batch.visible = false;
       }
+      // 更新指定層
       if (dialogRef.name == "ASSIGN") {
+        var data = {
+          status:
+            dialogRef.success == true
+              ? LocationStatusEnum.AVAILABLE
+              : LocationStatusEnum.RESERVE,
+          aisle: this.assign.aisle,
+          level: this.assign.level,
+        };
+
+        const query = this.getQuery(data, false);
+
+        setRange(this.checkOnLock, query).then((resp) => {
+          this.checkOnLock = resp.status == 200 ? false : true;
+          if (resp.status == 200) {
+            this.warning(resp.errorMessage, 5000);
+            return;
+          }
+          if (resp.status == "OK") {
+            this.checkOnLock = true;
+            this.success("更新指定層完成");
+            this.onLoad();
+          }
+        });
         this.dialogs.assign.visible = false;
       }
     },
-    onLoad() {
-      const query = this.getQuery(this.params);
-      console.log(query);
-      getStations(query).then((resp) => {
-        console.log(resp);
-        if (resp.status == "OK") {
-          this.storages = resp.message.content;
-        }
-      });
+    onSelectionChange(val) {
+      this.checkOnLock = true;
+      this.selected.storages = val;
     },
     onSizeChange(val) {},
     onCurrentChange(val) {},
