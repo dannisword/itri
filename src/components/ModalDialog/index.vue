@@ -54,7 +54,6 @@ export default {
   data() {
     return {
       width: "50%",
-
       dialogRef: {
         name: "",
         success: false,
@@ -76,13 +75,12 @@ export default {
     }
   },
   methods: {
-
     afterClosed(visible) {
       this.dialogRef.success = visible;
       this.$emit("afterClosed", this.dialogRef);
     },
     handleClose(done) {
-      this.dialogRef.success = false;
+      this.dialogRef.success = undefined;
       this.$emit("afterClosed", this.dialogRef);
     },
   },

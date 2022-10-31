@@ -1,7 +1,6 @@
 import request from "@/utils/request";
 import { parseMessage } from "@/utils/app";
 
-// /api/station/status/{storageId}
 /**
  * A2-4 設定儲位狀態
  * @param {*} storageId

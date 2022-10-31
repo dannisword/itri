@@ -12,6 +12,24 @@ export default {
         size: 50,
         totalPages: 0,
       },
+      Large: {
+        size: "Large",
+        action: "",
+        cancel: "",
+        showAction: false,
+      },
+      Medium: {
+        size: "Medium",
+        action: "",
+        cancel: "",
+        showAction: false,
+      },
+      Small: {
+        size: "Small",
+        action: "",
+        cancel: "",
+        showAction: false,
+      },
     };
   },
   created() {
@@ -39,6 +57,7 @@ export default {
             query += `&${key}=${value}`;
           }
         }
+        console.log(query);
         return query;
       };
     },

@@ -19,6 +19,20 @@ export default {
       }
       return moment(inp).format(format);
     },
+    formatEnable(isEnable) {
+      if (isEnable == true) {
+        return "啟用";
+      } else {
+        return "停用";
+      }
+    },
+    formatEmpty(isEmpty){
+      if (isEmpty == true) {
+        return "是";
+      } else {
+        return "否";
+      }
+    }
   },
   methods: {
     /**
@@ -38,10 +52,10 @@ export default {
       return moment().endOf("month").format(format);
     },
     /**
-     * 
-     * @param {*} nip 
-     * @param {*} format 
-     * @returns 
+     *
+     * @param {*} nip
+     * @param {*} format
+     * @returns
      */
     addDay: function (amount, format = "YYYY-MM-DD") {
       return moment().add(amount, "days").format(format);

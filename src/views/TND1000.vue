@@ -294,24 +294,7 @@ export default {
           visible: false,
         },
       },
-      Large: {
-        size: "Large",
-        action: "",
-        cancel: "",
-        showAction: false,
-      },
-      Medium: {
-        size: "Medium",
-        action: "",
-        cancel: "",
-        showAction: false,
-      },
-      Small: {
-        size: "Small",
-        action: "",
-        cancel: "",
-        showAction: false,
-      },
+
     };
   },
   created() {

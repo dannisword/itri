@@ -46,13 +46,7 @@
     </el-row>
 
     <!-- 資料 -->
-    <el-table
-      :data="roles.content"
-      class="table-container"
-      border
-      stripe
-      height="100%"
-    >
+    <el-table :data="roles.content" class="table-container" border stripe>
       <el-table-column label="項次" width="100" prop="id" fixed>
       </el-table-column>
       <el-table-column label="角色編號" prop="code" width="180">
@@ -142,7 +136,7 @@ import {
   getRolePrivilege,
   setRolePrivilege,
 } from "@/api/privilege";
-import { getPrivileges } from "@/utils/app";
+import { getPrivileges, success } from "@/utils/app";
 
 export default {
   components: {
@@ -234,12 +228,16 @@ export default {
       }
       // 新增或編輯角色
       if (dialogRef.name == "ROLE") {
+        let resp;
         if (this.role.id == 0) {
-          await addRole(this.role);
+          resp = await addRole(this.role);
         } else {
-          await setRole(this.role.id, this.role);
+          resp = await setRole(this.role.id, this.role);
         }
-        await this.onLoad();
+        console.log(resp);
+        if (resp.status == "OK") {
+          this.success("角色資料異動成功！");
+        }
       }
       // 編輯權限
       if (dialogRef.name == "ROLE-MENU") {
@@ -250,8 +248,13 @@ export default {
             permission: d.permission,
           };
         });
-        setRolePrivilege(this.role.id, data);
+        setRolePrivilege(this.role.id, data).then((resp) => {
+          if (resp.status == "OK") {
+            this.success("角色權限異動成功！");
+          }
+        });
       }
+      await this.onLoad();
     },
     onSizeChange(val) {},
     onCurrentChange(val) {},

@@ -90,8 +90,7 @@
         prop="isEmptyCarrier"
       >
         <template slot-scope="scope">
-          <span v-if="scope.row.isEmptyCarrier == true">是</span>
-          <span v-else>否</span>
+          <span>{{ scope.row.isEmptyCarrier | formatEmpty }}</span>
         </template>
       </el-table-column>
       <el-table-column label="狀態" width="100" prop="statusName">
@@ -239,6 +238,7 @@ export default {
       getStations(query).then((resp) => {
         if (resp.status == "OK") {
           this.storages = resp.message.content;
+          // 項次
           const pageable = resp.message.pageable;
           let index = this.getIndex(pageable);
           this.storages.forEach((elm) => {
@@ -272,10 +272,7 @@ export default {
       return "否,";
     },
     onModalClose(dialogRef) {
-      //
       if (dialogRef.name == "EDIT") {
-        console.log(this.storage);
-        //
         const data = {
           alias: this.storage.alias,
           status: this.storage.status,

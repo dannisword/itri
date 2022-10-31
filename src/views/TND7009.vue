@@ -58,21 +58,21 @@
     </el-row>
     <!-- 資料 -->
     <el-table
-      :data="users.content"
+      :data="users"
       class="table-container"
       border
       stripe
       @cell-dblclick="ondblClick"
     >
-      <el-table-column label="項次" width="100" prop="id" fixed>
+      <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="帳號" prop="account" width="100" fixed>
-      </el-table-column>
-      <el-table-column label="姓名" prop="userName" width="180">
-      </el-table-column>
-      <el-table-column label="角色名稱" prop="roleName" width="180">
-      </el-table-column>
-      <el-table-column label="狀態" prop="statusName" width="125">
+      <el-table-column label="帳號" prop="account" fixed> </el-table-column>
+      <el-table-column label="姓名" prop="userName" width="120"> </el-table-column>
+      <el-table-column label="角色名稱" prop="roleName" width="200"> </el-table-column>
+      <el-table-column label="狀態" prop="isEnable" >
+        <template slot-scope="scope">
+          <span>{{ scope.row.isEnable | formatEnable() }}</span>
+        </template>
       </el-table-column>
       <el-table-column label="帳號啟用日" prop="enableDate" width="180">
         <template slot-scope="scope">
@@ -242,8 +242,16 @@ export default {
       const query = this.getQuery(this.params);
       getUsers(query)
         .then(async (resp) => {
-          this.users = await this.parseMessage(resp);
-          for (let user of this.users.content) {
+          if (resp.status != "OK") {
+            return;
+          }
+          console.log(resp);
+          this.users = resp.message.content;
+          // 項次
+          const pageable = resp.message.pageable;
+          let index = this.getIndex(pageable);
+
+          for (let user of this.users) {
             let name = "";
             for (let role of user.roles) {
               if (name == "") {
@@ -254,14 +262,13 @@ export default {
               role.isEnable = true;
             }
             user.roleName = name;
-            user.statusName = "停用";
-            if (user.isEnable == true) {
-              user.statusName = "啟用";
-            }
+            user.seq = index;
+            index++;
           }
         })
         .catch((e) => {
-          this.showWarning("執行查詢異常");
+          console.log(e);
+          //this.warning("執行查詢異常");
         });
     },
     onOpenModal(val) {
@@ -306,6 +313,7 @@ export default {
           } else {
             setUser(this.user.id, user);
           }
+          this.onLoad();
         }
       }
       if (ref.name == "PASSWORD") {
@@ -351,6 +359,6 @@ export default {
 </script>
 <style scoped>
 .el-input {
-  width: auto;
+  width: 200px;
 }
 </style>

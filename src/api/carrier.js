@@ -1,56 +1,84 @@
 import request from "@/utils/request";
+import { parseMessage } from "@/utils/app";
 
 /**
- * 新增物流箱
+ * A2-10 新增物流箱
  * @param {*} data
  * @returns
  */
 export function addCarrier(data) {
-  return request({
-    url: `/api/carrier`,
-    method: "POST",
-    data,
+  const uri = `/api/carrier${data}`;
+  const method = "POST";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
 }
 /**
- * 物流箱允入設定
+ * A2-11 物流箱允入設定
  * @param {*} data
  * @returns
  */
 export function configCarrier(data) {
-  return request({
-    url: `/api/carrier/config`,
-    method: "PUT",
-    data,
+  const uri = `/api/carrier/config`;
+  const method = "PUT";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+      data,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
 }
 /**
- * 設定多筆物流箱啟用/停用
+ * A2-12 設定多筆物流箱啟用/停用
  * @param {*} data
  * @returns
  */
-export function setCarriers(data) {
-  return request({
-    url: `/api/carrier/isEnable`,
-    method: "POST",
-    data,
+export function enableCarriers(checkOnWork, data) {
+  const uri = `/api/carrier/patch/isEnable/${checkOnWork}`;
+  const method = "PUT";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+      data,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
 }
 /**
- * 設定物流箱啟用/停用
+ * A2-13 設定物流箱啟用/停用
  * @param {*} id
  * @param {*} data
  * @returns
  */
-export function setCarrier(id, data) {
-  return request({
-    url: `/api/carrier/isEnable/${id}`,
-    method: "POST",
-    data,
+export function enableCarrier(id, isEnable) {
+  const uri = `/api/carrier/isEnable/${id}?isEnable=${isEnable}`;
+  const method = "PUT";
+
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
 }
 /**
- * 取得特定物流箱
+ * A2-14 取得特定物流箱
  * @param {*} id
  * @returns
  */
@@ -61,14 +89,35 @@ export function getCarrier(id) {
   });
 }
 /**
- * 查詢物流箱
+ * A2-15 查詢物流箱
  * @param {*} params
  * @returns
  */
 export function getCarriers(params) {
   return request({
-    url: `/api/carrier/search`,
-    method: "POST",
+    url: `/api/carrier/search${params}`,
+    method: "GET",
     params,
+  });
+}
+/**
+ *
+ * @param {*} id
+ * @param {*} isEnable
+ * @returns
+ */
+export function printBarcode(data) {
+  const uri = `/api/carrier/barcode`;
+  const method = "POST";
+
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+      data,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
 }
