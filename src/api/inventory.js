@@ -1,6 +1,19 @@
 import request from "@/utils/request";
 import { parseMessage } from "@/utils/app";
 
+// /api/inventory/search
+/**
+ * A7-6 查詢出庫叫單數
+ * @param {*} params
+ * @returns
+ */
+export function getInventories(params) {
+  return request({
+    url: `/api/inventory/search${params}`,
+    method: "GET",
+  });
+}
+
 /**
  * A7-17 收單作業
  * @returns
@@ -60,7 +73,7 @@ export function setInventory(data) {
     request({
       url: uri,
       method: method,
-      data
+      data,
     }).then((resp) => {
       parseMessage(resp);
       resolve(resp);
@@ -72,7 +85,7 @@ export function setInventory(data) {
  * @param {*} params
  * @returns
  */
-export function getInventories() {
+export function getInventorie() {
   return request({
     url: `/api/inventory/sysParam`,
     method: "GET",

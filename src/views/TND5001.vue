@@ -79,35 +79,34 @@
           :current-page="page.number"
           :page-size="page.size"
           layout="total,jumper,prev, pager, next"
-          :total="page.totalPages"
+          :total="page.totalElements"
         ></el-pagination>
       </el-col>
     </el-row>
 
     <!-- 資料-->
-    <el-table
-      :data="content"
-      class="table-container"
-      border
-      stripe
-      height="100%"
-    >
+    <el-table :data="content" class="table-container" border stripe>
       <el-table-column label="項次" width="100" prop="id" fixed>
       </el-table-column>
-      <el-table-column label="盤點單號碼" prop="name"> </el-table-column>
-      <el-table-column label="單據狀態" prop="statusName" width="100">
+      <el-table-column label="盤點單號碼" prop="name" width="120">
       </el-table-column>
-      <el-table-column label="盤點類型" prop="statusName" width="100">
+      <el-table-column label="單據狀態" prop="statusName"> </el-table-column>
+      <el-table-column label="盤點類型" prop="type"> </el-table-column>
+      <el-table-column label="盤點時間" prop="inventoryDate" width="100">
       </el-table-column>
-      <el-table-column label="盤點時間" prop="statusName" width="100">
-      </el-table-column>
-      <el-table-column label="料品號" prop="statusName"> </el-table-column>
+      <el-table-column label="料品號" prop="prodCode"> </el-table-column>
 
-      <el-table-column label="有複盤單" prop="statusName" width="100">
+      <el-table-column label="有複盤單" prop="hasChild" width="100">
+        <template slot-scope="scope">
+          <span>{{ scope.row.hasChild | formatEmpty }}</span>
+        </template>
       </el-table-column>
-      <el-table-column label="有異動單" prop="statusName" width="100">
+      <el-table-column label="有異動單" prop="hasAdjust" width="100">
+        <template slot-scope="scope">
+          <span>{{ scope.row.hasAdjust | formatEmpty }}</span>
+        </template>
       </el-table-column>
-      <el-table-column label="綁定站點" prop="statusName" width="100">
+      <el-table-column label="綁定站點" prop="assignWorkStationId" width="100">
       </el-table-column>
 
       <el-table-column label="動作" width="200" align="center">
@@ -125,6 +124,7 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getWorkStation } from "@/api/workStation";
+import { getInventories } from "@/api/inventory";
 
 export default {
   components: {
@@ -137,10 +137,16 @@ export default {
       workStations: [],
       nowDate: [],
       params: {
-        page: 0,
-        size: 10,
         direction: "ASC",
-        properties: "id",
+        docNo: "",
+        docStatus: 0,
+        endDate: "",
+        page: 1,
+        prodCode: "",
+        properties: "",
+        size: 50,
+        startDate: "",
+        type: 0,
       },
       status: [
         {
@@ -202,6 +208,12 @@ export default {
       this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);
       this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params);
+
+      getInventories(query).then((resp) => {
+        if (resp.status == "OK") {
+          this.content = resp.message.content;
+        }
+      });
     },
     onAction(val) {},
     onSizeChange(val) {},

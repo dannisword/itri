@@ -44,7 +44,7 @@
           :current-page="page.number"
           :page-size="page.size"
           layout="total,jumper,prev, pager, next"
-          :total="page.totalPages"
+          :total="page.totalElements"
         ></el-pagination>
       </el-col>
     </el-row>
@@ -54,7 +54,6 @@
       class="table-container"
       border
       stripe
-      height="100%"
       @sort-change="onSortChange"
     >
       <el-table-column label="項次" width="100" prop="id" fixed>
@@ -111,7 +110,7 @@ export default {
       this.params.endDate = this.toDate(this.nowDate[1]);
       this.params.page = this.page.page;
       this.params.size = this.page.size;
-      this.params.totalPages = this.page.totalPages;
+      this.params.totalElements = this.page.totalElements;
       const query = this.getQuery(this.params);
       getStocks(query).then((respone) => {
         this.stocks = respone.message.content;

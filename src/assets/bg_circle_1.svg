@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="140px" height="130px" viewBox="0 0 140 130" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>bg_circle_1</title>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#578DFF" offset="0%"></stop>
+            <stop stop-color="#703BF1" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="bg_circle_1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect fill="#FFFFFF" x="0" y="0" width="140" height="130"></rect>
+        <path d="M65,0.5 C29.3776336,0.5 0.5,29.3776336 0.5,65 C0.5,100.622366 29.3776336,129.5 65,129.5 C100.622366,129.5 129.5,100.622366 129.5,65 C129.5,29.3776336 100.622366,0.5 65,0.5 Z M65,13.5 C93.4426646,13.5 116.5,36.5573354 116.5,65 C116.5,93.4426646 93.4426646,116.5 65,116.5 C36.5573354,116.5 13.5,93.4426646 13.5,65 C13.5,36.5573354 36.5573354,13.5 65,13.5 Z" id="Oval-Copy-7" fill="#F6F6F6" fill-rule="nonzero"></path>
+        <path d="M117,22 C105.40202,22 96,31.4020203 96,43 C96,54.5979797 105.40202,64 117,64 C128.59798,64 138,54.5979797 138,43 C138,31.4020203 128.59798,22 117,22 Z M117,26 C126.388841,26 134,33.6111593 134,43 C134,52.3888407 126.388841,60 117,60 C107.611159,60 100,52.3888407 100,43 C100,33.6111593 107.611159,26 117,26 Z" id="Oval-Copy-10" fill="url(#linearGradient-1)" fill-rule="nonzero"></path>
+    </g>
+</svg>

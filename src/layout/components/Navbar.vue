@@ -55,7 +55,6 @@ export default {
     ...mapGetters(["sidebar", "avatar"]),
   },
   created() {
-    //store.dispatch('user/getInfo')
     this.$store.dispatch("user/getInfo").then((data) => {});
   },
   methods: {

@@ -40,22 +40,32 @@
           :current-page="page.number"
           :page-size="page.size"
           layout="total,jumper,prev, pager, next"
-          :total="page.totalPages"
+          :total="page.totalElements"
         ></el-pagination>
       </el-col>
     </el-row>
 
     <!-- 資料 -->
-    <el-table :data="roles.content" class="table-container" border stripe>
-      <el-table-column label="項次" width="100" prop="id" fixed>
+    <el-table
+      :data="roles"
+      class="table-container"
+      border
+      stripe
+      @sort-change="onSortcChange"
+    >
+      <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="角色編號" prop="code" width="180">
+      <el-table-column label="角色編號" prop="code" width="180" sortable fixed>
       </el-table-column>
-      <el-table-column label="角色名稱" prop="name"> </el-table-column>
-      <el-table-column label="狀態" prop="statusName" width="125">
+      <el-table-column label="角色名稱" prop="name" width="180" sortable>
+      </el-table-column>
+      <el-table-column label="狀態" prop="isEnable">
+        <template slot-scope="scope">
+          <span>{{ scope.row.isEnable | formatEnable() }}</span>
+        </template>
       </el-table-column>
 
-      <el-table-column label="編輯名稱與狀態" width="200" align="center">
+      <el-table-column label="編輯名稱與狀態" width="180" align="center">
         <template slot-scope="scope">
           <div>
             <el-button @click="onSetRole(scope.row)" size="mini" type="primary"
@@ -65,7 +75,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="編輯權限" width="200" align="center">
+      <el-table-column label="編輯權限" width="180" align="center">
         <template slot-scope="scope">
           <el-button @click="onSetMenus(scope.row)" size="mini" type="primary"
             >編輯
@@ -81,11 +91,11 @@
       :visible.sync="dialogs.role.visible"
       @afterClosed="onModalClose"
     >
-      <el-form ref="role" :model="role" label-width="100px">
-        <el-form-item label="角色編號">
-          <el-input v-model="role.code" :disabled="role.id > 0"></el-input>
+      <el-form ref="role" :model="role" label-width="100px" :rules="rules">
+        <el-form-item label="角色編號" prop="code">
+          <el-input v-model="role.code"></el-input>
         </el-form-item>
-        <el-form-item label="角色名稱">
+        <el-form-item label="角色名稱" prop="name">
           <el-input v-model="role.name"></el-input>
         </el-form-item>
         <el-form-item label="狀態">
@@ -109,21 +119,19 @@
       :visible.sync="dialogs.menu.visible"
       @afterClosed="onModalClose"
     >
-      <el-table
-        :data="privileges"
-        class="table-container"
-        border
-        stripe
-        height="400px"
+      <el-tree
+        ref="tree"
+        :data="menus"
+        show-checkbox
+        node-key="id"
+        :props="defaultProps"
+        default-expand-all
+        :expand-on-click-node="false"
       >
-        <el-table-column label="功能名稱" prop="description"> </el-table-column>
-
-        <el-table-column label="使用權限" prop="permission">
-          <template slot-scope="scope">
-            <el-checkbox v-model="scope.row.permission"></el-checkbox>
-          </template>
-        </el-table-column>
-      </el-table>
+        <span slot-scope="{ node, data }">
+          <span> {{ node.label }}</span>
+        </span>
+      </el-tree>
     </ModalDialog>
   </div>
 </template>
@@ -131,12 +139,9 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getRoles, addRole, setRole } from "@/api/role";
-import {
-  getPrivilegeAll,
-  getRolePrivilege,
-  setRolePrivilege,
-} from "@/api/privilege";
-import { getPrivileges, success } from "@/utils/app";
+import { getRolePrivilege, setRolePrivilege } from "@/api/privilege";
+import { getMenus } from "@/utils/app";
+import { validLetters, validEmpty } from "@/utils/validate";
 
 export default {
   components: {
@@ -144,14 +149,35 @@ export default {
   },
   mixins: [pageMixin],
   data() {
+    const validateLetters = (rule, value, callback) => {
+      if (validEmpty(value) == true) {
+        callback(new Error("請輸入角色編號"));
+      }
+      if (validLetters(value) == true) {
+        callback(new Error("請輸入英數字"));
+      } else {
+        callback();
+      }
+    };
+    const validatezName = (rule, value, callback) => {
+      if (validEmpty(value) == true) {
+        callback(new Error("請輸入角色名稱"));
+      } else {
+        callback();
+      }
+    };
     return {
+      rules: {
+        code: [{ required: true, trigger: "blur", validator: validateLetters }],
+        name: [{ required: true, trigger: "blur", validator: validatezName }],
+      },
       params: {
         roleName: "",
         isEnable: true,
-        page: 0,
-        size: 10,
+        page: 1,
+        size: 50,
         direction: "ASC",
-        properties: "id",
+        properties: "code",
       },
       dialogs: {
         role: {
@@ -168,24 +194,30 @@ export default {
       role: {},
       roles: [],
       menus: [],
-      privileges: [],
+      defaultProps: {
+        children: "childrens",
+        label: "description",
+      },
     };
   },
   computed: {},
   async created() {
     this.status = this.source.status;
-    this.menus = await getPrivileges();
+    this.menus = await getMenus();
     this.onLoad();
   },
   methods: {
     async onLoad() {
       const query = this.getQuery(this.params);
-      this.roles = await getRoles(query);
+      const resp = await getRoles(query);
+      this.roles = resp.content;
+      // 分頁設定
+      this.setPagination(resp);
 
-      this.setPagination(this.roles);
-      // 處理狀態
-      for (let role of this.roles.content) {
-        role.statusName = role.isEnable == true ? "啟用" : "停用";
+      // 處理項次
+      for (let role of this.roles) {
+        this.page.seq++;
+        role.seq = this.page.seq;
       }
     },
     onSetRole(val) {
@@ -202,20 +234,28 @@ export default {
       // 編輯權限
       const data = await getRolePrivilege(val.id);
       this.role = val;
-      this.privileges = [];
+      //
+      const nodes = [];
       for (let menu of this.menus) {
         var p = data.message.find((x) => x.privilegeId == menu.id);
-        let permission = false;
-        if (p) {
-          permission = p.permission;
+        if (p && p.permission == true) {
+          nodes.push({ id: menu.id, label: menu.description });
         }
-        this.privileges.push({
-          roleId: val.id,
-          description: menu.description,
-          privilegeId: menu.id,
-          permission: permission,
-        });
+        //
+        if (menu.childrens == undefined) {
+          continue;
+        }
+        for (let child of menu.childrens) {
+          var p = data.message.find((x) => x.privilegeId == child.id);
+          if (p && p.permission == true) {
+            nodes.push({ id: child.id, label: child.description });
+          }
+        }
       }
+      // 再一次渲染
+      this.$nextTick(() => {
+        this.$refs.tree.setCheckedNodes(nodes);
+      });
 
       this.dialogs.menu.visible = true;
     },
@@ -223,31 +263,41 @@ export default {
       this.dialogs.role.visible = false;
       this.dialogs.menu.visible = false;
 
-      if (dialogRef.success == false) {
+      if (dialogRef.success == undefined || dialogRef.success == false) {
         return;
       }
       // 新增或編輯角色
       if (dialogRef.name == "ROLE") {
-        let resp;
-        if (this.role.id == 0) {
-          resp = await addRole(this.role);
-        } else {
-          resp = await setRole(this.role.id, this.role);
-        }
-        console.log(resp);
-        if (resp.status == "OK") {
-          this.success("角色資料異動成功！");
-        }
+        this.$refs.role.validate(async (valid) => {
+          //this.$refs.role.clearValidate();
+          console.log(valid);
+          if (valid == false) {
+            this.warning("角色資料未輸入完整！");
+            return;
+          }
+          let resp;
+          if (this.role.id == 0) {
+            resp = await addRole(this.role);
+          } else {
+            resp = await setRole(this.role.id, this.role);
+          }
+
+          if (resp.status == "OK") {
+            this.success("角色資料異動成功！");
+          }
+        });
       }
       // 編輯權限
       if (dialogRef.name == "ROLE-MENU") {
-        var data = this.privileges.map((d) => {
-          return {
-            roleId: d.roleId,
-            privilegeId: d.privilegeId,
-            permission: d.permission,
-          };
-        });
+        const selected = this.$refs.tree.getCheckedKeys();
+        let data = [];
+        for (let item of selected) {
+          data.push({
+            roleId: this.role.id,
+            privilegeId: item,
+            permission: true,
+          });
+        }
         setRolePrivilege(this.role.id, data).then((resp) => {
           if (resp.status == "OK") {
             this.success("角色權限異動成功！");
@@ -256,8 +306,19 @@ export default {
       }
       await this.onLoad();
     },
+    onSortcChange(val) {
+      this.params.direction = "ASC";
+      if (val.order == "descending") {
+        this.params.direction = "DESC";
+      }
+      this.params.properties = val.prop;
+      this.onLoad();
+    },
     onSizeChange(val) {},
-    onCurrentChange(val) {},
+    onCurrentChange(val) {
+      this.params.page = val;
+      this.onLoad();
+    },
     newRole() {
       return {
         id: 0,

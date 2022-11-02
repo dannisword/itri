@@ -76,7 +76,7 @@
           :current-page="page.number"
           :page-size="page.size"
           layout="total,jumper,prev, pager, next"
-          :total="page.totalPages"
+          :total="page.totalElements"
         ></el-pagination>
       </el-col>
     </el-row>
@@ -110,8 +110,9 @@
 <script>
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
-import { getInboundsBySearch } from "@/api/inbound";
+import { getInbounds } from "@/api/inbound";
 import { getWorkStation } from "@/api/workStation";
+import { SelectTypeEnum } from "@/utils/enums/index";
 
 export default {
   components: {
@@ -127,73 +128,43 @@ export default {
         assignWorkStationId: "",
         direction: "ASC",
         docStatus: 0,
-        page: 0,
+        page: 1,
         prodCode: "",
-        properties: "id",
+        properties: "",
         receivedEndDateTime: "",
         receivedStartDateTime: "",
-        receiveSource: "0",
-        size: 10,
+        receiveSource: "",
+        size: 50,
         sysOrderNo: "",
       },
-      inStatus: [
-        {
-          label: "已收單",
-          value: 0,
-        },
-        {
-          label: "工作執行中",
-          value: 1,
-        },
-        {
-          label: "已完成",
-          value: 2,
-        },
-        {
-          label: "全部",
-          value: 3,
-        },
-      ],
-      inSource: [
-        {
-          label: "全部",
-          value: "0",
-        },
-        {
-          label: "工單",
-          value: "1",
-        },
-        {
-          label: "收料單",
-          value: "2",
-        },
-      ],
+      inStatus: [],
+      inSource: [],
     };
   },
-  created() {
+  async created() {
     this.nowDate.push(this.addDay(-7));
     this.nowDate.push(this.addDay(0));
+    // 作業站點
     getWorkStation().then((resp) => {
-      if (resp.message) {
+      console.log(resp);
+      if (resp.status == "OK") {
         this.workStations = resp.message;
       }
     });
+    // 入庫單狀態
+    this.inStatus = await this.getSelector(SelectTypeEnum.INBOUND_STATUS);
+    // 收單來源
+    this.inSource = await this.getSelector(SelectTypeEnum.INBOUND_SOURCE);
   },
   methods: {
     onLoad() {
-      this.onNav("/TND2100");
-
-      console.log("onLoad");
-
-      return;
       this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);
       this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
-      const query = this.getQuery(this.params);
-      getInboundsBySearch(query).then((resp) => {
+      const query = this.getQuery(this.params, false);
+      getInbounds(query).then((resp) => {
         if (resp.message) {
           this.content = resp.message.content;
         }
-        console.log(resp);
       });
     },
     onSizeChange(val) {},
@@ -201,3 +172,8 @@ export default {
   },
 };
 </script>
+<style>
+.el-input {
+  width: 200px;
+}
+</style>

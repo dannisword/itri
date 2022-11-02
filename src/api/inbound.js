@@ -6,7 +6,7 @@ import { parseMessage } from "@/utils/app";
  * @param {*} params 
  * @returns 
  */
-export function getInboundsBySearch(params) {
+export function getInbounds(params) {
   return request({
     url: `/api/inbound/search${params}`,
     method: "GET",
@@ -84,7 +84,7 @@ export function setInbound(data) {
  * @param {*} params
  * @returns
  */
-export function getInbounds() {
+export function getInbound() {
   return request({
     url: `/api/inbound/sysParam`,
     method: "GET",

@@ -32,7 +32,7 @@
 
             <el-menu-item
               :index="sub.code"
-              v-for="sub in menu.subs"
+              v-for="sub in menu.childrens"
               @click="onNav(sub)"
             >
               <span slot="title">{{ sub.description }}</span>

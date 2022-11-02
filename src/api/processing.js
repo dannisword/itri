@@ -70,13 +70,25 @@ export function setProcess(data) {
 
 }
 /**
- * A5-5 查詢出庫叫單數
+ * 查詢出庫叫單數
  * @param {*} params
  * @returns
  */
-export function getProcesses() {
+export function getProcesse(params) {
   return request({
-    url: `/api/processing/sysParam`,
+    url: `/api/processing/sysParam${params}`,
+    method: "GET",
+  });
+}
+
+/**
+ * A5-6 分頁查詢加工單
+ * @param {*} params 
+ * @returns 
+ */
+export function getProcesses(params) {
+  return request({
+    url: `/api/processing/search${params}`,
     method: "GET",
   });
 }

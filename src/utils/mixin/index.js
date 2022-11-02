@@ -3,6 +3,8 @@ import dateMixin from "@/utils/mixin/date";
 import responeMixin from "@/utils/mixin/respone";
 import example from "@/utils/mixin/exapmle.json";
 import { getUserInfo } from "@/utils/localStorage";
+import { getSelector } from "@/api/system";
+
 export default {
   mixins: [dateMixin, responeMixin],
   data() {
@@ -10,7 +12,8 @@ export default {
       page: {
         page: 0,
         size: 50,
-        totalPages: 0,
+        totalElements: 0,
+        seq: 0,
       },
       Large: {
         size: "Large",
@@ -51,13 +54,18 @@ export default {
           if (typeof value == "string" && value == "") {
             continue;
           }
-          if (query == "") {
-            query += `?${key}=${value}`;
+          //
+          if (Array.isArray(value) == true) {
+            console.log(value);
           } else {
-            query += `&${key}=${value}`;
+            if (query == "") {
+              query += `?${key}=${value}`;
+            } else {
+              query += `&${key}=${value}`;
+            }
           }
         }
-        console.log(query);
+        //console.log(query);
         return query;
       };
     },
@@ -72,7 +80,10 @@ export default {
     setPagination(val) {
       this.page.number = val.number + 1;
       this.page.size = val.size;
-      this.page.totalPages = val.totalPages;
+      this.page.totalElements = val.totalElements;
+
+      const pageable = val.pageable;
+      this.page.seq = pageable.pageNumber * val.size;
     },
     success(message, duration = 3000) {
       Message({
@@ -110,6 +121,20 @@ export default {
           })
           .catch(() => {
             resolve(false);
+          });
+      });
+    },
+    getSelector(type) {
+      return new Promise((resolve, reject) => {
+        getSelector(type)
+          .then((resp) => {
+            if (resp.status == "OK") {
+              resolve(resp.message);
+            }
+            resolve();
+          })
+          .catch((e) => {
+            reject(e);
           });
       });
     },

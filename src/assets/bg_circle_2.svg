@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="130px" height="130px" viewBox="0 0 130 130" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>bg_circle_2</title>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#578DFF" offset="0%"></stop>
+            <stop stop-color="#703BF1" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="bg_circle_2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect fill="#FFFFFF" x="0" y="0" width="130" height="130"></rect>
+        <path d="M65,0 C29.1014913,0 0,29.1014913 0,65 C0,100.898509 29.1014913,130 65,130 C100.898509,130 130,100.898509 130,65 C130,29.1014913 100.898509,0 65,0 Z M65,14 C93.1665222,14 116,36.8334778 116,65 C116,93.1665222 93.1665222,116 65,116 C36.8334778,116 14,93.1665222 14,65 C14,36.8334778 36.8334778,14 65,14 Z" id="Oval-Copy-9" fill="url(#linearGradient-1)" fill-rule="nonzero"></path>
+    </g>
+</svg>

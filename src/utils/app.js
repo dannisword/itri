@@ -21,8 +21,8 @@ export function parseBody(resp) {
 }
 /**
  * 回傳訊息
- * @param {*} respone 
- * @returns 
+ * @param {*} respone
+ * @returns
  */
 export function parseMessage(respone) {
   return new Promise((resolve, reject) => {
@@ -137,11 +137,14 @@ export async function getPrivileges() {
     item.parentCode = Math.floor(item.displaySeq / 1000) * 1000;
     item.level = item.parentCode == item.displaySeq ? 0 : 1;
     item.path = `/${item.code}`;
+    item.label = item.description;
     item.icon = getIcon(item.code);
+    if (item.displaySeq == item.parentCode) {
+      item.parentCode = 0;
+    }
   }
   return source;
 }
-
 /**
  * 取得選單
  * @returns
@@ -149,16 +152,16 @@ export async function getPrivileges() {
 export async function getMenus() {
   const source = await getPrivileges();
   // 父選單
-  let menus = source.filter((x) => x.level == 0);
+  let menus = source.filter((x) => x.parentCode == 0);
   // 子選單
-  menus.forEach((elm) => {
-    const subs = source.filter(
-      (p) => p.parentCode == elm.parentCode && p.level == 1
-    );
-    elm.hasChilds = subs.length > 0 ? true : false;
-    if (elm.hasChilds == true) {
-      elm.subs = subs;
+  for (let menu of menus) {
+    const childrens = source.filter((p) => p.parentCode == menu.displaySeq);
+
+    menu.hasChilds = childrens.length > 0 ? true : false;
+
+    if (menu.hasChilds == true) {
+      menu.childrens = childrens;
     }
-  });
+  }
   return menus;
 }

@@ -10,11 +10,11 @@
           <el-input v-model="params.userName"></el-input>
         </el-form-item>
         <el-form-item label="角色名稱">
-          <el-select v-model="params.roleId" placeholder="請選擇">
+          <el-select v-model="params.roleId" multiple placeholder="請選擇">
             <el-option
               v-for="item in roles"
               :key="item.id"
-              :label="item.name"
+              :label="item.label"
               :value="item.id"
             >
             </el-option>
@@ -52,7 +52,7 @@
           :current-page="page.number"
           :page-size="page.size"
           layout="total,jumper,prev, pager, next"
-          :total="page.totalPages"
+          :total="page.totalElements"
         ></el-pagination>
       </el-col>
     </el-row>
@@ -67,9 +67,11 @@
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
       <el-table-column label="帳號" prop="account" fixed> </el-table-column>
-      <el-table-column label="姓名" prop="userName" width="120"> </el-table-column>
-      <el-table-column label="角色名稱" prop="roleName" width="200"> </el-table-column>
-      <el-table-column label="狀態" prop="isEnable" >
+      <el-table-column label="姓名" prop="userName" width="120">
+      </el-table-column>
+      <el-table-column label="角色名稱" prop="roleName" width="200">
+      </el-table-column>
+      <el-table-column label="狀態" prop="isEnable">
         <template slot-scope="scope">
           <span>{{ scope.row.isEnable | formatEnable() }}</span>
         </template>
@@ -177,7 +179,7 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getUsers, setUser, addUser, changPassword } from "@/api/user";
-import { getRoles } from "@/api/role";
+import { SelectTypeEnum } from "@/utils/enums/index";
 
 export default {
   components: {
@@ -188,13 +190,13 @@ export default {
     return {
       params: {
         account: "",
-        userName: "",
-        roleId: 0,
-        isEnable: true,
-        page: 0,
-        size: 10,
         direction: "ASC",
+        isEnable: true,
+        page: 1,
         properties: "id",
+        roleId: [],
+        size: 10,
+        userName: "",
       },
       user: {},
       users: [],
@@ -217,35 +219,27 @@ export default {
           visible: false,
         },
       },
-      optional: {
-        size: "Large",
-      },
     };
   },
   async created() {
+    this.getSelector(SelectTypeEnum.USER_ROLE).then((resp) => {
+      this.roles = resp;
+    });
     this.status = this.source.status;
-    var data = await getRoles();
-    this.roles = data.content;
+    //var data = await getRoles();
+    //this.roles = data.content;
     await this.onLoad();
-  },
-  watch: {
-    user: {
-      handler: function (newVal, oldVal) {
-        console.log(newVal);
-      },
-      deep: true,
-    },
   },
   methods: {
     onLoad() {
-      // 處理資料轉換
       const query = this.getQuery(this.params);
+      console.log(query);
+      return
       getUsers(query)
         .then(async (resp) => {
           if (resp.status != "OK") {
             return;
           }
-          console.log(resp);
           this.users = resp.message.content;
           // 項次
           const pageable = resp.message.pageable;

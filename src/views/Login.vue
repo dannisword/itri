@@ -1,24 +1,20 @@
 <template>
-  <div class="container note" :style="note">
-    <div class="login-content">
+  <div class="mainWrap">
+    <div id="registerWrap">
       <el-form
-        class="login-form"
         ref="loginForm"
         auto-complete="on"
         label-position="left"
-        :model="loginForm"
+        :model="user"
         :rules="loginRules"
       >
-        歡迎
-        <div class="title-container">
-          <h3 class="title">請先登入</h3>
-        </div>
+        <div id="register_header"><h1>倉儲管理系統</h1></div>
 
         <el-form-item prop="account">
           <el-input
             ref="account"
             name="account"
-            v-model="loginForm.account"
+            v-model="user.account"
             placeholder="帳號"
             type="text"
             tabindex="1"
@@ -31,7 +27,7 @@
           <el-input
             ref="password"
             name="password"
-            v-model="loginForm.password"
+            v-model="user.password"
             :type="passwordType"
             :key="passwordType"
             prefix-icon="el-icon-lock"
@@ -52,45 +48,46 @@
 
         <el-button
           :loading="loading"
-          type="primary"
+          type="info"
           style="width: 100%; margin-bottom: 30px"
           @click.native.prevent="onLogin()"
         >
           登入
         </el-button>
-        <div class="tips">
-          <span>version 2022-09-01</span>
-        </div>
       </el-form>
+    </div>
+    <div id="logo">
+      <img src="../assets/logo-itri.png" alt="logo" class="logo" />
+      <p>Copyright 工業技術研究院 All Rights Reserved.</p>
     </div>
   </div>
 </template>
 
 <script>
-import { validUsername } from "@/utils/validate";
-import { _login, login } from "@/api/auth";
+import { validEmpty } from "@/utils/validate";
+import { _login } from "@/api/auth";
 
 export default {
   name: "Login",
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
+      if (validEmpty(value) == true) {
         callback(new Error("請輸入帳號"));
       } else {
         callback();
       }
     };
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 0) {
+      if (validEmpty(value) == true) {
         callback(new Error("請輸入密碼"));
       } else {
         callback();
       }
     };
     return {
-      loginForm: {
-        account: "admin",
-        password: "admin",
+      user: {
+        account: "",
+        password: "",
       },
       loginRules: {
         account: [
@@ -104,7 +101,7 @@ export default {
       passwordType: "password",
       redirect: undefined,
       note: {
-        backgroundImage: "url(" + require("@/assets/background.png") + ")",
+        backgroundImage: "url(" + require("@/assets/bg_main_1.png") + ")",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
       },
@@ -138,7 +135,7 @@ export default {
         }
         this.loading = true;
         this.$store
-          .dispatch("user/onLogin", this.loginForm)
+          .dispatch("user/onLogin", this.user)
           .then((resp) => {
             this.$router.push({ path: this.redirect || "/" });
             this.loading = false;
@@ -146,18 +143,6 @@ export default {
           .catch((e) => {
             this.loading = false;
           });
-
-        return;
-        const resp = await login(
-          this.loginForm.account,
-          this.loginForm.password
-        );
-        const data = await this.parseMessage(resp);
-        if (data !== undefined) {
-          var userInfo = this.getUser(data.token);
-          this.setUserInfo(userInfo);
-          this.$router.push({ path: this.redirect || "/" });
-        }
       });
     },
     handleLogin() {
@@ -165,7 +150,7 @@ export default {
         if (valid) {
           this.loading = true;
           this.$store
-            .dispatch("user/login", this.loginForm)
+            .dispatch("user/login", this.user)
             .then(() => {
               this.$router.push({ path: this.redirect || "/" });
               this.loading = false;
@@ -228,6 +213,78 @@ $cursor: #fff;
     background: rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     color: #454545;
+  }
+}
+
+.mainWrap {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-image: url(../assets/bg_main_1.png), url(../assets/bg_main_2.png),
+    url(../assets/bg_circle_1.svg), url(../assets/bg_circle_2.svg);
+  background-position: right top, left bottom, left 100px top 190px,
+    right 20% bottom 180px;
+  background-repeat: no-repeat;
+  background-size: 60%, 60%, 140px 130px, 130px 130px;
+  margin: 0;
+}
+
+#registerWrap {
+  position: absolute;
+  width: 400px;
+  background-color: #fff;
+  box-shadow: 0px 0px 10px 10px #ccc;
+  top: 23%;
+  left: 20%;
+  padding: 50px 40px;
+  border-radius: 20px;
+  z-index: 99999;
+}
+
+#register_header {
+  background-size: 70px;
+  width: 300px;
+  top: 12%;
+  left: 7%;
+  margin-bottom: 30px;
+}
+
+#logo {
+  position: absolute;
+  bottom: 20px;
+  right: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+#logo img {
+  width: 300px;
+}
+
+#logo p {
+  color: #334750;
+  font-size: 16px;
+  line-height: 40px;
+}
+.el-button-login {
+  background-color: #454545;
+}
+@media screen and (min-width: 1440px) {
+  #mainWrap {
+    background-image: url(../assets/bg_main_1.png), url(../assets/bg_main_2.png),
+      url(../assets/bg_circle_1.svg), url(../assets/bg_circle_2.svg);
+    background-position: right top, left bottom, left 100px top 190px,
+      right 470px bottom 180px;
+    background-repeat: no-repeat;
+    background-size: 60%, 60%, 140px 130px, 130px 130px;
+    margin: 0;
+  }
+
+  #registerWrap {
+    top: 300px;
+    left: 480px;
+    background-color: #fff;
   }
 }
 </style>

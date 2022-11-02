@@ -70,7 +70,7 @@
           :current-page="page.number"
           :page-size="page.size"
           layout="total,jumper,prev, pager, next"
-          :total="page.totalPages"
+          :total="page.totalElements"
         ></el-pagination>
       </el-col>
     </el-row>
@@ -81,19 +81,18 @@
       class="table-container"
       border
       stripe
-      height="100%"
     >
       <el-table-column type="selection" width="55"> </el-table-column>
       <el-table-column label="項次" width="100" prop="id" fixed>
       </el-table-column>
       <el-table-column label="加工單號碼" prop="code" width="180">
       </el-table-column>
-      <el-table-column label="料品號" prop="statusName"> </el-table-column>
-      <el-table-column label="供應商" prop="statusName" width="100">
+      <el-table-column label="料品號" prop="prodCode"> </el-table-column>
+      <el-table-column label="供應商" prop="supplier" width="100">
       </el-table-column>
-      <el-table-column label="數量" prop="statusName" width="100">
+      <el-table-column label="數量" prop="totalProcQty" width="100">
       </el-table-column>
-      <el-table-column label="單據狀態" prop="statusName" width="100">
+      <el-table-column label="單據狀態" prop="docStatus" width="100">
       </el-table-column>
       <el-table-column label="綁定站點" prop="statusName" width="100">
       </el-table-column>
@@ -112,6 +111,7 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getWorkStation } from "@/api/workStation";
+import { getProcesses } from "@/api/processing";
 
 export default {
   components: {
@@ -124,10 +124,16 @@ export default {
       workStations: [],
       nowDate: [],
       params: {
-        page: 0,
-        size: 10,
         direction: "ASC",
+        docStatus: 0,
+        page: 1,
+        prodCode: "",
         properties: "id",
+        receivedEndDate: "",
+        receivedStartDate: "",
+        size: 50,
+        stationId: "",
+        sysOrderNo: "",
       },
       processStatus: [
         {
@@ -167,6 +173,12 @@ export default {
       this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);
       this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params);
+      getProcesses(query).then((resp) => {
+        console.log(resp.message);
+        if (resp.status == "OK") {
+          this.content = resp.message.content;
+        }
+      });
     },
     onAction(val) {},
     onSizeChange(val) {},

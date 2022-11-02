@@ -49,7 +49,7 @@
           :current-page="page.number"
           :page-size="page.size"
           layout="total,jumper,prev, pager, next"
-          :total="page.totalPages"
+          :total="page.totalElements"
         ></el-pagination>
       </el-col>
     </el-row>
@@ -273,7 +273,7 @@ export default {
         properties: "id",
       },
       station: {
-        name: "A001", // REMARK REMOVE
+        name: "", 
         signIn: 0,
         signOut: 0,
       },
@@ -311,8 +311,6 @@ export default {
       const query = this.getQuery(this.params);
 
       getSignStatistics(query).then((resp) => {
-        console.log(resp);
-
         if (resp.status == "OK") {
           // 計算 index
           const pageable = resp.message.pageable;
@@ -385,6 +383,7 @@ export default {
       if (val == "OUT") {
         this.dialogs.OUT.visible = true;
       }
+      this.onSerach();
     },
     onDefaultLast() {
       const data = this.clone(this.emps);
