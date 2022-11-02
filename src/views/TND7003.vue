@@ -71,7 +71,12 @@
 <script>
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
-import { importProcess, preProcess, getProcesses, setProcess } from "@/api/processing";
+import {
+  importProcess,
+  preProcess,
+  getProcess,
+  setProcess,
+} from "@/api/processing";
 
 export default {
   components: {
@@ -87,6 +92,7 @@ export default {
         size: "Small",
         action: "儲存設定",
         cancel: "取消",
+        showAction: true,
       },
       dialogs: {
         setting: {
@@ -112,7 +118,7 @@ export default {
       });
     },
     onSetting() {
-      getProcesses().then((resp) => {
+      getProcess().then((resp) => {
         if (resp.message) {
           this.workStations = resp.message;
           this.dialogs.setting.visible = true;
@@ -129,7 +135,7 @@ export default {
     },
     onSettingClose(val) {
       this.dialogs.setting.visible = false;
-      if (val.success == false) {
+      if (val.success == undefined || val.success == false) {
         return;
       }
       setProcess(this.workStations).then((resp) => {
@@ -140,7 +146,7 @@ export default {
     },
     onPreProcessClose(val) {
       this.dialogs.preProcess.visible = false;
-      if (val.success == false) {
+      if (val.success == undefined || val.success == false) {
         return;
       }
       preProcess(true).then((resp) => {

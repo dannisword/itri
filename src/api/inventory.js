@@ -1,7 +1,7 @@
 import request from "@/utils/request";
 import { parseMessage } from "@/utils/app";
 
-// /api/inventory/search
+
 /**
  * A7-6 查詢出庫叫單數
  * @param {*} params

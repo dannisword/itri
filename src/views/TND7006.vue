@@ -23,6 +23,9 @@
       </el-table-column>
       <el-table-column label="站點名稱" prop="description" fixed>
       </el-table-column>
+
+      <el-table-column label="現況作業模式" prop="currentModel" fixed width="180">
+      </el-table-column>
       <el-table-column label="入庫作業" width="100" prop="inBound">
         <template slot-scope="scope">
           <el-checkbox
@@ -103,6 +106,8 @@ export default {
       this.workStations = [];
       let resp = await getWorkStation();
       this.workStations = resp.message;
+
+      console.log(this.workStations);
     },
     async onEdit() {
       this.isEdit = false;

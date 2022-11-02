@@ -351,7 +351,7 @@ export default {
     },
     onSave(val) {
       this.dialogs.EDIT.visible = false;
-      if (val.success == false) {
+      if (val.success == undefined || val.success == false) {
         return;
       }
       // 存檔

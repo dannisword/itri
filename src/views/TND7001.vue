@@ -27,7 +27,7 @@
         </div>
       </el-col>
     </el-row>
-
+    <!-- 設定自動叫單 -->
     <ModalDialog
       :title="dialogs.setting.title"
       :name="dialogs.setting.name"
@@ -54,7 +54,7 @@
         </el-table-column>
       </el-table>
     </ModalDialog>
-
+    <!-- 開工預先叫單 -->
     <ModalDialog
       :title="dialogs.preInBound.title"
       :name="dialogs.preInBound.name"
@@ -86,6 +86,7 @@ export default {
         size: "Small",
         action: "儲存設定",
         cancel: "取消",
+        showAction: true,
       },
       dialogs: {
         setting: {
@@ -131,7 +132,7 @@ export default {
     },
     onSettingClose(val) {
       this.dialogs.setting.visible = false;
-      if (val.success == false) {
+      if (val.success == undefined || val.success == false) {
         return;
       }
       setInbound(this.workStations).then((resp) => {
@@ -142,7 +143,7 @@ export default {
     },
     onPreInboundClose(val) {
       this.dialogs.preInBound.visible = false;
-      if (val.success == false) {
+      if (val.success == undefined || val.success == false) {
         return;
       }
       preInBound(true).then((resp) => {

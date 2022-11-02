@@ -87,6 +87,7 @@ export default {
         size: "Small",
         action: "儲存設定",
         cancel: "取消",
+        showAction: true,
       },
       dialogs: {
         setting: {
@@ -111,7 +112,7 @@ export default {
   },
   methods: {
     onImport() {
-      importInBound().then((resp) => {
+      importOutBound().then((resp) => {
         this.receive = resp.message;
       });
     },
@@ -128,7 +129,7 @@ export default {
     },
     onSettingClose(val) {
       this.dialogs.setting.visible = false;
-      if (val.success == false) {
+      if (val.success == undefined || val.success == false) {
         return;
       }
       setOutBound(this.workStations).then((resp) => {
@@ -139,7 +140,7 @@ export default {
     },
     onPreOutboundClose(val) {
       this.dialogs.preOutBound.visible = false;
-      if (val.success == false) {
+      if (val.success == undefined || val.success == false) {
         return;
       }
       preOutBound(true).then((resp) => {

@@ -8,7 +8,7 @@
         <el-input v-model="user.userName"></el-input>
       </el-form-item>
       <el-form-item label="角色名稱">
-        <el-select v-model="userRoles" multiple placeholder="請選擇">
+        <el-select v-model="userRoles" multiple placeholder="請選擇" disabled>
           <el-option
             v-for="item in roles"
             :key="item.id"
@@ -95,6 +95,7 @@ export default {
       var data = this.userInfo();
 
       getUser(data.id).then((resp) => {
+        this.userRoles = [];
         if (resp.status == "OK") {
           this.user = resp.message;
 
@@ -118,16 +119,20 @@ export default {
       });
     },
     onModalClose(val) {
+      if (val.success == undefined || val.success == false) {
+        this.dialogs.PWD.visible = false;
+        return;
+      }
       if (val.success == true) {
         if (
           this.password.confirm.length <= 0 &&
           this.password.new.length <= 0
         ) {
-          this.warning("新密碼不一至，請重新輸入！");
+          this.warning("新密碼不一致，請重新輸入！");
           return;
         }
         if (this.password.new !== this.password.confirm) {
-          this.warning("新密碼不一至，請重新輸入！");
+          this.warning("新密碼不一致，請重新輸入！");
           return;
         }
         changPassword(

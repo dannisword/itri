@@ -272,6 +272,9 @@ export default {
       return "否,";
     },
     onModalClose(dialogRef) {
+      if (dialogRef.success == undefined) {
+        return;
+      }
       if (dialogRef.name == "EDIT") {
         const data = {
           alias: this.storage.alias,
