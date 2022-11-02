@@ -56,7 +56,13 @@ export default {
           }
           //
           if (Array.isArray(value) == true) {
-            console.log(value);
+            for (let item of value) {
+              if (query == "") {
+                query += `?${key}=${item}`;
+              } else {
+                query += `&${key}=${item}`;
+              }
+            }
           } else {
             if (query == "") {
               query += `?${key}=${value}`;
@@ -65,7 +71,7 @@ export default {
             }
           }
         }
-        //console.log(query);
+        console.log(query);
         return query;
       };
     },
@@ -76,7 +82,10 @@ export default {
     },
   },
   methods: {
-    onSimulation() {},
+    /**
+     * 設定分頁
+     * @param {*} val
+     */
     setPagination(val) {
       this.page.number = val.number + 1;
       this.page.size = val.size;
@@ -85,6 +94,11 @@ export default {
       const pageable = val.pageable;
       this.page.seq = pageable.pageNumber * val.size;
     },
+    /**
+     * 成功訊息
+     * @param {*} message 
+     * @param {*} duration 
+     */
     success(message, duration = 3000) {
       Message({
         message: message,
@@ -92,6 +106,11 @@ export default {
         duration: duration,
       });
     },
+    /**
+     * 警告訊息
+     * @param {*} message 
+     * @param {*} duration 
+     */
     warning(message, duration = 3000) {
       Message({
         message: message,
@@ -99,16 +118,11 @@ export default {
         duration: duration,
       });
     },
-    onNav(uri) {
-      this.$router.push(uri);
-    },
-    getIndex(pageable) {
-      return pageable.offset * 50 + 1;
-    },
-    clone(obj) {
-      var data = JSON.stringify(obj);
-      return JSON.parse(data);
-    },
+    /**
+     * 提示訊息
+     * @param {*} msg 
+     * @returns 
+     */
     confirm(msg) {
       return new Promise((resolve) => {
         this.$confirm(msg, "提示", {
@@ -123,6 +137,20 @@ export default {
             resolve(false);
           });
       });
+    },
+    /**
+     * 導覽頁面
+     * @param {*} uri 
+     */
+    onNav(uri) {
+      this.$router.push(uri);
+    },
+    getIndex(pageable) {
+      return pageable.offset * 50 + 1;
+    },
+    clone(obj) {
+      var data = JSON.stringify(obj);
+      return JSON.parse(data);
     },
     getSelector(type) {
       return new Promise((resolve, reject) => {

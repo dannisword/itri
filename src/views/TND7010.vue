@@ -153,7 +153,7 @@ export default {
       if (validEmpty(value) == true) {
         callback(new Error("請輸入角色編號"));
       }
-      if (validLetters(value) == true) {
+     else if (validLetters(value) == true) {
         callback(new Error("請輸入英數字"));
       } else {
         callback();
@@ -213,7 +213,6 @@ export default {
       this.roles = resp.content;
       // 分頁設定
       this.setPagination(resp);
-
       // 處理項次
       for (let role of this.roles) {
         this.page.seq++;
@@ -269,8 +268,6 @@ export default {
       // 新增或編輯角色
       if (dialogRef.name == "ROLE") {
         this.$refs.role.validate(async (valid) => {
-          //this.$refs.role.clearValidate();
-          console.log(valid);
           if (valid == false) {
             this.warning("角色資料未輸入完整！");
             return;

@@ -137,6 +137,13 @@ export default {
         this.$store
           .dispatch("user/onLogin", this.user)
           .then((resp) => {
+            if (resp == true) {
+              this.$alert("首次登入請變更密碼！", "提示", {
+                confirmButtonText: "確認",
+                cancelButtonText: "取消",
+                type: "warning",
+              });
+            }
             this.$router.push({ path: this.redirect || "/" });
             this.loading = false;
           })

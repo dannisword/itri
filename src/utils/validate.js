@@ -31,10 +31,19 @@ export function validLetters(val) {
   return true;
 }
 /**
- * 
- * @param {*} val 
- * @returns 
+ * 驗證空字串
+ * @param {*} val
+ * @returns
  */
-export function validEmpty(val){
-  return val == undefined || val== null || val=="" ? true: false 
+export function validEmpty(val) {
+  return val == undefined || val == null || val == "" ? true : false;
+}
+/**
+ * 限英數字與特殊符號，不可有空白格。
+ * @param {*} val
+ */
+export function validPassword(val) {
+  console.log(val)
+  var re = /[^\a-\z\A-\Z0-9\~!@#$%^&*]/g
+  return val.match(re) == null ? false : true;
 }

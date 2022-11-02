@@ -32,6 +32,18 @@ export default {
       } else {
         return "否";
       }
+    },
+    formatRoleName(data){
+      let name = "";
+      for (let role of data) {
+        if (name == "") {
+          name = role.name;
+        } else {
+          name += `, ${role.name}`;
+        }
+        role.isEnable = true;
+      }
+      return name;
     }
   },
   methods: {

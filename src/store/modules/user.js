@@ -51,15 +51,15 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ account: account.trim(), password: password })
         .then((response) => {
-
           var data = getUserData(response.message.token);
+          const isFirst = account == password ? true : false;
           if (data) {
             setUserInfo(data);
             setStorageItem("accessToken", response);
             commit("SET_NAME", data.userName);
             commit("SET_TOKEN", response.message.token);
           }
-          resolve();
+          resolve(isFirst);
         })
         .catch((error) => {
           reject(error);

@@ -63,13 +63,18 @@
       border
       stripe
       @cell-dblclick="ondblClick"
+      @sort-change="onSortcChange"
     >
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="帳號" prop="account" fixed> </el-table-column>
-      <el-table-column label="姓名" prop="userName" width="120">
+      <el-table-column label="帳號" prop="account" fixed sortable>
       </el-table-column>
-      <el-table-column label="角色名稱" prop="roleName" width="200">
+      <el-table-column label="姓名" prop="userName" width="120" sortable>
+      </el-table-column>
+      <el-table-column label="角色名稱" prop="roles" width="200" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.roles | formatRoleName() }}</span>
+        </template>
       </el-table-column>
       <el-table-column label="狀態" prop="isEnable">
         <template slot-scope="scope">
@@ -103,8 +108,8 @@
       @afterClosed="onModalClose"
     >
       <div>
-        <el-form ref="form" :model="user" label-width="100px">
-          <el-form-item label="帳號">
+        <el-form ref="user" :model="user" label-width="100px" :rules="rules">
+          <el-form-item label="帳號" prop="account">
             <el-input v-model="user.account"></el-input>
           </el-form-item>
           <el-form-item label="姓名">
@@ -115,10 +120,9 @@
               <el-option
                 v-for="item in roles"
                 :key="item.id"
-                :label="item.name"
+                :label="item.label"
                 :value="item.id"
               >
-                <span style="float: left">{{ item.name }}</span>
               </el-option>
             </el-select>
           </el-form-item>
@@ -145,8 +149,8 @@
               v-model="user.disableDate"
             ></el-date-picker>
           </el-form-item>
-          <el-form-item>
-            <el-button type="success" @click="onChangPassword()"
+          <el-form-item v-if="user.id > 0">
+            <el-button type="success" @click="onChangPassword()" 
               >修改密碼</el-button
             >
           </el-form-item>
@@ -161,14 +165,19 @@
       :visible.sync="dialogs.password.visible"
       @afterClosed="onModalClose"
     >
-      <el-form ref="password" :model="password" label-width="150px">
-        <el-form-item label="輸入新密碼">
+      <el-form
+        ref="password"
+        :model="password"
+        label-width="150px"
+        :rules="rules"
+      >
+        <el-form-item label="輸入新密碼" prop="originalPassword">
           <el-input
             type="password"
             v-model="password.originalPassword"
           ></el-input>
         </el-form-item>
-        <el-form-item label="再次輸入新密碼">
+        <el-form-item label="再次輸入新密碼" prop="newPassword">
           <el-input type="password" v-model="password.newPassword"></el-input>
         </el-form-item>
       </el-form>
@@ -180,6 +189,7 @@ import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getUsers, setUser, addUser, changPassword } from "@/api/user";
 import { SelectTypeEnum } from "@/utils/enums/index";
+import { validLetters, validEmpty, validPassword } from "@/utils/validate";
 
 export default {
   components: {
@@ -187,15 +197,42 @@ export default {
   },
   mixins: [pageMixin],
   data() {
+    const validateAccount = (rule, value, callback) => {
+      if (validEmpty(value) == true) {
+        callback(new Error("請輸入帳號"));
+      } else if (validLetters(value) == true) {
+        callback(new Error("請輸入英數字"));
+      } else {
+        callback();
+      }
+    };
+    const validatePassword = (rule, value, callback) => {
+      if (validPassword(value) == true) {
+        callback(new Error("限英數字與特殊符號，不可有空白格!"));
+      } else {
+        callback();
+      }
+    };
     return {
+      rules: {
+        account: [
+          { required: true, trigger: "blur", validator: validateAccount },
+        ],
+        originalPassword: [
+          { required: true, trigger: "blur", validator: validatePassword },
+        ],
+        newPassword: [
+          { required: true, trigger: "blur", validator: validatePassword },
+        ],
+      },
       params: {
         account: "",
         direction: "ASC",
         isEnable: true,
         page: 1,
-        properties: "id",
+        properties: "account",
         roleId: [],
-        size: 10,
+        size: 50,
         userName: "",
       },
       user: {},
@@ -222,42 +259,29 @@ export default {
     };
   },
   async created() {
+    console.log(validPassword("1@we "));
+
     this.getSelector(SelectTypeEnum.USER_ROLE).then((resp) => {
       this.roles = resp;
     });
     this.status = this.source.status;
-    //var data = await getRoles();
-    //this.roles = data.content;
     await this.onLoad();
   },
   methods: {
     onLoad() {
       const query = this.getQuery(this.params);
-      console.log(query);
-      return
       getUsers(query)
         .then(async (resp) => {
           if (resp.status != "OK") {
             return;
           }
           this.users = resp.message.content;
+          // 分頁設定
+          this.setPagination(resp.message);
           // 項次
-          const pageable = resp.message.pageable;
-          let index = this.getIndex(pageable);
-
           for (let user of this.users) {
-            let name = "";
-            for (let role of user.roles) {
-              if (name == "") {
-                name = role.name;
-              } else {
-                name += `, ${role.name}`;
-              }
-              role.isEnable = true;
-            }
-            user.roleName = name;
-            user.seq = index;
-            index++;
+            this.page.seq++;
+            user.seq = this.page.seq;
           }
         })
         .catch((e) => {
@@ -279,12 +303,21 @@ export default {
       }
       this.dialogs.account.visible = true;
     },
-    onModalClose(ref) {
+    async onModalClose(ref) {
+      // 新增/編輯帳號
       if (ref.name == "ACCOUNT") {
         this.dialogs.account.visible = false;
-
-        if (ref.success == true) {
+        this.$refs.user.validate(async (valid) => {
+          if (valid == false) {
+            this.warning("帳號資料未輸入完整！");
+            return;
+          }
+          if (this.userRoles.length <= 0) {
+            this.warning("未選擇角色資料！");
+            return;
+          }
           const roles = [];
+          // 權限
           this.userRoles.forEach((e) => {
             roles.push({ id: e });
           });
@@ -303,13 +336,14 @@ export default {
             password: "",
           };
           if (user.id == 0) {
-            addUser(user);
+            await addUser(user);
           } else {
-            setUser(this.user.id, user);
+            await setUser(this.user.id, user);
           }
-          this.onLoad();
-        }
+          await this.onLoad();
+        });
       }
+      // 變更密碼
       if (ref.name == "PASSWORD") {
         if (ref.success == true) {
           changPassword(
@@ -329,14 +363,25 @@ export default {
     ondblClick(val) {
       this.onOpenModal(val);
     },
+    onSortcChange(val) {
+      this.params.direction = "ASC";
+      if (val.order == "descending") {
+        this.params.direction = "DESC";
+      }
+      this.params.properties = val.prop;
+      this.onLoad();
+    },
     onSizeChange(val) {},
-    onCurrentChange(val) {},
+    onCurrentChange(val) {
+      this.params.page = val;
+      this.onLoad();
+    },
     newUser() {
       var user = {
         roles: [],
         account: "",
         userName: "",
-        employeeId: "9901",
+        employeeId: "",
         email: "",
         phone: "",
         enableDate: this.toDateTime(new Date()),
