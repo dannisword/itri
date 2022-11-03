@@ -14,7 +14,11 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="站別">
-          <el-select v-model="params.workStationId" placeholder="請選擇">
+          <el-select
+            v-model="params.workStationId"
+            multiple
+            placeholder="請選擇"
+          >
             <el-option
               v-for="item in options"
               :key="item.value"
@@ -38,13 +42,11 @@
     </div>
 
     <!-- 分頁 -->
-
     <el-row type="flex">
       <el-col :span="8"> </el-col>
       <el-col :span="16" align="end">
         <el-pagination
           background
-          @size-change="onSizeChange"
           @current-change="onCurrentChange"
           :current-page="page.number"
           :page-size="page.size"
@@ -60,13 +62,19 @@
       class="table-container"
       border
       stripe
-      height="400px"
+      @sort-change="onSortcChange"
     >
-      <el-table-column label="項次" width="100" prop="id" fixed>
+      <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="簽入日期" prop="signInDate" width="180">
+      <el-table-column
+        label="簽入日期"
+        prop="signInDate"
+        width="180"
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="站別" prop="workStationId"> </el-table-column>
+      <el-table-column label="站別" prop="workStationId" sortable="custom">
+      </el-table-column>
       <el-table-column label="簽入總人數" prop="signInCount" width="125">
       </el-table-column>
       <el-table-column label="簽出總人數" prop="signOutCount" width="125">
@@ -118,7 +126,7 @@
         class="table-container"
         border
         stripe
-        height="400px"
+        height="480px"
       >
         <el-table-column label="今日簽入" prop="selected">
           <template slot-scope="scope">
@@ -178,7 +186,7 @@
         class="table-container"
         border
         stripe
-        height="400px"
+        height="480px"
       >
         <el-table-column label="今日簽出" prop="selected">
           <template slot-scope="scope">
@@ -266,14 +274,14 @@ export default {
       params: {
         endDate: "",
         startDate: "",
-        workStationId: "",
+        workStationId: [],
         page: 0,
         size: 50,
         direction: "ASC",
         properties: "id",
       },
       station: {
-        name: "", 
+        name: "",
         signIn: 0,
         signOut: 0,
       },
@@ -294,10 +302,11 @@ export default {
           visible: false,
         },
       },
-
     };
   },
   created() {
+    this.Large.showAction = false;
+    this.Medium.showAction = false;
     this.nowDate.push(new Date());
     this.nowDate.push(new Date());
     getSelector("WORK_STATION").then((resp) => {
@@ -312,15 +321,15 @@ export default {
 
       getSignStatistics(query).then((resp) => {
         if (resp.status == "OK") {
-          // 計算 index
-          const pageable = resp.message.pageable;
-          let index = this.getIndex(pageable);
           this.records = resp.message.content;
-
-          this.records.forEach((elm) => {
-            elm.id = index;
-            index++;
-          });
+          // 分頁設定
+          this.setPagination(resp.message);
+          console.log(this.page);
+          // 處理項次
+          for (let record of this.records) {
+            this.page.seq++;
+            record.seq = this.page.seq;
+          }
         }
       });
     },
@@ -426,8 +435,18 @@ export default {
       await this.onLoad();
     },
     handleClose() {},
-    onSizeChange(val) {},
-    onCurrentChange(val) {},
+    async onSortcChange(val) {
+      this.params.direction = "ASC";
+      if (val.order == "descending") {
+        this.params.direction = "DESC";
+      }
+      this.params.properties = val.prop;
+      await this.onLoad();
+    },
+    onCurrentChange(val) {
+      this.params.page = val;
+      this.onLoad();
+    },
   },
 };
 </script>

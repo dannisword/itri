@@ -24,7 +24,7 @@ export function validUsername(str) {
  * @returns
  */
 export function validLetters(val) {
-  var re = /[^\a-\z\A-\Z0-9]/g;
+  var re = /[^\a-\z\A-\Z0-9_]/g;
   if (val.match(re) == null) {
     return false;
   }
@@ -44,6 +44,6 @@ export function validEmpty(val) {
  */
 export function validPassword(val) {
   console.log(val)
-  var re = /[^\a-\z\A-\Z0-9\~!@#$%^&*]/g
+  var re = /[^\a-\z\A-\Z0-9\~!@#$%^&*_-]/g
   return val.match(re) == null ? false : true;
 }

@@ -53,3 +53,20 @@
 .mt-1 {
     margin-top: 10px;
 }
+
+// 字體
+.el-form-item__label {
+    font-size: $--font-size;
+}
+
+.el-input__inner {
+    font-size: $--font-size;
+}
+
+.el-table {
+    font-size: $--font-size;
+}
+
+.el-button {
+    font-size: $--font-size;
+}

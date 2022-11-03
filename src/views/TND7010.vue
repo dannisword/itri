@@ -55,11 +55,11 @@
     >
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="角色編號" prop="code" width="180" sortable fixed>
+      <el-table-column label="角色編號" prop="code" min-width="180" sortable="custom" fixed>
       </el-table-column>
-      <el-table-column label="角色名稱" prop="name" width="180" sortable>
+      <el-table-column label="角色名稱" prop="name" min-width="180" sortable="custom">
       </el-table-column>
-      <el-table-column label="狀態" prop="isEnable">
+      <el-table-column label="狀態" prop="isEnable" width="180">
         <template slot-scope="scope">
           <span>{{ scope.row.isEnable | formatEnable() }}</span>
         </template>
@@ -93,7 +93,7 @@
     >
       <el-form ref="role" :model="role" label-width="100px" :rules="rules">
         <el-form-item label="角色編號" prop="code">
-          <el-input v-model="role.code"></el-input>
+          <el-input v-model="role.code" :disabled="role.id > 0"></el-input>
         </el-form-item>
         <el-form-item label="角色名稱" prop="name">
           <el-input v-model="role.name"></el-input>
@@ -152,8 +152,7 @@ export default {
     const validateLetters = (rule, value, callback) => {
       if (validEmpty(value) == true) {
         callback(new Error("請輸入角色編號"));
-      }
-     else if (validLetters(value) == true) {
+      } else if (validLetters(value) == true) {
         callback(new Error("請輸入英數字"));
       } else {
         callback();

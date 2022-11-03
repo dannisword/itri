@@ -60,7 +60,7 @@
       </el-table-column>
       <el-table-column label="料品號" width="100" prop="prodCode" fixed>
       </el-table-column>
-      <el-table-column label="入庫時間" width="120" prop="entryDate" sortable>
+      <el-table-column label="入庫時間" width="120" prop="entryDate" sortable="custom">
       </el-table-column>
       <el-table-column label="供應商" prop="supplier"> </el-table-column>
       <el-table-column label="數量" prop="availableQty"> </el-table-column>
@@ -92,7 +92,7 @@ export default {
         startDate: "", // 入庫日期(起)
         endDate: "", // 入庫日期(訖)
         page: 0,
-        size: 10,
+        size: 50,
         direction: "ASC",
         properties: "id",
       },

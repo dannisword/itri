@@ -2,7 +2,7 @@
   <div class="app-container">
     <!-- 查詢條件 -->
     <div class="form-container">
-      <el-form ref="params" :model="params" label-width="100px" :inline="true">
+      <el-form ref="params" :model="params" label-width="80px" :inline="true">
         <el-form-item label="帳號">
           <el-input v-model="params.account"></el-input>
         </el-form-item>
@@ -31,14 +31,14 @@
             </el-option>
           </el-select>
         </el-form-item>
-
-        <el-divider class="form-divider"></el-divider>
         <el-form-item>
           <el-button type="primary" @click="onLoad()">查詢</el-button>
           <el-button type="success" @click="onOpenModal(null)"
             >新增帳號</el-button
           >
         </el-form-item>
+        <el-divider class="form-divider"></el-divider>
+
       </el-form>
     </div>
     <!-- 分頁底部 -->
@@ -47,7 +47,6 @@
       <el-col :span="16" align="end">
         <el-pagination
           background
-          @size-change="onSizeChange"
           @current-change="onCurrentChange"
           :current-page="page.number"
           :page-size="page.size"
@@ -58,6 +57,7 @@
     </el-row>
     <!-- 資料 -->
     <el-table
+      v-loading="loading"
       :data="users"
       class="table-container"
       border
@@ -67,11 +67,11 @@
     >
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="帳號" prop="account" fixed sortable>
+      <el-table-column label="帳號" prop="account" fixed sortable="custom">
       </el-table-column>
-      <el-table-column label="姓名" prop="userName" width="120" sortable>
+      <el-table-column label="姓名" prop="userName" width="120" sortable="custom">
       </el-table-column>
-      <el-table-column label="角色名稱" prop="roles" width="200" sortable>
+      <el-table-column label="角色名稱" prop="roles" width="200" sortable="custom">
         <template slot-scope="scope">
           <span>{{ scope.row.roles | formatRoleName() }}</span>
         </template>
@@ -106,9 +106,10 @@
       :name="dialogs.account.name"
       :visible.sync="dialogs.account.visible"
       @afterClosed="onModalClose"
+      :optional="Small"
     >
       <div>
-        <el-form ref="user" :model="user" label-width="100px" :rules="rules">
+        <el-form ref="user" :model="user" label-width="90px" :rules="rules">
           <el-form-item label="帳號" prop="account">
             <el-input v-model="user.account"></el-input>
           </el-form-item>
@@ -150,7 +151,7 @@
             ></el-date-picker>
           </el-form-item>
           <el-form-item v-if="user.id > 0">
-            <el-button type="success" @click="onChangPassword()" 
+            <el-button type="success" @click="onChangPassword()"
               >修改密碼</el-button
             >
           </el-form-item>
@@ -214,6 +215,7 @@ export default {
       }
     };
     return {
+      loading: false,
       rules: {
         account: [
           { required: true, trigger: "blur", validator: validateAccount },
@@ -259,8 +261,6 @@ export default {
     };
   },
   async created() {
-    console.log(validPassword("1@we "));
-
     this.getSelector(SelectTypeEnum.USER_ROLE).then((resp) => {
       this.roles = resp;
     });
@@ -270,8 +270,10 @@ export default {
   methods: {
     onLoad() {
       const query = this.getQuery(this.params);
+      this.loading = true;
       getUsers(query)
         .then(async (resp) => {
+          this.loading = false;
           if (resp.status != "OK") {
             return;
           }
@@ -283,8 +285,10 @@ export default {
             this.page.seq++;
             user.seq = this.page.seq;
           }
+     
         })
         .catch((e) => {
+          this.loading = false;
           console.log(e);
           //this.warning("執行查詢異常");
         });
@@ -304,6 +308,11 @@ export default {
       this.dialogs.account.visible = true;
     },
     async onModalClose(ref) {
+      if (ref.success == undefined || ref.success == false) {
+        this.dialogs.account.visible = false;
+        this.dialogs.password.visible = false;
+        return;
+      }
       // 新增/編輯帳號
       if (ref.name == "ACCOUNT") {
         this.dialogs.account.visible = false;
@@ -371,7 +380,6 @@ export default {
       this.params.properties = val.prop;
       this.onLoad();
     },
-    onSizeChange(val) {},
     onCurrentChange(val) {
       this.params.page = val;
       this.onLoad();
@@ -396,8 +404,4 @@ export default {
   },
 };
 </script>
-<style scoped>
-.el-input {
-  width: 200px;
-}
-</style>
+<style scoped></style>

@@ -13,7 +13,7 @@ export default {
     return {
       params: {
         page: 0,
-        size: 10,
+        size: 50,
         direction: "ASC",
         properties: "id",
       },

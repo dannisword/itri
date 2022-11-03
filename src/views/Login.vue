@@ -31,7 +31,7 @@
             :type="passwordType"
             :key="passwordType"
             prefix-icon="el-icon-lock"
-            placeholder="Password"
+            placeholder="密碼"
             tabindex="2"
             auto-complete="on"
             @keyup.enter.native="handleLogin"
@@ -190,7 +190,6 @@ $cursor: #fff;
 */
 
 // 容器
-
 /* reset element-ui css */
 .login-container {
   .el-input {

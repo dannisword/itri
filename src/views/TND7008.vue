@@ -243,7 +243,7 @@ export default {
         isEnable: true,
         page: 1,
         properties: "id",
-        size: 10,
+        size: 50,
         startDate: "",
         status: 0,
       },

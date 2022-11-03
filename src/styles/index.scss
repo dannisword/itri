@@ -5,12 +5,14 @@
 @import './sidebar.scss';
 @import './form.scss';
 
+
 body {
   height: 100%;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+  font-size: $--font-size;
 }
 
 label {
@@ -72,6 +74,7 @@ div:focus {
   width: 100vw;
   height: 100vh;
 }
+
 // 登入首頁
 .login-content {
   position: relative;
@@ -97,7 +100,7 @@ div:focus {
     margin-bottom: 10px;
 
     span {
-      display:block;
+      display: block;
       align-self: center;
       text-align: center;
     }

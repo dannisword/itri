@@ -146,7 +146,7 @@ export default {
         properties: "id",
         receivedEndDateTime: "",
         receivedStartDateTime: "",
-        size: 10,
+        size: 50,
         sysOrderNo: "",
       },
       outStatus: [

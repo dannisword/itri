@@ -19,19 +19,19 @@ export default {
         size: "Large",
         action: "",
         cancel: "",
-        showAction: false,
+        showAction: true,
       },
       Medium: {
         size: "Medium",
         action: "",
         cancel: "",
-        showAction: false,
+        showAction: true,
       },
       Small: {
         size: "Small",
         action: "",
         cancel: "",
-        showAction: false,
+        showAction: true,
       },
     };
   },

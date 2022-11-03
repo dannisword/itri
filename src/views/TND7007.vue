@@ -196,7 +196,7 @@ export default {
         locationId: "",
         page: 1,
         properties: "id",
-        size: 10,
+        size: 50,
         status: 0,
         storageId: "",
       },

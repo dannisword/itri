@@ -3,8 +3,8 @@
     <el-dialog
       :title="title"
       :visible.sync="visible"
-      :width="width"
       :before-close="handleClose"
+      :width="width"
     >
       <p><slot></slot></p>
       <span slot="footer" class="dialog-footer">
@@ -60,6 +60,8 @@ export default {
         message: "",
         data: null,
       },
+      formLabelWidth: "50px",
+      dialogWidth: "350px",
     };
   },
   created() {
@@ -74,7 +76,24 @@ export default {
       this.width = "90%";
     }
   },
+  mounted() {
+    window.onresize = () => {
+      return (() => {
+        //this.setDialogWidth();
+      })();
+    };
+  },
+
   methods: {
+    setDialogWidth() {
+      let windowSize = window.innerWidth;
+      const defaultWidth = 1024; // 預設寬度
+      if (windowSize <= defaultWidth) {
+        this.width = defaultWidth + "px";
+      } else {
+        this.width = defaultWidth + "px";
+      }
+    },
     afterClosed(visible) {
       this.dialogRef.success = visible;
       this.$emit("afterClosed", this.dialogRef);
@@ -87,8 +106,10 @@ export default {
 };
 </script>
 <style>
-.dialog {
-  width: 50% !important;
-  min-width: 200px !important;
+@media screen and (max-width: 780px) {
+  .el-dialog {
+    min-width: 380px !important;
+  }
 }
+
 </style>

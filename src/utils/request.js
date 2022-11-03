@@ -14,9 +14,17 @@ function parseBody(response) {
   }
 }
 function parseError(response) {
+  if (response == undefined){
+    Message({
+      message: "服務停止！",
+      type: "error",
+      duration: 5000,
+    });
+    return;
+  }
   if (response.status == 404 || response.status == 400) {
     Message({
-      message: "服務不存在",
+      message: `錯誤的請求(${response.status})`,
       type: "warning",
       duration: 5000,
     });
@@ -25,7 +33,7 @@ function parseError(response) {
   }
   if (response.status == 500) {
     Message({
-      message: "服務發生問題",
+      message: `服務發生問題(${response.status})`,
       type: "warning",
       duration: 5000,
     });
