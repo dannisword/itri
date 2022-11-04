@@ -83,7 +83,6 @@ export default {
       })();
     };
   },
-
   methods: {
     setDialogWidth() {
       let windowSize = window.innerWidth;
@@ -111,5 +110,4 @@ export default {
     min-width: 380px !important;
   }
 }
-
 </style>

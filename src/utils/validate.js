@@ -43,7 +43,6 @@ export function validEmpty(val) {
  * @param {*} val
  */
 export function validPassword(val) {
-  console.log(val)
   var re = /[^\a-\z\A-\Z0-9\~!@#$%^&*_-]/g
   return val.match(re) == null ? false : true;
 }

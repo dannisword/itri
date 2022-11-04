@@ -305,14 +305,13 @@ export default {
     };
   },
   created() {
-    // 不顯示 Dialog 功能鍵 
+    // 不顯示 Dialog 功能鍵
     this.Large.showAction = false;
     this.Medium.showAction = false;
 
     this.nowDate.push(new Date());
     this.nowDate.push(new Date());
     this.getSelector(SelectTypeEnum.WORK_STATION).then((resp) => {
-      console.log(resp);
       this.options = resp;
     });
   },
@@ -327,7 +326,6 @@ export default {
           this.records = resp.message.content;
           // 分頁設定
           this.setPagination(resp.message);
-          console.log(this.page);
           // 處理項次
           for (let record of this.records) {
             this.page.seq++;
@@ -409,7 +407,6 @@ export default {
       data.forEach((elm) => {
         elm.selected = true;
       });
-      console.log(data);
       this.emps = data;
     },
     async onConfirm(val) {
@@ -439,10 +436,10 @@ export default {
     },
     handleClose() {},
     async onSortcChange(val) {
-      this.params.direction = "ASC";
-      if (val.order == "descending") {
-        this.params.direction = "DESC";
+      if (val.order == null) {
+        return;
       }
+      this.params.direction = val.order == "ascending" ? "ASC" : "DESC";
       this.params.properties = val.prop;
       await this.onLoad();
     },

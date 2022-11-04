@@ -71,7 +71,12 @@
 <script>
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
-import { importOutBound, getOutBounds, preOutBound, setOutBound } from "@/api/outbound";
+import {
+  importOutBound,
+  getOutBound,
+  preOutBound,
+  setOutBound,
+} from "@/api/outbound";
 
 export default {
   components: {
@@ -104,7 +109,7 @@ export default {
     };
   },
   created() {
-    getOutBounds().then((resp) => {
+    getOutBound().then((resp) => {
       if (resp.message) {
         this.workStations = resp.message;
       }

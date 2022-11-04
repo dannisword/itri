@@ -3,7 +3,7 @@
     <!-- 查詢條件 -->
     <div class="form-container">
       <el-form :model="params" label-width="100px" :inline="true">
-        <el-form-item label="簽入日期">
+        <el-form-item label="入庫日期">
           <el-date-picker
             v-model="nowDate"
             type="daterange"
@@ -39,7 +39,6 @@
       <el-col :span="16" align="end">
         <el-pagination
           background
-          @size-change="onSizeChange"
           @current-change="onCurrentChange"
           :current-page="page.number"
           :page-size="page.size"
@@ -56,17 +55,40 @@
       stripe
       @sort-change="onSortChange"
     >
-      <el-table-column label="項次" width="100" prop="id" fixed>
+      <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="料品號" width="100" prop="prodCode" fixed>
+      <el-table-column
+        label="料品號"
+        width="100"
+        prop="prodCode"
+        fixed
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="入庫時間" width="120" prop="entryDate" sortable="custom">
+      <el-table-column
+        label="入庫時間"
+        width="120"
+        prop="entryDate"
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="供應商" prop="supplier"> </el-table-column>
-      <el-table-column label="數量" prop="availableQty"> </el-table-column>
-      <el-table-column label="儲位編號" width="150" prop="stationId">
+      <el-table-column label="供應商" prop="supplier" sortable="custom">
       </el-table-column>
-      <el-table-column label="物流箱編號" width="150" prop="carrierId">
+      <el-table-column label="數量" prop="availableQty" sortable="custom">
+      </el-table-column>
+      <el-table-column
+        label="儲位編號"
+        width="150"
+        prop="stationId"
+        sortable="custom"
+      >
+      </el-table-column>
+      <el-table-column
+        label="物流箱編號"
+        width="150"
+        prop="carrierId"
+        sortable="custom"
+      >
       </el-table-column>
     </el-table>
   </div>
@@ -91,10 +113,10 @@ export default {
         supplier: "", //供應商代號
         startDate: "", // 入庫日期(起)
         endDate: "", // 入庫日期(訖)
-        page: 0,
+        page: 1,
         size: 50,
         direction: "ASC",
-        properties: "id",
+        properties: "entryDate",
       },
       stocks: [],
     };
@@ -108,12 +130,16 @@ export default {
     onLoad() {
       this.params.startDate = this.toDate(this.nowDate[0]);
       this.params.endDate = this.toDate(this.nowDate[1]);
-      this.params.page = this.page.page;
-      this.params.size = this.page.size;
-      this.params.totalElements = this.page.totalElements;
       const query = this.getQuery(this.params);
       getStocks(query).then((respone) => {
         this.stocks = respone.message.content;
+        // 分頁設定
+        this.setPagination(respone.message);
+        // 處理項次
+        for (let stock of this.stocks) {
+          this.page.seq++;
+          stock.seq = this.page.seq;
+        }
       });
     },
     onChang(val) {
@@ -124,16 +150,18 @@ export default {
         this.nowDate.push(this.addDay(0));
       }
     },
-    onSortChange(val) {
+    async onSortChange(val) {
       if (val.order == null) {
         return;
       }
       this.params.direction = val.order == "ascending" ? "ASC" : "DESC";
       this.params.properties = val.prop;
+      await this.onLoad();
+    },
+    onCurrentChange(val) {
+      this.params.page = val;
       this.onLoad();
     },
-    onSizeChange(val) {},
-    onCurrentChange(val) {},
   },
 };
 </script>

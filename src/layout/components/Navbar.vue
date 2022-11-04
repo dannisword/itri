@@ -72,7 +72,6 @@ export default {
     });
     getSelector(SelectTypeEnum.OPERATING_MODE).then((resp) => {
       this.operating = resp.message;
-      console.log(this.operating);
     });
   },
   methods: {

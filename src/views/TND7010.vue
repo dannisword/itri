@@ -245,7 +245,6 @@ export default {
     async onSetMenus(val) {
       // 編輯權限
       const data = await getRolePrivilege(val.id);
-      console.log(data);
       this.role = val;
       //
       const nodes = [];

@@ -2,7 +2,7 @@
   <div class="app-container">
     <!-- 查詢條件 -->
     <div class="form-container">
-      <el-form :model="params" label-width="90px" :inline="true">
+      <el-form :model="params" label-width="100px" :inline="true">
         <el-form-item label="收單日期">
           <el-date-picker
             v-model="nowDate"
@@ -15,7 +15,11 @@
         </el-form-item>
 
         <el-form-item label="作業站點">
-          <el-select v-model="params.assignWorkStationId" placeholder="請選擇">
+          <el-select
+            v-model="params.assignWorkStationId"
+            multiple
+            placeholder="請選擇"
+          >
             <el-option
               v-for="item in workStations"
               :key="item.id"
@@ -27,10 +31,10 @@
         </el-form-item>
 
         <el-form-item label="加工單狀態">
-          <el-select v-model="params.docStatus" placeholder="請選擇">
+          <el-select v-model="params.docStatus" multiple placeholder="請選擇">
             <el-option
-              v-for="item in processStatus"
-              :key="item.value"
+              v-for="item in processingStatus"
+              :key="item.id"
               :label="item.label"
               :value="item.value"
             >
@@ -38,7 +42,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="出庫單號碼">
+        <el-form-item label="加工單號碼">
           <el-input v-model="params.sysOrderNo"></el-input>
         </el-form-item>
 
@@ -65,7 +69,6 @@
       <el-col :span="16" align="end">
         <el-pagination
           background
-          @size-change="onSizeChange"
           @current-change="onCurrentChange"
           :current-page="page.number"
           :page-size="page.size"
@@ -81,20 +84,52 @@
       class="table-container"
       border
       stripe
+      @sort-change="onSortcChange"
     >
       <el-table-column type="selection" width="55"> </el-table-column>
-      <el-table-column label="項次" width="100" prop="id" fixed>
+      <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="加工單號碼" prop="code" width="180">
+      <el-table-column
+        label="加工單號碼"
+        prop="sysOrderNo"
+        width="180"
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="料品號" prop="prodCode"> </el-table-column>
-      <el-table-column label="供應商" prop="supplier" width="100">
+      <el-table-column
+        label="料品號"
+        prop="prodCode"
+        sortable="custom"
+        min-width="180"
+      >
       </el-table-column>
-      <el-table-column label="數量" prop="totalProcQty" width="100">
+      <el-table-column
+        label="供應商"
+        prop="supplier"
+        sortable="custom"
+        width="100"
+      >
       </el-table-column>
-      <el-table-column label="單據狀態" prop="docStatus" width="100">
+      <el-table-column
+        label="數量"
+        prop="totalProcQty"
+        sortable="custom"
+        width="100"
+      >
       </el-table-column>
-      <el-table-column label="綁定站點" prop="statusName" width="100">
+      <el-table-column
+        label="單據狀態"
+        prop="docStatus"
+        sortable="custom"
+        width="120"
+      >
+      </el-table-column>
+      <el-table-column
+        label="綁定站點"
+        prop="statusName"
+        sortable="custom"
+        width="120"
+      >
       </el-table-column>
       <el-table-column label="動作" width="200" align="center">
         <template slot-scope="scope">
@@ -112,6 +147,7 @@ import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getWorkStation } from "@/api/workStation";
 import { getProcesses } from "@/api/processing";
+import { SelectTypeEnum } from "@/utils/enums/index";
 
 export default {
   components: {
@@ -135,37 +171,20 @@ export default {
         stationId: "",
         sysOrderNo: "",
       },
-      processStatus: [
-        {
-          label: "已收單",
-          value: 0,
-        },
-        {
-          label: "已生效",
-          value: 1,
-        },
-        {
-          label: "工作執行中",
-          value: 2,
-        },
-        {
-          label: "已失效",
-          value: 3,
-        },
-        {
-          label: "已完成",
-          value: 4,
-        },
-      ],
+      processingStatus: [],
     };
   },
   created() {
     this.nowDate.push(this.addDay(-7));
     this.nowDate.push(this.addDay(0));
-    getWorkStation().then((resp) => {
-      if (resp.message) {
-        this.workStations = resp.message;
+    getWorkStation().then((respone) => {
+      if (respone.message) {
+        this.workStations = respone.message;
       }
+    });
+
+    this.getSelector(SelectTypeEnum.PROCESSING_STATUS).then((resp) => {
+      this.processingStatus = resp;
     });
   },
   methods: {
@@ -173,16 +192,33 @@ export default {
       this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);
       this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params);
-      getProcesses(query).then((resp) => {
-        console.log(resp.message);
-        if (resp.status == "OK") {
-          this.content = resp.message.content;
+      getProcesses(query).then((respone) => {
+        if (respone.status == "OK") {
+          this.content = respone.message.content;
+          console.log(respone);
+          // 分頁設定
+          this.setPagination(respone.message);
+          // 處理項次
+          for (let item of this.content) {
+            this.page.seq++;
+            item.seq = this.page.seq;
+          }
         }
       });
     },
     onAction(val) {},
-    onSizeChange(val) {},
-    onCurrentChange(val) {},
+    async onSortcChange(val) {
+      if (val.order == null) {
+        return;
+      }
+      this.params.direction = val.order == "ascending" ? "ASC" : "DESC";
+      this.params.properties = val.prop;
+      await this.onLoad();
+    },
+    onCurrentChange(val) {
+      this.params.page = val;
+      this.onLoad();
+    },
   },
 };
 </script>

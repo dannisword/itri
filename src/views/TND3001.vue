@@ -15,7 +15,11 @@
         </el-form-item>
 
         <el-form-item label="作業站點">
-          <el-select v-model="params.assignWorkStationId" placeholder="請選擇">
+          <el-select
+            v-model="params.assignWorkStationId"
+            multiple
+            placeholder="請選擇"
+          >
             <el-option
               v-for="item in workStations"
               :key="item.id"
@@ -27,7 +31,7 @@
         </el-form-item>
 
         <el-form-item label="出庫單狀態">
-          <el-select v-model="params.docStatus" placeholder="請選擇">
+          <el-select v-model="params.docStatus" multiple placeholder="請選擇">
             <el-option
               v-for="item in outStatus"
               :key="item.value"
@@ -39,7 +43,7 @@
         </el-form-item>
 
         <el-form-item label="出貨模式">
-          <el-select v-model="params.docType" placeholder="請選擇">
+          <el-select v-model="params.docType" multiple placeholder="請選擇">
             <el-option
               v-for="item in outSource"
               :key="item.value"
@@ -98,17 +102,44 @@
       <el-table-column type="selection" width="55"> </el-table-column>
       <el-table-column label="項次" width="100" prop="id" fixed>
       </el-table-column>
-      <el-table-column label="出貨模式" prop="code" width="180">
+      <el-table-column
+        label="出貨模式"
+        prop="code"
+        width="180"
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="出庫單號碼" prop="name"> </el-table-column>
-      <el-table-column label="料品號" prop="statusName"> </el-table-column>
-      <el-table-column label="供應商" prop="statusName" width="100">
+      <el-table-column label="出庫單號碼" prop="name" sortable="custom">
       </el-table-column>
-      <el-table-column label="數量" prop="statusName" width="100">
+      <el-table-column label="料品號" prop="statusName" sortable="custom">
       </el-table-column>
-      <el-table-column label="出庫單狀態" prop="statusName" width="100">
+      <el-table-column
+        label="供應商"
+        prop="statusName"
+        sortable="custom"
+        width="100"
+      >
       </el-table-column>
-      <el-table-column label="綁定站點" prop="statusName" width="100">
+      <el-table-column
+        label="數量"
+        prop="statusName"
+        sortable="custom"
+        width="100"
+      >
+      </el-table-column>
+      <el-table-column
+        label="出庫單狀態"
+        prop="statusName"
+        sortable="custom"
+        width="100"
+      >
+      </el-table-column>
+      <el-table-column
+        label="綁定站點"
+        prop="statusName"
+        sortable="custom"
+        width="100"
+      >
       </el-table-column>
       <el-table-column label="動作" width="200" align="center">
         <template slot-scope="scope">
@@ -125,6 +156,8 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getWorkStation } from "@/api/workStation";
+import { getOutBounds } from "@/api/outbound";
+import { SelectTypeEnum } from "@/utils/enums/index";
 
 export default {
   components: {
@@ -149,49 +182,11 @@ export default {
         size: 50,
         sysOrderNo: "",
       },
-      outStatus: [
-        {
-          label: "已收單",
-          value: 0,
-        },
-        {
-          label: "已生效",
-          value: 1,
-        },
-        {
-          label: "工作執行中",
-          value: 2,
-        },
-        {
-          label: "已失效",
-          value: 3,
-        },
-        {
-          label: "已完成",
-          value: 4,
-        },
-        {
-          label: "全部",
-          value: 5,
-        },
-      ],
-      outSource: [
-        {
-          label: "全部",
-          value: "0",
-        },
-        {
-          label: "調撥出庫",
-          value: "1",
-        },
-        {
-          label: "雷刻出庫",
-          value: "2",
-        },
-      ],
+      outStatus: [],
+      outSource: [],
     };
   },
-  created() {
+  async created() {
     this.nowDate.push(this.addDay(-7));
     this.nowDate.push(this.addDay(0));
     getWorkStation().then((resp) => {
@@ -199,14 +194,22 @@ export default {
         this.workStations = resp.message;
       }
     });
+
+    this.outStatus = await this.getSelector(SelectTypeEnum.OUTBOUND_STATUS);
+
+    this.outSource = await this.getSelector(SelectTypeEnum.SHIPPING_MODE);
   },
   methods: {
     onLoad() {
-      this.onNav("/TND3100");
-      return;
+      //this.onNav("/TND3100");
+
       this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);
       this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params);
+      getOutBounds(query).then((respone) => {
+        this.content = respone.message;
+        console.log(respone);
+      });
     },
     onAction(val) {},
     onSizeChange(val) {},

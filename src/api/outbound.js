@@ -2,6 +2,18 @@ import request from "@/utils/request";
 import { parseMessage } from "@/utils/app";
 
 /**
+ * A4-1 查詢出庫單(表頭)
+ * @returns 
+ */
+export function getOutBounds() {
+  return request({
+    url: `/api/outbound/search`,
+    method: "GET",
+  });
+}
+
+
+/**
  * A4-17 收單作業
  * @returns
  */
@@ -73,7 +85,7 @@ export function setOutBound(data) {
  * @param {*} params
  * @returns
  */
-export function getOutBounds() {
+export function getOutBound() {
   return request({
     url: `/api/outbound/sysParam`,
     method: "GET",

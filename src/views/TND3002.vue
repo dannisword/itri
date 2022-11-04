@@ -1,13 +1,18 @@
 <template>
   <div class="app-container">
-    <div>
+    <div style="width: 320px">
       <el-form :model="params" label-width="180px" :inline="true">
-        <el-form-item label="輸入出庫空箱數">
+        <el-form-item>
+          <h2>輸入出庫空箱數</h2>
+        </el-form-item>
+        <el-form-item>
           <el-input v-model="params.sysOrderNo"></el-input>
         </el-form-item>
         <el-button type="primary" @click="onAction()">空箱出庫</el-button>
 
-        <p style="color: red">自動倉可用的總儲位數：70個</p>
+        <el-form-item>
+          <p style="color: red">自動倉可用的總儲位數：70個</p>
+        </el-form-item>
 
         <el-divider class="form-divider"></el-divider>
 
@@ -26,7 +31,7 @@
       @afterClosed="onModalClose"
       :optional="optional"
     >
-      <el-form :model="params" label-width="90px" :inline="true">
+      <el-form :model="params" :inline="true">
         <el-form-item label="站點">
           <el-select v-model="params.assignWorkStationId" placeholder="請選擇">
             <el-option
@@ -39,14 +44,32 @@
           </el-select>
         </el-form-item>
 
-        <el-divider class="form-divider"></el-divider>
         <el-form-item label="作業日期">
-          <el-date-picker v-model="nowDate" type="date"> </el-date-picker>
+          <el-date-picker v-model="params.dateAt" type="date"> </el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onLoad()" icon="el-icon-search"></el-button>
+          <el-button
+            type="primary"
+            @click="onLoad()"
+            icon="el-icon-search"
+          ></el-button>
         </el-form-item>
       </el-form>
+
+      <!-- 分頁 -->
+      <el-row type="flex">
+        <el-col :span="8"> </el-col>
+        <el-col :span="16" align="end">
+          <el-pagination
+            background
+            @current-change="onCurrentChange"
+            :current-page="page.number"
+            :page-size="page.size"
+            layout="total,jumper,prev, pager, next"
+            :total="page.totalElements"
+          ></el-pagination>
+        </el-col>
+      </el-row>
 
       <el-table
         :data="content"
@@ -88,6 +111,8 @@ export default {
       content: [],
       workStations: [],
       params: {
+        dateAt: "",
+        assignWorkStationId: "",
         page: 0,
         size: 50,
         direction: "ASC",
@@ -123,8 +148,12 @@ export default {
     onAction() {},
     onModalClose(val) {
       this.dialogs.carrier.visible = false;
-      console.log(val);
     },
   },
 };
 </script>
+<style>
+.el-dialog__body {
+  padding: 10px 20px;
+}
+</style>

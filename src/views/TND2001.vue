@@ -2,7 +2,7 @@
   <div class="app-container">
     <!-- 查詢條件 -->
     <div class="form-container">
-      <el-form :model="params" label-width="90px" :inline="true">
+      <el-form :model="params" label-width="100px" :inline="true">
         <el-form-item label="收單日期">
           <el-date-picker
             v-model="nowDate"
@@ -15,7 +15,11 @@
         </el-form-item>
 
         <el-form-item label="作業站點">
-          <el-select v-model="params.assignWorkStationId" placeholder="請選擇">
+          <el-select
+            v-model="params.assignWorkStationId"
+            multiple
+            placeholder="請選擇"
+          >
             <el-option
               v-for="item in workStations"
               :key="item.id"
@@ -26,8 +30,8 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="入庫狀態">
-          <el-select v-model="params.docStatus" placeholder="請選擇">
+        <el-form-item label="入庫單狀態">
+          <el-select v-model="params.docStatus" multiple placeholder="請選擇">
             <el-option
               v-for="item in inStatus"
               :key="item.value"
@@ -39,7 +43,11 @@
         </el-form-item>
 
         <el-form-item label="收單來源">
-          <el-select v-model="params.receiveSource" placeholder="請選擇">
+          <el-select
+            v-model="params.receiveSource"
+            multiple
+            placeholder="請選擇"
+          >
             <el-option
               v-for="item in inSource"
               :key="item.value"
@@ -58,11 +66,11 @@
           <el-input v-model="params.prodCode"></el-input>
         </el-form-item>
 
-        <el-divider class="form-divider"></el-divider>
-
         <el-form-item>
           <el-button type="primary" @click="onLoad()">查詢</el-button>
         </el-form-item>
+
+        <el-divider class="form-divider"></el-divider>
       </el-form>
     </div>
     <!-- 分頁 -->
@@ -71,7 +79,6 @@
       <el-col :span="16" align="end">
         <el-pagination
           background
-          @size-change="onSizeChange"
           @current-change="onCurrentChange"
           :current-page="page.number"
           :page-size="page.size"
@@ -87,22 +94,53 @@
       class="table-container"
       border
       stripe
-      height="100%"
+      @sort-change="onSortcChange"
     >
       <el-table-column label="項次" width="100" prop="id" fixed>
       </el-table-column>
-      <el-table-column label="收單來源" prop="code" width="180">
+      <el-table-column
+        label="收單來源"
+        prop="code"
+        width="180"
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="入庫單號碼" prop="name"> </el-table-column>
-      <el-table-column label="料品號" prop="statusName" width="125">
+      <el-table-column label="入庫單號碼" prop="name" sortable="custom">
       </el-table-column>
-      <el-table-column label="供應商" prop="statusName" width="125">
+      <el-table-column
+        label="料品號"
+        prop="statusName"
+        width="125"
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="收料數量" prop="statusName" width="125">
+      <el-table-column
+        label="供應商"
+        prop="statusName"
+        width="125"
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="入庫單狀態" prop="statusName" width="125">
+      <el-table-column
+        label="收料數量"
+        prop="statusName"
+        width="125"
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="綁定站點" prop="statusName" width="125">
+      <el-table-column
+        label="入庫單狀態"
+        prop="statusName"
+        width="125"
+        sortable="custom"
+      >
+      </el-table-column>
+      <el-table-column
+        label="綁定站點"
+        prop="statusName"
+        width="125"
+        sortable="custom"
+      >
       </el-table-column>
     </el-table>
   </div>
@@ -113,6 +151,7 @@ import pageMixin from "@/utils/mixin";
 import { getInbounds } from "@/api/inbound";
 import { getWorkStation } from "@/api/workStation";
 import { SelectTypeEnum } from "@/utils/enums/index";
+
 
 export default {
   components: {
@@ -146,7 +185,6 @@ export default {
     this.nowDate.push(this.addDay(0));
     // 作業站點
     getWorkStation().then((resp) => {
-      console.log(resp);
       if (resp.status == "OK") {
         this.workStations = resp.message;
       }
@@ -161,19 +199,25 @@ export default {
       this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);
       this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params, false);
-      getInbounds(query).then((resp) => {
-        if (resp.message) {
-          this.content = resp.message.content;
+      getInbounds(query).then((respone) => {
+        if (respone.message) {
+          this.content = respone.message.content;
         }
       });
     },
-    onSizeChange(val) {},
-    onCurrentChange(val) {},
+    async onSortcChange(val) {
+      if (val.order == null) {
+        return;
+      }
+      this.params.direction = val.order == "ascending" ? "ASC" : "DESC";
+      this.params.properties = val.prop;
+      await this.onLoad();
+    },
+    onCurrentChange(val) {
+      this.params.page = val;
+      this.onLoad();
+    },
   },
 };
 </script>
-<style>
-.el-input {
-  width: 200px;
-}
-</style>
+<style></style>

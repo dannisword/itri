@@ -111,8 +111,6 @@ export default {
       this.workStations = [];
       let resp = await getWorkStation();
       this.workStations = resp.message;
-
-      console.log(this.workStations);
     },
     async onEdit() {
       this.isEdit = false;

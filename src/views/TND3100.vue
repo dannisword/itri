@@ -21,7 +21,7 @@
       <el-table-column label="出庫單號碼" prop="name"> </el-table-column>
       <el-table-column label="料品號" prop="statusName"> </el-table-column>
       <el-table-column label="供應商" prop="statusName"> </el-table-column>
-      <el-table-column label="收料數量" prop="statusName" width="125">
+      <el-table-column label="訂購數量" prop="statusName" width="125">
       </el-table-column>
       <el-table-column label="實際已揀總數" prop="statusName" width="125">
       </el-table-column>
