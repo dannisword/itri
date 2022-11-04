@@ -24,7 +24,12 @@
       <el-table-column label="站點名稱" prop="description" fixed>
       </el-table-column>
 
-      <el-table-column label="現況作業模式" prop="currentModel" fixed width="180">
+      <el-table-column
+        label="現況作業模式"
+        prop="currentModel"
+        fixed
+        width="180"
+      >
       </el-table-column>
       <el-table-column label="入庫作業" width="100" prop="inBound">
         <template slot-scope="scope">
@@ -125,32 +130,9 @@ export default {
 };
 </script>
 <style type="sass" scoped>
-el-checkbox {
-  color: #fff;
+.input:disabled {
   background-color: black;
-}
-::v-deep.el-checkbox__input.is-checked .el-checkbox__inner::after {
-  content: "";
-  border: 1px solid #ffc342;
-  border-left: 0;
-  border-top: 0;
-}
-::v-deep.el-checkbox__input.is-checked + .el-checkbox__label {
-  color: #ffc342;
-  margin-top: 1px;
-}
-::v-deep .el-checkbox__inner {
-  background: transparent;
-}
-::v-deep.el-checkbox__input.is-focus .el-checkbox__inner,
-.el-checkbox__inner:hover {
-  border-color: #fff;
-}
-::v-deep.el-checkbox__input.is-checked .el-checkbox__inner {
-  background: transparent;
-  border-color: #ffc342;
-}
-::v-deep .el-checkbox__inner:hover {
-  border-color: #fff;
+  color: linen;
+  opacity: 1;
 }
 </style>

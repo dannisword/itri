@@ -9,28 +9,31 @@
     <breadcrumb class="breadcrumb-container" />
 
     <div class="right-menu">
+      站別：
+      <span style="margin-right: 10px">{{ user.workStation }}</span>
+      作業模式：
+      <el-select
+        v-model="workType"
+        placeholder="請選擇"
+        style="margin-right: 10px"
+      >
+        <el-option
+          class="zh-input"
+          v-for="item in operating"
+          :key="item.id"
+          :label="item.label"
+          :value="item.id"
+        >
+        </el-option>
+      </el-select>
+
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           {{ this.$store.state.user.name }}
           <i class="el-icon-caret-bottom"></i>
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <!--
-          <router-link to="/">
-            <el-dropdown-item>
-              Home
-            </el-dropdown-item>
-          </router-link>
-
-          <a target="_blank" href="https://github.com/PanJiaChen/vue-admin-template/">
-            <el-dropdown-item>Github</el-dropdown-item>
-          </a>
-          <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
-            <el-dropdown-item>Docs</el-dropdown-item>
-          </a>
-          -->
-
-          <el-dropdown-item divided @click.native="logout">
+          <el-dropdown-item @click.native="logout">
             <span style="display: block">登出</span>
           </el-dropdown-item>
         </el-dropdown-menu>
@@ -45,6 +48,8 @@ import Breadcrumb from "@/components/Breadcrumb";
 import Hamburger from "@/components/Hamburger";
 import { clearStorageItem } from "@/utils/localStorage";
 import { logout } from "@/api/auth";
+import { getSelector } from "@/api/system";
+import { SelectTypeEnum } from "@/utils/enums/index";
 
 export default {
   components: {
@@ -54,8 +59,21 @@ export default {
   computed: {
     ...mapGetters(["sidebar", "avatar"]),
   },
+  data() {
+    return {
+      user: {},
+      operating: [],
+      workType: 1,
+    };
+  },
   created() {
-    this.$store.dispatch("user/getInfo").then((data) => {});
+    this.$store.dispatch("user/getInfo").then((data) => {
+      this.user = data;
+    });
+    getSelector(SelectTypeEnum.OPERATING_MODE).then((resp) => {
+      this.operating = resp.message;
+      console.log(this.operating);
+    });
   },
   methods: {
     toggleSideBar() {
@@ -75,7 +93,7 @@ export default {
   height: 50px;
   overflow: hidden;
   position: relative;
-  background: linear-gradient(90deg, #6868FD, #75EBFD);;
+  background: linear-gradient(90deg, #6868fd, #75ebfd);
   box-shadow: 0 1px 4px rgba(15, 67, 116, 0.08);
 
   .hamburger-container {
@@ -145,6 +163,29 @@ export default {
         }
       }
     }
+  }
+}
+.el-select .el-input_i {
+  font-size: 10px;
+}
+
+.documentation-container {
+  margin: 50px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  .document-btn {
+    flex-shrink: 0;
+    display: block;
+    cursor: pointer;
+    background: black;
+    color: white;
+    height: 60px;
+    padding: 0 16px;
+    margin: 16px;
+    line-height: 60px;
+    font-size: 20px;
+    text-align: center;
   }
 }
 </style>

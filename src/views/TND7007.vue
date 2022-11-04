@@ -86,7 +86,7 @@
       <el-table-column
         label="是否為空箱"
         align="center"
-        width="100"
+        width="120"
         prop="isEmptyCarrier"
       >
         <template slot-scope="scope">

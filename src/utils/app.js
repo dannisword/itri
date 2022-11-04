@@ -27,7 +27,6 @@ export function parseBody(resp) {
 export function parseMessage(respone) {
   return new Promise((resolve, reject) => {
     try {
-      console.log(respone);
       if (!respone.message) {
         warning("回傳格式異常");
         resolve();

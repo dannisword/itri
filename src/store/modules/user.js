@@ -70,6 +70,7 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
+      
       var data = getUserInfo();
       if (data == null) {
         reject(undefined);

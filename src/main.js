@@ -7,7 +7,7 @@ import "element-ui/lib/theme-chalk/index.css";
 import "element-ui/lib/theme-chalk/display.css";
 
 import locale from "element-ui/lib/locale/lang/en"; // lang i18n
-import zhLocale from "element-ui/lib/locale/lang/zh-TW";
+import zhLocale from "@/assets/lang/zh-TW";
 
 import "@/styles/index.scss"; // global css
 

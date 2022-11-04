@@ -21,7 +21,7 @@
           >
             <el-option
               v-for="item in options"
-              :key="item.value"
+              :key="item.id"
               :label="item.label"
               :value="item.value"
             >
@@ -248,7 +248,6 @@
 <script>
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
-import { getSelector } from "@/api/system";
 import {
   getSignRecord,
   getSignStatistics,
@@ -256,6 +255,7 @@ import {
   setSignIn,
   setSignOut,
 } from "@/api/station";
+import { SelectTypeEnum } from "@/utils/enums/index";
 
 export default {
   components: {
@@ -305,12 +305,15 @@ export default {
     };
   },
   created() {
+    // 不顯示 Dialog 功能鍵 
     this.Large.showAction = false;
     this.Medium.showAction = false;
+
     this.nowDate.push(new Date());
     this.nowDate.push(new Date());
-    getSelector("WORK_STATION").then((resp) => {
-      this.options = resp.message;
+    this.getSelector(SelectTypeEnum.WORK_STATION).then((resp) => {
+      console.log(resp);
+      this.options = resp;
     });
   },
   methods: {

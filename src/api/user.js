@@ -83,9 +83,17 @@ export function getUser(userId) {
  * A1-8 取得左側選單
  * @returns
  */
-export function getMenus() {
-  return request({
-    url: `/api/menus`,
-    method: "GET",
+export function getUserMenus() {
+  const url = `/api/menu`;
+  const method = `POST`;
+
+  return new Promise((resolve) => {
+    request({
+      url: url,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
 }

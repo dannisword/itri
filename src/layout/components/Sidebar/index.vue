@@ -1,6 +1,6 @@
 <template>
-  <div :class="{ 'has-logo': showLogo }"  >
-    <logo v-if="showLogo" :collapse="isCollapse"/>
+  <div :class="{ 'has-logo': showLogo }">
+    <logo v-if="showLogo" :collapse="isCollapse" />
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu
         :default-active="activeMenu"
@@ -17,25 +17,25 @@
           <el-menu-item
             v-if="menu.hasChilds == false"
             @click="onNav(menu)"
-            :index="menu.code"
+            :index="menu.index"
             class="submenu-title-noDropdown"
           >
             <i :class="menu.icon"></i>
-            <span slot="title">{{ menu.description }}</span>
+            <span slot="title">{{ menu.name }}</span>
           </el-menu-item>
           <!-- 有子目錄 -->
-          <el-submenu v-else :index="menu.code">
+          <el-submenu v-else :index="menu.index">
             <template slot="title">
               <i :class="menu.icon"></i>
-              <span slot="title">{{ menu.description }}</span>
+              <span slot="title">{{ menu.name }}</span>
             </template>
 
             <el-menu-item
-              :index="sub.code"
-              v-for="sub in menu.childrens"
+              :index="sub.index"
+              v-for="sub in menu.subs"
               @click="onNav(sub)"
             >
-              <span slot="title">{{ sub.description }}</span>
+              <span slot="title">{{ sub.name }}</span>
             </el-menu-item>
           </el-submenu>
         </div>
@@ -48,8 +48,7 @@
 import { mapGetters } from "vuex";
 import Logo from "./Logo";
 import variables from "@/styles/variables.scss";
-//import { getMenus } from "@/api/baseService.js";
-import { getMenus } from "@/utils/app";
+import { getUserMenus } from "@/api/user";
 
 export default {
   components: { Logo },
@@ -87,16 +86,50 @@ export default {
   },
   methods: {
     async onLoad() {
-      this.menus = await getMenus(this.routes);
+      //this.menus = await getMenus();
+      const data = await getUserMenus();
+      const menus = data.message;
+      let id = 1;
+      for (let menu of menus) {
+        menu.icon = this.getIcon(menu.index);
+        menu.path = `/${menu.index}`;
+        id++;
+        if (menu.hasChilds == false) {
+          continue;
+        }
+        for (let sub of menu.subs) {
+          sub.path = `/${sub.index}`;
+          id++;
+        }
+      }
+      this.menus = menus;
     },
     handleSelect(key, keyPath) {},
     onNav(menu) {
       // 檢查權限
-      this.$router.push(menu.code);
+      this.$router.push(menu.path);
+    },
+    getIcon(code) {
+      switch (code) {
+        case "TND1000":
+          return "el-icon-user-solid";
+        case "TND2000":
+          return "el-icon-download";
+        case "TND3000":
+          return "el-icon-upload2";
+        case "TND4000":
+          return "el-icon-help";
+        case "TND5000":
+          return "el-icon-tickets";
+        case "TND6000":
+          return "el-icon-search";
+        case "TND7000":
+          return "el-icon-setting";
+        default:
+          return "";
+      }
     },
     //
   },
 };
 </script>
-
-

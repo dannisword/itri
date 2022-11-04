@@ -8,7 +8,7 @@
         </el-form-item>
 
         <el-form-item label="狀態">
-          <el-select v-model="params.isEnable" placeholder="請選擇">
+          <el-select v-model="params.isEnable" multiple placeholder="請選擇">
             <el-option
               v-for="item in status"
               :key="item.value"
@@ -35,7 +35,6 @@
       <el-col :span="16" align="end">
         <el-pagination
           background
-          @size-change="onSizeChange"
           @current-change="onCurrentChange"
           :current-page="page.number"
           :page-size="page.size"
@@ -55,9 +54,20 @@
     >
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="角色編號" prop="code" min-width="180" sortable="custom" fixed>
+      <el-table-column
+        label="角色編號"
+        prop="code"
+        min-width="180"
+        sortable="custom"
+        fixed
+      >
       </el-table-column>
-      <el-table-column label="角色名稱" prop="name" min-width="180" sortable="custom">
+      <el-table-column
+        label="角色名稱"
+        prop="name"
+        min-width="180"
+        sortable="custom"
+      >
       </el-table-column>
       <el-table-column label="狀態" prop="isEnable" width="180">
         <template slot-scope="scope">
@@ -90,6 +100,7 @@
       :name="dialogs.role.name"
       :visible.sync="dialogs.role.visible"
       @afterClosed="onModalClose"
+      :optional="Small"
     >
       <el-form ref="role" :model="role" label-width="100px" :rules="rules">
         <el-form-item label="角色編號" prop="code">
@@ -172,7 +183,7 @@ export default {
       },
       params: {
         roleName: "",
-        isEnable: true,
+        isEnable: [],
         page: 1,
         size: 50,
         direction: "ASC",
@@ -219,8 +230,11 @@ export default {
       }
     },
     onSetRole(val) {
+      this.Small.action = "新增";
+      this.Small.cancel = "取消";
       if (val != null) {
         this.role = val;
+        this.Small.action = "存檔";
         this.dialogs.role.title = "編輯名稱與狀態";
       } else {
         this.role = this.newRole();
@@ -231,6 +245,7 @@ export default {
     async onSetMenus(val) {
       // 編輯權限
       const data = await getRolePrivilege(val.id);
+      console.log(data);
       this.role = val;
       //
       const nodes = [];
@@ -310,7 +325,6 @@ export default {
       this.params.properties = val.prop;
       this.onLoad();
     },
-    onSizeChange(val) {},
     onCurrentChange(val) {
       this.params.page = val;
       this.onLoad();

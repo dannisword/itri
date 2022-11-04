@@ -21,7 +21,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="狀態">
-          <el-select v-model="params.isEnable" placeholder="請選擇">
+          <el-select v-model="params.isEnable" multiple placeholder="請選擇">
             <el-option
               v-for="item in status"
               :key="item.value"
@@ -109,7 +109,7 @@
       :optional="Small"
     >
       <div>
-        <el-form ref="user" :model="user" label-width="90px" :rules="rules">
+        <el-form ref="user" :model="user" label-width="100px" :rules="rules">
           <el-form-item label="帳號" prop="account">
             <el-input v-model="user.account"></el-input>
           </el-form-item>
@@ -230,7 +230,7 @@ export default {
       params: {
         account: "",
         direction: "ASC",
-        isEnable: true,
+        isEnable: [],
         page: 1,
         properties: "account",
         roleId: [],
@@ -297,12 +297,15 @@ export default {
       this.user = this.newUser();
       this.userRoles = [];
       this.dialogs.account.title = "新增帳號";
+      this.Small.action = "新增";
+      this.Small.cancel = "取消";
       // 編輯帳號
       if (val != null) {
         this.user = val;
         this.user.roles.forEach((element) => {
           this.userRoles.push(element.id);
         });
+        this.Small.action = "存檔";
         this.dialogs.account.title = "編輯帳號";
       }
       this.dialogs.account.visible = true;

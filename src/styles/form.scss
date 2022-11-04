@@ -70,3 +70,11 @@
 .el-button {
     font-size: $--font-size;
 }
+
+.el-input.is-disabled .el-input__inner{
+    color: #757575;
+}
+/*
+.el-checkbox__input.is-disabled.is-checked .el-checkbox__inner{
+    background-color: #409EFF;
+}*/
