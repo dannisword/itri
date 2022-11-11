@@ -1,7 +1,62 @@
 import request from "@/utils/request";
 import { parseMessage } from "@/utils/app";
 
-
+/**
+ * A7-1 建立盤點單
+ * @param {*} data 
+ * @returns 
+ */
+export function setInventories(data) {
+  const uri = `/api/inventory`;
+  const method = "POST";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+      data,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
+  });
+}
+/**
+ * A7-02 執行盤點單(生效)
+ * @param {*} docNo
+ * @returns
+ */
+export function setInvEffect(docNo) {
+  const uri = `/api/inventory/start/${docNo}`;
+  const method = "POST";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
+  });
+}
+/**
+ * A7-03 修改盤點單狀態
+ * @param {*} docNo
+ * @param {*} status
+ * @returns
+ */
+export function setInvInvalid(docNo, status) {
+  const uri = `/api/inventory/start/${docNo}/${status}`;
+  const method = "POST";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
+  });
+}
 /**
  * A7-6 查詢出庫叫單數
  * @param {*} params
@@ -88,6 +143,30 @@ export function setInventory(data) {
 export function getInventorie() {
   return request({
     url: `/api/inventory/sysParam`,
+    method: "GET",
+  });
+}
+
+/**
+ * A7-23 查詢可盤點清單
+ * @param {*} prodCode
+ * @returns
+ */
+export function getInvAdjustments(prodCode) {
+  return request({
+    url: `/api/inventory/stock/adjustment/search${prodCode}`,
+    method: "GET",
+  });
+}
+
+/**
+ * A7-24 查詢可盤點清單
+ * @param {*} prodCode
+ * @returns
+ */
+export function getInvAvailables(prodCode) {
+  return request({
+    url: `/api/inventory/available/search?prodCode=${prodCode}`,
     method: "GET",
   });
 }

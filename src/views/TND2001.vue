@@ -23,8 +23,8 @@
             <el-option
               v-for="item in workStations"
               :key="item.id"
-              :label="item.id"
-              :value="item.id"
+              :label="item.label"
+              :value="item.value"
             >
             </el-option>
           </el-select>
@@ -184,11 +184,7 @@ export default {
     this.nowDate.push(this.addDay(-7));
     this.nowDate.push(this.addDay(0));
     // 作業站點
-    getWorkStation().then((resp) => {
-      if (resp.status == "OK") {
-        this.workStations = resp.message;
-      }
-    });
+    this.workStations = await this.getSelector(SelectTypeEnum.WORK_STATION);
     // 入庫單狀態
     this.inStatus = await this.getSelector(SelectTypeEnum.INBOUND_STATUS);
     // 收單來源

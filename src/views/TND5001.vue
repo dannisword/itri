@@ -15,11 +15,7 @@
         </el-form-item>
 
         <el-form-item label="作業站點">
-          <el-select
-            v-model="params.assignWorkStationId"
-            multiple
-            placeholder="請選擇"
-          >
+          <el-select v-model="params.workStnCode" multiple placeholder="請選擇">
             <el-option
               v-for="item in workStations"
               :key="item.id"
@@ -43,7 +39,7 @@
         </el-form-item>
 
         <el-form-item label="盤點類型">
-          <el-select v-model="params.docType" multiple placeholder="請選擇">
+          <el-select v-model="params.type" multiple placeholder="請選擇">
             <el-option
               v-for="item in types"
               :key="item.value"
@@ -74,7 +70,7 @@
     <el-row type="flex">
       <el-col :span="8">
         <div type="flex">
-          <el-button type="primary">新增盤點單</el-button>
+          <el-button type="primary" @click="onAdd()">新增盤點單</el-button>
         </div>
       </el-col>
       <el-col :span="16" align="end">
@@ -92,24 +88,20 @@
     <!-- 資料-->
     <el-table
       :data="content"
+      v-loading="loading"
       class="table-container"
       border
       stripe
       @sort-change="onSortcChange"
     >
-      <el-table-column
-        label="項次"
-        width="100"
-        prop="seq"
-        sortable="custom"
-        fixed
-      >
+      <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
       <el-table-column
         label="盤點單號碼"
         prop="sysOrderNo"
         width="130"
         sortable="custom"
+        fixed
       >
       </el-table-column>
       <el-table-column
@@ -171,10 +163,19 @@
 
       <el-table-column label="動作" width="200" align="center">
         <template slot-scope="scope">
-          <el-button @click="onAction(scope.row)" size="mini" type="primary"
+          <el-button
+            @click="onEffect(scope.row)"
+            size="mini"
+            type="primary"
+            :disabled="scope.row.docStatus > 0"
             >生效
           </el-button>
-          <el-button @click="onAction(scope.row)" size="mini">失效 </el-button>
+          <el-button
+            @click="onInvalid(scope.row)"
+            size="mini"
+            :disabled="scope.row.docStatus > 2"
+            >失效
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -184,7 +185,7 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getWorkStation } from "@/api/workStation";
-import { getInventories } from "@/api/inventory";
+import { getInventories, setInvEffect, setInvInvalid } from "@/api/inventory";
 import { SelectTypeEnum } from "@/utils/enums/index";
 
 export default {
@@ -194,20 +195,22 @@ export default {
   mixins: [pageMixin],
   data() {
     return {
+      loading: false,
       content: [],
       workStations: [],
       nowDate: [],
       params: {
         direction: "ASC",
         docNo: "",
-        docStatus: 0,
+        docStatus: [],
         endDate: "",
         page: 1,
         prodCode: "",
-        properties: "",
+        properties: "sysOrderNo",
         size: 50,
         startDate: "",
-        type: 0,
+        type: [],
+        workStnCode: [],
       },
       status: [],
       types: [],
@@ -230,25 +233,64 @@ export default {
   },
   methods: {
     onLoad() {
+      this.loading = true;
       this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);
       this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params);
 
-      getInventories(query).then((respone) => {
-        if (respone.status == "OK") {
-          this.content = respone.message.content;
-          console.log(respone);
-          // 分頁設定
-          this.setPagination(respone.message);
-          // 處理項次
-          for (let item of this.content) {
-            this.page.seq++;
-            item.seq = this.page.seq;
+      getInventories(query)
+        .then((respone) => {
+          if (respone.status == "OK") {
+            this.content = respone.message.content;
+            // 分頁設定
+            this.setPagination(respone.message);
+            // 處理項次
+            for (let item of this.content) {
+              this.page.seq++;
+              item.seq = this.page.seq;
+            }
+            setTimeout(() => {
+              this.loading = false;
+            }, 300);
           }
+        })
+        .catch((e) => {
+          this.loading = false;
+        });
+    },
+    onAdd() {
+      this.onNav("TND5103")
+    },
+    onEffect(val) {
+      setInvEffect(val.sysOrderNo).then((resp) => {
+        console.log(resp);
+        if (resp.status != "OK") {
+          this.warning(`設定 ${val.sysOrderNo}盤點單失敗！`);
+          return;
         }
+        if (resp.message == false) {
+          this.warning(`設定 ${val.sysOrderNo}盤點單失敗！`);
+        } else {
+          this.success(`設定 ${val.sysOrderNo}盤點單已生效！`);
+        }
+        this.onLoad();
       });
     },
-    onAction(val) {},
+    onInvalid(val) {
+      //狀態(0:還原, 2:工作執行中, 5:失效)
+      setInvInvalid(val.sysOrderNo, 5).then((resp) => {
+        if (resp.status != "OK") {
+          this.warning(`設定 ${val.sysOrderNo}盤點單失敗！`);
+          return;
+        }
+        if (resp.message == false) {
+          this.warning(`設定 ${val.sysOrderNo}盤點單失敗！`);
+        } else {
+          this.success(`設定 ${val.sysOrderNo}盤點單已失效！`);
+        }
+        this.onLoad();
+      });
+    },
     async onSortcChange(val) {
       if (val.order == null) {
         return;

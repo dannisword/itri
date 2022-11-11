@@ -10,6 +10,7 @@
             range-separator="至"
             start-placeholder="開始日期"
             end-placeholder="結束日期"
+            @change="onChang"
           >
           </el-date-picker>
         </el-form-item>
@@ -23,8 +24,8 @@
             <el-option
               v-for="item in workStations"
               :key="item.id"
-              :label="item.id"
-              :value="item.id"
+              :label="item.label"
+              :value="item.value"
             >
             </el-option>
           </el-select>
@@ -143,9 +144,9 @@
   </div>
 </template>
 <script>
+import moment from "moment";
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
-import { getWorkStation } from "@/api/workStation";
 import { getProcesses } from "@/api/processing";
 import { SelectTypeEnum } from "@/utils/enums/index";
 
@@ -177,10 +178,9 @@ export default {
   created() {
     this.nowDate.push(this.addDay(-7));
     this.nowDate.push(this.addDay(0));
-    getWorkStation().then((respone) => {
-      if (respone.message) {
-        this.workStations = respone.message;
-      }
+
+    this.getSelector(SelectTypeEnum.WORK_STATION).then((resp) => {
+      this.workStations = resp;
     });
 
     this.getSelector(SelectTypeEnum.PROCESSING_STATUS).then((resp) => {
@@ -193,6 +193,7 @@ export default {
       this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params);
       getProcesses(query).then((respone) => {
+        console.log(respone);
         if (respone.status == "OK") {
           this.content = respone.message.content;
           console.log(respone);
@@ -205,6 +206,14 @@ export default {
           }
         }
       });
+    },
+    onChang(val) {
+      const diff = moment(val[1]).diff(val[0], "days");
+      if (diff > 60) {
+        val[0] = this.addDay(-7);
+        val[1] = this.addDay(0);
+        this.warning("日期查詢間隔勿超過60天");
+      }
     },
     onAction(val) {},
     async onSortcChange(val) {

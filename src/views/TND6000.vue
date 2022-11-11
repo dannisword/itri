@@ -146,8 +146,8 @@ export default {
       const diff = moment(val[1]).diff(val[0], "days");
       if (diff > 60) {
         this.warning("日期查詢間隔勿超過60天");
-        this.nowDate.push(this.addDay(-60));
-        this.nowDate.push(this.addDay(0));
+        val[0] = this.addDay(-60);
+        val[1] = this.addDay(0);
       }
     },
     async onSortChange(val) {

@@ -11,10 +11,14 @@
 ## API URL
 http://www.forelog.org.tw/iwms-web/swagger-ui/index.html
 https://www.logistics.org.tw/tenacity/swagger-ui/index.html
+- 文件
 https://drive.google.com/drive/folders/1TbOsjzd-yjzAxxH3xPZWjAXpygIef0Ke
 ## 畫面
+- 舊版
 https://9bem8l.axshare.com
-https://vrwbdo.axsha
+
+- 新版畫面
+https://vrwbdo.axshare.com 
 
 ## 完成功能
 - TND1000, 簽入/出作業 
@@ -43,9 +47,5 @@ https://vrwbdo.axsha
 - TND7010, 角色權限設定,
 
 
-心理安全感
-可靠性
-結構跟清晰 
-工作的意義
-積極的影響
+
 

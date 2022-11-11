@@ -54,6 +54,9 @@
         >
           登入
         </el-button>
+        <div class="tips">
+          <span class="version-span">版本 v1.0.0:2202</span>
+        </div>
       </el-form>
     </div>
     <div id="logo">
@@ -188,7 +191,9 @@ $cursor: #fff;
   }
 }
 */
-
+.version-span {
+  color: #454545;
+}
 // 容器
 /* reset element-ui css */
 .login-container {

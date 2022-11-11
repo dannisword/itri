@@ -16,6 +16,7 @@
         v-model="workType"
         placeholder="請選擇"
         style="margin-right: 10px"
+        @change="onChange"
       >
         <el-option
           class="zh-input"
@@ -46,7 +47,7 @@
 import { mapGetters } from "vuex";
 import Breadcrumb from "@/components/Breadcrumb";
 import Hamburger from "@/components/Hamburger";
-import { clearStorageItem } from "@/utils/localStorage";
+import { setStorageItem, clearStorageItem } from "@/utils/localStorage";
 import { logout } from "@/api/auth";
 import { getSelector } from "@/api/system";
 import { SelectTypeEnum } from "@/utils/enums/index";
@@ -63,13 +64,14 @@ export default {
     return {
       user: {},
       operating: [],
-      workType: 1,
+      workType: 0,
     };
   },
   created() {
     this.$store.dispatch("user/getInfo").then((data) => {
       this.user = data;
     });
+
     getSelector(SelectTypeEnum.OPERATING_MODE).then((resp) => {
       this.operating = resp.message;
     });
@@ -82,6 +84,10 @@ export default {
       await logout();
       clearStorageItem();
       this.$router.push(`/login?redirect=${this.$route.fullPath}`);
+    },
+    onChange(val) {
+      setStorageItem("currentModel", val)
+      console.log(val);
     },
   },
 };

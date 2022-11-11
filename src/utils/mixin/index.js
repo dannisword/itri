@@ -96,8 +96,8 @@ export default {
     },
     /**
      * 成功訊息
-     * @param {*} message 
-     * @param {*} duration 
+     * @param {*} message
+     * @param {*} duration
      */
     success(message, duration = 3000) {
       Message({
@@ -108,8 +108,8 @@ export default {
     },
     /**
      * 警告訊息
-     * @param {*} message 
-     * @param {*} duration 
+     * @param {*} message
+     * @param {*} duration
      */
     warning(message, duration = 3000) {
       Message({
@@ -120,8 +120,8 @@ export default {
     },
     /**
      * 提示訊息
-     * @param {*} msg 
-     * @returns 
+     * @param {*} msg
+     * @returns
      */
     confirm(msg) {
       return new Promise((resolve) => {
@@ -140,7 +140,7 @@ export default {
     },
     /**
      * 導覽頁面
-     * @param {*} uri 
+     * @param {*} uri
      */
     onNav(uri) {
       this.$router.push(uri);

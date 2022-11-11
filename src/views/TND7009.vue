@@ -215,7 +215,6 @@ export default {
       }
     };
     return {
-      loading: false,
       rules: {
         account: [
           { required: true, trigger: "blur", validator: validateAccount },
@@ -227,6 +226,7 @@ export default {
           { required: true, trigger: "blur", validator: validatePassword },
         ],
       },
+      loading: false,
       params: {
         account: "",
         direction: "ASC",
@@ -269,8 +269,9 @@ export default {
   },
   methods: {
     onLoad() {
-      const query = this.getQuery(this.params);
       this.loading = true;
+      const query = this.getQuery(this.params);
+
       getUsers(query)
         .then(async (resp) => {
           this.loading = false;
