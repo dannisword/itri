@@ -71,7 +71,7 @@ exports.default = {
       noMatch: '无匹配数据',
       loading: '加载中',
       placeholder: '请选择',
-      noData: '暂无数据'
+      noData: '無資料'
     },
     pagination: {
       goto: '前往',

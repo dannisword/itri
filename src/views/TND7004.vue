@@ -74,7 +74,7 @@ import pageMixin from "@/utils/mixin";
 import {
   importInventory,
   preInventory,
-  getInventorie,
+  getInvSysParam,
   setInventory,
 } from "@/api/inventory";
 
@@ -118,7 +118,7 @@ export default {
       });
     },
     onSetting() {
-      getInventorie().then((resp) => {
+      getInvSysParam().then((resp) => {
         if (resp.message) {
           this.workStations = resp.message;
           this.dialogs.setting.visible = true;

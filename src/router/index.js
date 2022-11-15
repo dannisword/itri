@@ -83,7 +83,25 @@ export const constantRoutes = [
         path: "/TND5001",
         name: "TND5001",
         component: () => import("@/views/TND5001"),
-        meta: { title: "盤點工作" },
+        meta: { title: "執行盤點工作" },
+      },
+      {
+        path: "/TND5100/:type/:id",
+        name: "TND5100",
+        component: () => import("@/views/TND5100"),
+        meta: { title: "執行盤點工作-初盤" },
+      },
+      {
+        path: "/TND5101/:type/:id",
+        name: "TND5101",
+        component: () => import("@/views/TND5100"),
+        meta: { title: "執行盤點工作-已完成有盤差" },
+      },
+      {
+        path: "/TND5102/:type/:id",
+        name: "TND5102",
+        component: () => import("@/views/TND5100"),
+        meta: { title: "執行盤點工作-複盤" },
       },
       {
         path: "/TND5103",

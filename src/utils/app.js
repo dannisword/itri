@@ -32,10 +32,10 @@ export function parseMessage(respone) {
         resolve();
       }
       //
-      if (respone.message.body) {
-        warning(respone.message.body.message);
-        resolve();
-      }
+      //if (respone.message.body) {
+      //  warning(respone.message.body.message);
+      //  resolve();
+      //}
 
       if (respone.message.statusCode == "BAD_REQUEST") {
         warning(respone.message.body.message);

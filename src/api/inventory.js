@@ -3,8 +3,8 @@ import { parseMessage } from "@/utils/app";
 
 /**
  * A7-1 建立盤點單
- * @param {*} data 
- * @returns 
+ * @param {*} data
+ * @returns
  */
 export function setInventories(data) {
   const uri = `/api/inventory`;
@@ -57,6 +57,48 @@ export function setInvInvalid(docNo, status) {
     });
   });
 }
+
+/**
+ * A7-04 回報單據明細盤點資料(編輯/盤點完成)
+ * @param {*} detailId 
+ * @param {*} isFinish 
+ * @param {*} data 
+ * @returns 
+ */
+export function setInvDetail(detailId, isFinish, data) {
+  const uri = `/api/inventory/start/${detailId}/${isFinish}`;
+  const method = "PUT";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+      data
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
+  });
+}
+/**
+ * A7-05 結束此單作業
+ * @param {*} docNo 
+ * @param {*} action 
+ * @returns 
+ */
+export function setInvFinished(docNo, action) {
+  const uri = `/api/inventory/finish/${docNo}/${action}`;
+  const method = "PUT";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
+  });
+}
+
 /**
  * A7-6 查詢出庫叫單數
  * @param {*} params
@@ -68,7 +110,28 @@ export function getInventories(params) {
     method: "GET",
   });
 }
-
+/**
+ * A7-7 取得盤點單
+ * @param {*} inventoryId
+ * @returns
+ */
+export function getInventory(inventoryId) {
+  return request({
+    url: `/api/inventory/${inventoryId}`,
+    method: "GET",
+  });
+}
+/**
+ * A7-08 取得盤點單明細
+ * @param {*} inventoryId
+ * @returns
+ */
+export function getInvDetail(inventoryId) {
+  return request({
+    url: `/api/inventory/detail/${inventoryId} `,
+    method: "GET",
+  });
+}
 /**
  * A7-17 收單作業
  * @returns
@@ -140,7 +203,7 @@ export function setInventory(data) {
  * @param {*} params
  * @returns
  */
-export function getInventorie() {
+export function getInvSysParam() {
   return request({
     url: `/api/inventory/sysParam`,
     method: "GET",

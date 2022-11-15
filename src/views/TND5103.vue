@@ -11,7 +11,8 @@
         <el-input v-model="memo" @keyup.enter.native="onLoad()"></el-input>
       </el-form-item>
       <el-form-item label="盤點日期">
-        <el-date-picker v-model="params.nowDate"> </el-date-picker>
+        <el-date-picker v-model="nowDate" format="yyyy-MM-dd">
+        </el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="success" @click="onLoadToday()"
@@ -42,8 +43,7 @@
 
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="料品號" prop="prodCode" fixed>
-        </el-table-column>
+      <el-table-column label="料品號" prop="prodCode" fixed> </el-table-column>
       <el-table-column label="物流箱編號" prop="carrierId" fixed>
       </el-table-column>
       <el-table-column label="儲位編號" prop="stationId"> </el-table-column>
@@ -122,9 +122,10 @@ export default {
       memo: "",
       content: [],
       changes: [],
+      nowDate:"",
       params: {
         prodCode: "",
-        nowDate: "",
+        date: "",
       },
       selected: {
         today: [],
@@ -140,7 +141,7 @@ export default {
     };
   },
   created() {
-    this.params.nowDate = this.addDay(0);
+    this.nowDate = this.addDay(0);
     this.Large.showAction = false;
   },
   methods: {
@@ -170,6 +171,11 @@ export default {
         });
     },
     onLoadToday() {
+      if (this.params.prodCode.length <=0){
+        this.warning(`請輸入盤點料品號！`);
+        return;
+      }
+      this.params.date = this.toDate(this.nowDate);
       const query = this.getQuery(this.params);
       this.loading = true;
       getInvAdjustments(query)

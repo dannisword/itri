@@ -40,7 +40,6 @@ export default {
       required: true,
       default: false,
     },
-
     optional: {
       type: Object,
       default: () => ({

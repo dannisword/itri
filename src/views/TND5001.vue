@@ -57,22 +57,18 @@
         <el-form-item label="料品號">
           <el-input v-model="params.prodCode"></el-input>
         </el-form-item>
-
-        <el-divider class="form-divider"></el-divider>
+        <!--        <el-divider class="form-divider"></el-divider> -->
 
         <el-form-item>
           <el-button type="primary" @click="onLoad()">查詢</el-button>
+          <el-button type="success" @click="onAdd()">新增盤點單</el-button>
         </el-form-item>
       </el-form>
     </div>
 
     <!-- 分頁 -->
     <el-row type="flex">
-      <el-col :span="8">
-        <div type="flex">
-          <el-button type="primary" @click="onAdd()">新增盤點單</el-button>
-        </div>
-      </el-col>
+      <el-col :span="8"> </el-col>
       <el-col :span="16" align="end">
         <el-pagination
           background
@@ -85,7 +81,7 @@
       </el-col>
     </el-row>
 
-    <!-- 資料-->
+    <!-- 盤點資料-->
     <el-table
       :data="content"
       v-loading="loading"
@@ -93,14 +89,15 @@
       border
       stripe
       @sort-change="onSortcChange"
+      @cell-dblclick="ondblClick"
     >
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
       <el-table-column
         label="盤點單號碼"
         prop="sysOrderNo"
-        width="130"
         sortable="custom"
+        min-width="200"
         fixed
       >
       </el-table-column>
@@ -186,7 +183,7 @@ import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getWorkStation } from "@/api/workStation";
 import { getInventories, setInvEffect, setInvInvalid } from "@/api/inventory";
-import { SelectTypeEnum } from "@/utils/enums/index";
+import { SelectTypeEnum, InvDocStatusEnum } from "@/utils/enums/index";
 
 export default {
   components: {
@@ -230,6 +227,7 @@ export default {
     this.getSelector(SelectTypeEnum.INVENTORY_TYPE).then((resp) => {
       this.types = resp;
     });
+    this.onLoad();
   },
   methods: {
     onLoad() {
@@ -259,7 +257,7 @@ export default {
         });
     },
     onAdd() {
-      this.onNav("TND5103")
+      this.onNav("TND5103");
     },
     onEffect(val) {
       setInvEffect(val.sysOrderNo).then((resp) => {
@@ -302,6 +300,28 @@ export default {
     onCurrentChange(val) {
       this.params.page = val;
       this.onLoad();
+    },
+    ondblClick(val) {
+      if (
+        val.docStatus == InvDocStatusEnum.Received ||
+        val.docStatus == InvDocStatusEnum.Invalid
+      ) {
+        return;
+      }
+      // 已生效, 已完成
+      let url = "";
+      if (val.type == "初盤") {
+        url = `/TND5100/1/${val.id}`;
+      }
+
+      if (val.type == "已完成有盤差") {
+        url = `/TND5101/2/${val.id}`;
+      }
+
+      if (val.type == "複盤") {
+        url = `/TND5102/3/${val.id}`;
+      }
+      this.onNav(url);
     },
   },
 };
