@@ -131,3 +131,15 @@ export function getCarrierConfig() {
     method: "GET",
   });
 }
+
+/**
+ * A2-20 取得物流箱歷程
+ * @param {*} params 
+ * @returns 
+ */
+export function getShuttles(params) {
+  return request({
+    url: `/device/shuttle/callBackLog${params}`,
+    method: "GET",
+  });
+}

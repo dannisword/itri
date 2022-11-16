@@ -11,7 +11,7 @@
         </el-form-item>
 
         <el-form-item label="狀態">
-          <el-select v-model="params.status" placeholder="請選擇">
+          <el-select v-model="params.status" multiple placeholder="請選擇">
             <el-option
               v-for="item in locationStatus"
               :key="item.value"
@@ -219,6 +219,17 @@
         </el-form-item>
       </el-form>
     </ModalDialog>
+
+    <!-- 鎖定訊息提示 -->
+    <ModalDialog
+      :title="dialogs.LOCK.title"
+      :name="dialogs.LOCK.name"
+      :visible.sync="dialogs.LOCK.visible"
+      :optional="dialogs.LOCK.optional"
+      @afterClosed="onMessage"
+    >
+      <span style="font-size: 20px">{{ message }}</span>
+    </ModalDialog>
   </div>
 </template>
 <script>
@@ -238,6 +249,7 @@ export default {
       locationStatus: [],
       loading: false,
       checkOnLock: true,
+      message: "",
       storage: {},
       storages: [],
       selected: {
@@ -246,6 +258,7 @@ export default {
       assign: {
         aisle: "",
         level: "",
+        status: 0,
       },
       params: {
         aisle: "",
@@ -275,6 +288,17 @@ export default {
           name: "ASSIGN",
           visible: false,
         },
+        LOCK: {
+          title: "物流箱允入設定",
+          name: "LOCK",
+          visible: false,
+          optional: {
+            size: "Small",
+            action: "先修改其他儲位",
+            cancel: "取消動作",
+            showAction: true,
+          },
+        },
       },
       optional: {
         size: "Small",
@@ -294,7 +318,7 @@ export default {
   methods: {
     onLoad() {
       this.loading = true;
-      const query = this.getQuery(this.params, true);
+      const query = this.getQuery(this.params, false);
       getStations(query)
         .then((resp) => {
           if (resp.status == "OK") {
@@ -315,7 +339,6 @@ export default {
     },
     onEditStorage(val) {
       this.storage = val;
-      console.log(this.storage);
       this.dialogs.storage.visible = true;
     },
     onSetStatus(val) {
@@ -389,35 +412,21 @@ export default {
       }
       // 更新指定層
       if (dialogRef.name == "ASSIGN") {
-        var data = {
-          status:
-            dialogRef.success == true
-              ? LocationStatusEnum.AVAILABLE
-              : LocationStatusEnum.RESERVE,
-          aisle: this.assign.aisle,
-          level: this.assign.level,
-        };
+        this.assign.status =
+          dialogRef.success == true
+            ? LocationStatusEnum.AVAILABLE
+            : LocationStatusEnum.RESERVE;
 
-        const query = this.getQuery(data, false);
-        this.loading = true;
-        setRange(this.checkOnLock, query)
-          .then((resp) => {
-            this.checkOnLock = resp.status == 200 ? false : true;
-            if (resp.status == 200) {
-              //this.warning(resp.errorMessage, 5000);
-              this.confirm(resp.errorMessage);
-              return;
-            }
-            if (resp.status == "OK") {
-              this.checkOnLock = true;
-              this.success("更新指定層完成");
-              this.onLoad();
-            }
-          })
-          .catch((e) => {
-            this.loading = false;
-          });
+        this.setAssign(this.assign);
       }
+    },
+    onMessage(dialogRef) {
+      this.dialogs.LOCK.visible = false;
+      if (dialogRef.success == undefined || dialogRef.success == false) {
+        this.checkOnLock = true;
+        return;
+      }
+      this.setAssign(this.assign);
     },
     onSelectionChange(val) {
       this.checkOnLock = true;
@@ -434,6 +443,28 @@ export default {
     onCurrentChange(val) {
       this.params.page = val;
       this.onLoad();
+    },
+    setAssign(data) {
+      const query = this.getQuery(data, false);
+      this.loading = true;
+      setRange(this.checkOnLock, query)
+        .then((resp) => {
+          this.checkOnLock = resp.status == 200 ? false : true;
+          this.loading = false;
+          if (resp.status == 200) {
+            this.message = resp.errorMessage;
+            this.dialogs.LOCK.visible = true;
+            return;
+          }
+          if (resp.status == "OK") {
+            this.checkOnLock = true;
+            this.success("更新指定層完成");
+            this.onLoad();
+          }
+        })
+        .catch((e) => {
+          this.loading = false;
+        });
     },
     canSelectRow(row, index) {
       return row.status < 2;

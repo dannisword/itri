@@ -67,7 +67,9 @@
         <el-button type="success" @click="onOpenModal('BATCH')"
           >批次更新狀態</el-button
         >
-        <el-button type="info" @click="onLoad()">物流箱歷程查詢</el-button>
+        <el-button type="info" @click="onNav('/TND7011')"
+          >物流箱歷程查詢</el-button
+        >
       </el-col>
       <el-col :span="8" align="end">
         <el-pagination
@@ -91,7 +93,11 @@
       @selection-change="onSelectionChange"
       @sort-change="onSortcChange"
     >
-      <el-table-column type="selection" width="55"></el-table-column>
+      <el-table-column
+        type="selection"
+        :selectable="canSelectRow"
+      ></el-table-column>
+      
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
       <el-table-column
@@ -133,13 +139,18 @@
           <span>{{ scope.row.isEnable | formatEnable() }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="品料號" prop="materialNo"> </el-table-column>
+      <el-table-column label="品料號" min-width="180" prop="materialNo">
+      </el-table-column>
       <el-table-column label="所在儲位/站點" width="180" prop="stationCode">
       </el-table-column>
 
-      <el-table-column label="編輯狀態" align="center">
+      <el-table-column label="編輯狀態" align="center" width="180">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="onEdit(scope.row)"
+          <el-button
+            size="mini"
+            type="primary"
+            @click="onEdit(scope.row)"
+            v-if="canEdit(scope.row)"
             >編輯
           </el-button>
         </template>
@@ -235,7 +246,7 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getSelector } from "@/api/system";
-import { SelectTypeEnum } from "@/utils/enums/index";
+import { SelectTypeEnum, CarrierStatusEnum } from "@/utils/enums/index";
 import {
   getCarriers,
   addCarrier,
@@ -374,7 +385,6 @@ export default {
       // 允入設定
       if (val == "ALLOWED") {
         getCarrierConfig().then((res) => {
-          console.log(res);
           if (res.status == "OK") {
             this.allowed = res.message;
             this.dialogs.ALLOWED.visible = true;
@@ -411,7 +421,6 @@ export default {
       });
     },
     onBatch(val) {
-      console.log(val);
       this.dialogs.BATCH.visible = false;
       if (val.success == undefined) {
         return;
@@ -492,6 +501,18 @@ export default {
       this.params.page = val;
       this.onLoad();
     },
+    canEdit(row) {
+      return (
+        row.status == CarrierStatusEnum.Arrive ||
+        row.status == CarrierStatusEnum.Remove
+      );
+    },
+    canSelectRow(row, index) {
+      return (
+        row.status == CarrierStatusEnum.Arrive ||
+        row.status == CarrierStatusEnum.Remove
+      );
+    },
   },
 };
 </script>
@@ -499,5 +520,8 @@ export default {
 .el-date-editor--daterange.el-input,
 .el-date-editor--daterange.el-input__inner {
   width: 360px;
+}
+.el-input {
+  width: 220px;
 }
 </style>

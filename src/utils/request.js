@@ -4,7 +4,7 @@ import { getUserInfo, getToken } from "./localStorage";
 
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
-  timeout: 5000,
+  timeout: 10000,
 });
 function parseBody(response) {
   if (response.status === 200) {

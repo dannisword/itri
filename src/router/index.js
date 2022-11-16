@@ -175,6 +175,12 @@ export const constantRoutes = [
         component: () => import("@/views/TND7010"),
         meta: { title: "角色權限設定" },
       },
+      {
+        path: "/TND7011",
+        name: "TND7011",
+        component: () => import("@/views/TND7011"),
+        meta: { title: "物流箱歷程查詢" },
+      },
     ],
   },
   // 404 page must be placed at the end !!!
