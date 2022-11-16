@@ -89,19 +89,46 @@
       border
       stripe
       @selection-change="onSelectionChange"
+      @sort-change="onSortcChange"
     >
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="物流箱編號" width="180" prop="id" fixed>
+      <el-table-column
+        label="物流箱編號"
+        width="180"
+        prop="id"
+        fixed
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="建立日期" width="180" prop="createTime">
+      <el-table-column
+        label="建立日期"
+        width="180"
+        prop="createTime"
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="建立人員" width="100" prop="creator">
+      <el-table-column
+        label="建立人員"
+        width="180"
+        prop="creator"
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="物流箱動作" width="180" prop="statusName">
+      <el-table-column
+        label="物流箱動作"
+        width="180"
+        prop="statusName"
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="狀態" width="100" prop="isEnable">
+      <el-table-column
+        label="狀態"
+        width="100"
+        prop="isEnable"
+        sortable="custom"
+      >
         <template slot-scope="scope">
           <span>{{ scope.row.isEnable | formatEnable() }}</span>
         </template>
@@ -452,6 +479,14 @@ export default {
     },
     onSelectionChange(val) {
       this.selected.carriers = val;
+    },
+    onSortcChange(val) {
+      this.params.direction = "ASC";
+      if (val.order == "descending") {
+        this.params.direction = "DESC";
+      }
+      this.params.properties = val.prop;
+      this.onLoad();
     },
     onCurrentChange(val) {
       this.params.page = val;

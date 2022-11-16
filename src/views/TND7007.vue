@@ -66,6 +66,7 @@
       border
       stripe
       @selection-change="onSelectionChange"
+      @sort-change="onSortcChange"
     >
       <el-table-column
         type="selection"
@@ -133,15 +134,21 @@
       <el-table-column
         label="是否為空箱"
         align="center"
-        width="120"
+        width="180"
         prop="isEmptyCarrier"
+        sortable="custom"
       >
         <template slot-scope="scope">
           <span>{{ scope.row.isEmptyCarrier | formatEmpty }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="狀態" width="100" prop="statusName">
+      <el-table-column
+        label="狀態"
+        width="100"
+        prop="statusName"
+        sortable="custom"
+      >
       </el-table-column>
 
       <el-table-column label="編輯" align="center">
@@ -363,20 +370,22 @@ export default {
           data.storageIds.push(elm.storageId);
         });
         this.loading = true;
-        setBatch(this.checkOnLock, data).then((resp) => {
-          this.checkOnLock = resp.status == 200 ? false : true;
-          if (resp.status == 200) {
-            this.warning(resp.errorMessage, 5000);
-            return;
-          }
-          if (resp.status == "OK") {
-            this.checkOnLock = true;
-            this.success("批次更新狀態完成");
-            this.onLoad();
-          }
-        }).catch(e=>{
-          this.loading = false;
-        });
+        setBatch(this.checkOnLock, data)
+          .then((resp) => {
+            this.checkOnLock = resp.status == 200 ? false : true;
+            if (resp.status == 200) {
+              this.warning(resp.errorMessage, 5000);
+              return;
+            }
+            if (resp.status == "OK") {
+              this.checkOnLock = true;
+              this.success("批次更新狀態完成");
+              this.onLoad();
+            }
+          })
+          .catch((e) => {
+            this.loading = false;
+          });
       }
       // 更新指定層
       if (dialogRef.name == "ASSIGN") {
@@ -413,6 +422,14 @@ export default {
     onSelectionChange(val) {
       this.checkOnLock = true;
       this.selected.storages = val;
+    },
+    onSortcChange(val) {
+      this.params.direction = "ASC";
+      if (val.order == "descending") {
+        this.params.direction = "DESC";
+      }
+      this.params.properties = val.prop;
+      this.onLoad();
     },
     onCurrentChange(val) {
       this.params.page = val;
