@@ -66,7 +66,12 @@
 
         <el-form-item>
           <el-button type="primary" @click="onLoad()">查詢</el-button>
-          <el-button type="success" @click="onAdd()">新增盤點單</el-button>
+          <el-button
+            type="success"
+            @click="onAdd()"
+            :disabled="currentModel() != 4"
+            >新增盤點單</el-button
+          >
         </el-form-item>
       </el-form>
     </div>
@@ -165,19 +170,21 @@
 
       <el-table-column label="動作" width="200" align="center">
         <template slot-scope="scope">
-          <el-button
-            @click="onEffect(scope.row)"
-            size="mini"
-            type="primary"
-            :disabled="scope.row.docStatus > 0"
-            >生效
-          </el-button>
-          <el-button
-            @click="onInvalid(scope.row)"
-            size="mini"
-            :disabled="scope.row.docStatus > 2"
-            >失效
-          </el-button>
+          <div v-if="currentModel() == 4">
+            <el-button
+              @click="onEffect(scope.row)"
+              size="mini"
+              type="primary"
+              :disabled="scope.row.docStatus > 0"
+              >生效
+            </el-button>
+            <el-button
+              @click="onInvalid(scope.row)"
+              size="mini"
+              :disabled="scope.row.docStatus > 2"
+              >失效
+            </el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -236,6 +243,9 @@ export default {
     if (this.workStation().length > 0) {
       this.params.workStnCode.push(this.workStation());
     }
+    //
+    console.log(this.currentModel());
+
     this.onLoad();
   },
   methods: {

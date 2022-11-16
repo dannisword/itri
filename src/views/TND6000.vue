@@ -74,7 +74,7 @@
       </el-table-column>
       <el-table-column label="供應商" prop="supplier" sortable="custom">
       </el-table-column>
-      <el-table-column label="數量" prop="availableQty" sortable="custom">
+      <el-table-column label="數量" prop="closingStock" sortable="custom">
       </el-table-column>
       <el-table-column
         label="儲位編號"

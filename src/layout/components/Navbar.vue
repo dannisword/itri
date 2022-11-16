@@ -71,7 +71,7 @@ export default {
     this.$store.dispatch("user/getInfo").then((data) => {
       this.user = data;
     });
-
+    this.onChange(0);
     getSelector(SelectTypeEnum.OPERATING_MODE).then((resp) => {
       this.operating = resp.message;
     });
@@ -86,8 +86,8 @@ export default {
       this.$router.push(`/login?redirect=${this.$route.fullPath}`);
     },
     onChange(val) {
-      setStorageItem("currentModel", val)
-      console.log(val);
+      setStorageItem("currentModel", val);
+      this.$store.dispatch("settings/changeModel", val);
     },
   },
 };

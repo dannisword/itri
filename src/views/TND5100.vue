@@ -232,6 +232,10 @@ export default {
         : true;
     },
     canFinish() {
+      // 切換盤點作業
+      if (this.currentModel() != 4) {
+        return false;
+      }
       let finished =
         this.inventory.docStatus == InvDocStatusEnum.Effective ||
         this.inventory.docStatus == InvDocStatusEnum.Progress

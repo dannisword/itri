@@ -134,12 +134,12 @@ export function getCarrierConfig() {
 
 /**
  * A2-20 取得物流箱歷程
- * @param {*} params 
- * @returns 
+ * @param {*} params
+ * @returns
  */
 export function getShuttles(params) {
   return request({
-    url: `/device/shuttle/callBackLog${params}`,
+    url: `/api/carrier/callBackLog${params}`,
     method: "GET",
   });
 }

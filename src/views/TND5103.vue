@@ -11,8 +11,7 @@
         <el-input v-model="memo" @keyup.enter.native="onLoad()"></el-input>
       </el-form-item>
       <el-form-item label="盤點日期">
-        <el-date-picker v-model="nowDate" format="yyyy-MM-dd">
-        </el-date-picker>
+        <el-date-picker v-model="nowDate" format="yyyy-MM-dd"> </el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="success" @click="onLoadToday()"
@@ -122,7 +121,7 @@ export default {
       memo: "",
       content: [],
       changes: [],
-      nowDate:"",
+      nowDate: "",
       params: {
         prodCode: "",
         date: "",
@@ -142,10 +141,10 @@ export default {
   },
   created() {
     this.nowDate = this.addDay(0);
-    this.Large.showAction = false;
   },
   methods: {
     onLoad() {
+      // ACAT002 11-11
       if (this.params.prodCode.length <= 0) {
         this.warning(`請輸入盤點料品號！`);
         return;
@@ -171,7 +170,7 @@ export default {
         });
     },
     onLoadToday() {
-      if (this.params.prodCode.length <=0){
+      if (this.params.prodCode.length <= 0) {
         this.warning(`請輸入盤點料品號！`);
         return;
       }
@@ -185,6 +184,7 @@ export default {
             return;
           }
           // 開窗
+          this.Large.showAction = false;
           this.dialogs.inv.visible = true;
           this.changes = resp.message;
           this.page.seq = 0;

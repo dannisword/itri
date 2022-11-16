@@ -15,7 +15,7 @@
         </el-form-item>
 
         <el-form-item label="物流箱編號">
-          <el-input v-model="params.storageId"></el-input>
+          <el-input v-model="params.carrierId"></el-input>
         </el-form-item>
 
         <el-form-item>
@@ -43,7 +43,7 @@
     <!--  -->
 
     <el-table
-      :data="carriers"
+      :data="content"
       v-loading="loading"
       class="table-container"
       border
@@ -52,15 +52,34 @@
     >
       <el-table-column label="項次" width="80" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="物流箱編號" width="180" prop="carrierId" fixed>
+      <el-table-column
+        label="物流箱編號"
+        width="180"
+        prop="carrierId"
+        fixed
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="歷程內容" min-width="180" prop="message">
+      <el-table-column
+        label="歷程內容"
+        min-width="280"
+        prop="message"
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="來源儲位/站點" min-width="180" prop="stationCode">
+      <el-table-column
+        label="感測器編號"
+        width="180"
+        prop="stationCode"
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="目的儲位/站點" min-width="180" prop="stationCode">
-      </el-table-column>
-      <el-table-column label="更新時間" width="180" prop="createTime">
+      <el-table-column
+        label="更新時間"
+        width="180"
+        prop="createTime"
+        sortable="custom"
+      >
       </el-table-column>
     </el-table>
   </div>
@@ -70,7 +89,6 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getShuttles } from "@/api/carrier";
-import respone from "@/utils/mixin/respone";
 
 export default {
   components: {
@@ -97,7 +115,7 @@ export default {
     //this.nowDate.push(this.addDay(-7));
     //this.nowDate.push(this.addDay(0));
     this.nowDate.push("2022-04-01");
-    this.nowDate.push("2022-05-01");
+    this.nowDate.push("2022-05-31");
   },
   methods: {
     onLoad() {
@@ -106,19 +124,18 @@ export default {
       this.params.endDate = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params);
       getShuttles(query)
-        .then((res) => {
-          console.log(res);
+        .then((respone) => {
           if (respone.status == "OK") {
-            this.content = resp.message.content;
+            this.content = respone.message.content;
+            // 分頁設定
+            this.setPagination(respone.message);
             // 處理項次
             for (let item of this.content) {
               this.page.seq++;
               item.seq = this.page.seq;
             }
           } else {
-            this.warning(errorMessage);
-            this.nowDate.push(this.addDay(-7));
-            this.nowDate.push(this.addDay(0));
+            this.warning(respone.errorMessage);
           }
           this.loading = false;
         })
@@ -132,6 +149,10 @@ export default {
         this.params.direction = "DESC";
       }
       this.params.properties = val.prop;
+      this.onLoad();
+    },
+    onCurrentChange(val) {
+      this.params.page = val;
       this.onLoad();
     },
   },

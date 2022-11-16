@@ -48,7 +48,6 @@ export default {
       return function (params, num = true) {
         let query = "";
         for (let [key, value] of Object.entries(params)) {
-       
           if (typeof value == "number" && value == 0 && num == true) {
             continue;
           }
@@ -85,6 +84,11 @@ export default {
       return function () {
         const user = getUserInfo();
         return user.workStation;
+      };
+    },
+    currentModel() {
+      return function () {
+        return this.$store.state.settings.currentModel;
       };
     },
   },
