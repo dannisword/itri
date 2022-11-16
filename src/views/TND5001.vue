@@ -119,6 +119,14 @@
       >
       </el-table-column>
       <el-table-column
+        label="單據狀態"
+        prop="docStatus"
+        width="130"
+        sortable="custom"
+      >
+      </el-table-column>
+
+      <el-table-column
         label="盤點類型"
         prop="type"
         width="130"
@@ -175,14 +183,21 @@
               @click="onEffect(scope.row)"
               size="mini"
               type="primary"
-              :disabled="scope.row.docStatus > 0"
+              v-if="canEffectAction(scope.row)"
               >生效
             </el-button>
             <el-button
               @click="onInvalid(scope.row)"
               size="mini"
-              :disabled="scope.row.docStatus > 2"
+              v-if="canInvalidAction(scope.row)"
               >失效
+            </el-button>
+            <!-- scope.row.docStatus > 2  reduction -->
+            <el-button
+              @click="onReduction(scope.row)"
+              size="mini"
+              v-if="canReductionAction(scope.row)"
+              >還原
             </el-button>
           </div>
         </template>
@@ -280,29 +295,36 @@ export default {
     },
     onEffect(val) {
       setInvEffect(val.sysOrderNo).then((resp) => {
-        if (resp.status != "OK") {
-          this.warning(resp.errorMessage);
-          return;
+        if (resp.status == "OK") {
+          if (resp.message == false) {
+            this.warning(`設定生效，${val.sysOrderNo}盤點單失敗！`);
+          } else {
+            this.onNav(`/TND5100/0/${val.id}`);
+          }
         }
-        if (resp.message == false) {
-          this.warning(`設定 ${val.sysOrderNo}盤點單失敗！`);
-        } else {
-          this.success(`設定 ${val.sysOrderNo}盤點單已生效！`);
-        }
-        this.onLoad();
       });
     },
     onInvalid(val) {
       //狀態(0:還原, 2:工作執行中, 5:失效)
       setInvInvalid(val.sysOrderNo, 5).then((resp) => {
-        if (resp.status != "OK") {
-          this.warning(`設定 ${val.sysOrderNo}盤點單失敗！`);
-          return;
+        if (resp.status == "OK") {
+          if (resp.message == false) {
+            this.warning(`設定失效，${val.sysOrderNo}盤點單失敗！`);
+          } else {
+            this.success(`設定失效，${val.sysOrderNo}盤點單成功！`);
+          }
         }
-        if (resp.message == false) {
-          this.warning(`設定 ${val.sysOrderNo}盤點單失敗！`);
-        } else {
-          this.success(`設定 ${val.sysOrderNo}盤點單已失效！`);
+        this.onLoad();
+      });
+    },
+    onReduction(val) {
+      setInvInvalid(val.sysOrderNo, 0).then((resp) => {
+        if (resp.status == "OK") {
+          if (resp.message == false) {
+            this.warning(`設定還原，${val.sysOrderNo}盤點單失敗！`);
+          } else {
+            this.success(`設定還原，${val.sysOrderNo}盤點單成功！`);
+          }
         }
         this.onLoad();
       });
@@ -327,8 +349,12 @@ export default {
         return;
       }
       console.log(val);
-      // 已生效, 已完成
+
       let url = "";
+      //if (val.docStatus == InvDocStatusEnum.Received) {
+      //  url = `/TND5100/0/${val.id}`;
+      //}
+      // 已生效, 已完成
       if (
         val.docStatus == InvDocStatusEnum.Progress ||
         val.docStatus == InvDocStatusEnum.Completed
@@ -344,6 +370,15 @@ export default {
         //url = `/TND5102/3/${val.id}`;
       }
       this.onNav(url);
+    },
+    canEffectAction(row) {
+      return row.docStatus == InvDocStatusEnum.Received;
+    },
+    canInvalidAction(row) {
+      return row.docStatus == InvDocStatusEnum.Received;
+    },
+    canReductionAction(row) {
+      return row.docStatus == InvDocStatusEnum.Invalid;
     },
   },
 };

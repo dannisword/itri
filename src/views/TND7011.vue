@@ -112,10 +112,10 @@ export default {
     };
   },
   created() {
-    //this.nowDate.push(this.addDay(-7));
-    //this.nowDate.push(this.addDay(0));
-    this.nowDate.push("2022-04-01");
-    this.nowDate.push("2022-05-31");
+    this.nowDate.push(this.addDay(-7));
+    this.nowDate.push(this.addDay(0));
+    //this.nowDate.push("2022-04-01");
+    //this.nowDate.push("2022-05-31");
   },
   methods: {
     onLoad() {

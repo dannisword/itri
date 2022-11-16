@@ -105,7 +105,10 @@
       </el-table-column>
       <el-table-column label="磅秤重量" prop="weight" min-width="120">
       </el-table-column>
+      <el-table-column label="isFinished" prop="isFinished" min-width="120">
+      </el-table-column>
 
+      <!-- 已盤點數量 -->
       <el-table-column label="已盤點數量" prop="prodQty" width="180">
         <template slot-scope="scope">
           <el-input
@@ -121,6 +124,8 @@
           <span v-else>{{ scope.row.prodQty }}</span>
         </template>
       </el-table-column>
+
+      <!-- 輸入盤點數量  -->
       <el-table-column label="輸入盤點數量" prop="inQty" width="180">
         <template slot-scope="scope">
           <el-input

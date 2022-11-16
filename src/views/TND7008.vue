@@ -396,7 +396,7 @@ export default {
       // 批次更新狀態
       if (val == "BATCH") {
         if (this.selected.carriers.length <= 0) {
-          this.warning("請選取批次更新物流箱");
+          this.warning("您尚未勾選要更新狀態的項目");
           return;
         }
         this.dialogs.BATCH.visible = true;
@@ -442,7 +442,7 @@ export default {
     },
     onPrint() {
       if (this.selected.carriers.length <= 0) {
-        this.warning("請選取需列印物流箱！");
+        this.warning("您尚未勾選欲列印的項目");
         return;
       }
       const data = [];
