@@ -15,7 +15,12 @@
         </el-form-item>
 
         <el-form-item label="作業站點">
-          <el-select v-model="params.workStnCode" multiple placeholder="請選擇">
+          <el-select
+            v-model="params.workStnCode"
+            multiple
+            placeholder="請選擇"
+            :disabled="workStation().length > 0"
+          >
             <el-option
               v-for="item in workStations"
               :key="item.id"
@@ -213,6 +218,7 @@ export default {
       types: [],
     };
   },
+  computed: {},
   created() {
     this.nowDate.push(this.addDay(-7));
     this.nowDate.push(this.addDay(0));
@@ -227,6 +233,9 @@ export default {
     this.getSelector(SelectTypeEnum.INVENTORY_TYPE).then((resp) => {
       this.types = resp;
     });
+    if (this.workStation().length > 0) {
+      this.params.workStnCode.push(this.workStation());
+    }
     this.onLoad();
   },
   methods: {
@@ -261,9 +270,8 @@ export default {
     },
     onEffect(val) {
       setInvEffect(val.sysOrderNo).then((resp) => {
-        console.log(resp);
         if (resp.status != "OK") {
-          this.warning(`設定 ${val.sysOrderNo}盤點單失敗！`);
+          this.warning(resp.errorMessage);
           return;
         }
         if (resp.message == false) {
@@ -308,18 +316,22 @@ export default {
       ) {
         return;
       }
+      console.log(val);
       // 已生效, 已完成
       let url = "";
-      if (val.type == "初盤") {
+      if (
+        val.docStatus == InvDocStatusEnum.Progress ||
+        val.docStatus == InvDocStatusEnum.Completed
+      ) {
         url = `/TND5100/1/${val.id}`;
       }
-
-      if (val.type == "已完成有盤差") {
+      // 完成
+      if (val.docStatus == InvDocStatusEnum.Finished) {
         url = `/TND5101/2/${val.id}`;
       }
 
-      if (val.type == "複盤") {
-        url = `/TND5102/3/${val.id}`;
+      if (val.docStatus == InvDocStatusEnum.Completed) {
+        //url = `/TND5102/3/${val.id}`;
       }
       this.onNav(url);
     },

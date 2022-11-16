@@ -27,20 +27,24 @@ export function parseBody(resp) {
 export function parseMessage(respone) {
   return new Promise((resolve, reject) => {
     try {
-      if (!respone.message) {
-        //warning("回傳格式異常");
+      // 顯示錯誤訊息
+      if (respone.errorMessage != undefined) {
+        warning(respone.errorMessage);
         resolve();
       }
-      //
-      //if (respone.message.body) {
-      //  warning(respone.message.body.message);
-      //  resolve();
-      //}
-
-      if (respone.message.statusCode == "BAD_REQUEST") {
+      /*
+      if (respone.message.body) {
         warning(respone.message.body.message);
         resolve();
       }
+
+      if (
+        respone.message.statusCode != undefined &&
+        respone.message.statusCode == "BAD_REQUEST"
+      ) {
+        //warning(respone.message.body.message);
+        resolve();
+      }*/
     } catch (e) {
       console.log(e);
     }

@@ -97,11 +97,10 @@ export function getCarriers(params) {
   return request({
     url: `/api/carrier/search${params}`,
     method: "GET",
-    params,
   });
 }
 /**
- *
+ * A2-16, 列印物流箱編號
  * @param {*} id
  * @param {*} isEnable
  * @returns
@@ -119,5 +118,16 @@ export function printBarcode(data) {
       parseMessage(resp);
       resolve(resp);
     });
+  });
+}
+
+/**
+ * A2-19, 取得物流箱允入條件
+ * @returns
+ */
+export function getCarrierConfig() {
+  return request({
+    url: `/api/carrier/config`,
+    method: "GET",
   });
 }

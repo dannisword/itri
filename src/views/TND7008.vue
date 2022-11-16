@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
     <div class="form-container">
+      <!-- 查詢條件 -->
       <el-form ref="params" :model="params" label-width="100px" :inline="true">
         <el-form-item label="建立日期">
           <el-date-picker
@@ -14,10 +15,10 @@
         </el-form-item>
 
         <el-form-item label="物流箱動作">
-          <el-select v-model="params.status" placeholder="請選擇">
+          <el-select v-model="params.status" multiple placeholder="請選擇">
             <el-option
               v-for="item in carrierStatus"
-              :key="item.value"
+              :key="item.id"
               :label="item.label"
               :value="item.value"
             >
@@ -26,10 +27,10 @@
         </el-form-item>
 
         <el-form-item label="狀態">
-          <el-select v-model="params.isEnable" placeholder="請選擇">
+          <el-select v-model="params.isEnable" multiple placeholder="請選擇">
             <el-option
               v-for="item in enabledTyps"
-              :key="item.value"
+              :key="item.id"
               :label="item.label"
               :value="item.value"
             >
@@ -71,18 +72,19 @@
       <el-col :span="8" align="end">
         <el-pagination
           background
-          @size-change="onSizeChange"
           @current-change="onCurrentChange"
-          :current-page="page.currentPage"
-          :page-size="page.pagesize"
+          :current-page="page.number"
+          :page-size="page.size"
           layout="total,jumper,prev, pager, next"
-          :total="page.totalPage"
+          :total="page.totalElements"
         ></el-pagination>
       </el-col>
     </el-row>
+
     <!-- 資料表 -->
     <el-table
       :data="carriers"
+      v-loading="loading"
       class="table-container"
       border
       stripe
@@ -91,13 +93,13 @@
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="物流箱編號" width="100" prop="id" fixed>
+      <el-table-column label="物流箱編號" width="180" prop="id" fixed>
       </el-table-column>
       <el-table-column label="建立日期" width="180" prop="createTime">
       </el-table-column>
       <el-table-column label="建立人員" width="100" prop="creator">
       </el-table-column>
-      <el-table-column label="物流箱動作" width="100" prop="statusName">
+      <el-table-column label="物流箱動作" width="180" prop="statusName">
       </el-table-column>
       <el-table-column label="狀態" width="100" prop="isEnable">
         <template slot-scope="scope">
@@ -180,7 +182,7 @@
           <el-select v-model="carrier.isEnable" placeholder="請選擇">
             <el-option
               v-for="item in enabledTyps"
-              :key="item.value"
+              :key="item.id"
               :label="item.label"
               :value="item.value"
             >
@@ -214,6 +216,7 @@ import {
   enableCarrier,
   enableCarriers,
   printBarcode,
+  getCarrierConfig,
 } from "@/api/carrier";
 
 export default {
@@ -223,6 +226,7 @@ export default {
   mixins: [pageMixin],
   data() {
     return {
+      loading: false,
       nowDate: [],
       carrierStatus: [],
       enabledTyps: [],
@@ -297,7 +301,7 @@ export default {
     };
   },
   created() {
-    this.nowDate.push(this.addDay(-1));
+    this.nowDate.push(this.addDay(-30));
     this.nowDate.push(this.addDay(0));
     // 物流箱動作
     getSelector(SelectTypeEnum.CARRIER_STATUS).then((resp) => {
@@ -307,36 +311,52 @@ export default {
     getSelector(SelectTypeEnum.ENABLED_TYPE).then((resp) => {
       this.enabledTyps = resp.message;
     });
+    this.onLoad();
   },
   methods: {
     onLoad() {
+      this.loading = true;
       this.params.startDate = this.toDate(this.nowDate[0]);
       this.params.endDate = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params);
 
-      getCarriers(query).then((resp) => {
-        if (resp.status == "OK") {
-          this.carriers = resp.message.content;
-          // 項次
-          const pageable = resp.message.pageable;
-          let index = this.getIndex(pageable);
-          this.carriers.forEach((elm) => {
-            elm.seq = index;
-            index++;
-          });
-        }
-      });
+      getCarriers(query)
+        .then((resp) => {
+          if (resp.status == "OK") {
+            this.carriers = resp.message.content;
+            // 分頁設定
+            this.setPagination(resp.message);
+            // 處理項次
+            for (let item of this.carriers) {
+              this.page.seq++;
+              item.seq = this.page.seq;
+            }
+            this.loading = false;
+          }
+        })
+        .catch((e) => {
+          this.loading = false;
+        });
     },
     onOpenModal(val) {
+      // 新增
       if (val == "NEW") {
         this.newNumber = 0;
         this.dialogs.NEW.visible = true;
       }
-
+      // 允入設定
       if (val == "ALLOWED") {
-        this.dialogs.ALLOWED.visible = true;
+        getCarrierConfig().then((res) => {
+          console.log(res);
+          if (res.status == "OK") {
+            this.allowed = res.message;
+            this.dialogs.ALLOWED.visible = true;
+          } else {
+            this.warning("取得物流箱允入條件錯誤！");
+          }
+        });
       }
-
+      // 批次更新狀態
       if (val == "BATCH") {
         if (this.selected.carriers.length <= 0) {
           this.warning("請選取批次更新物流箱");
@@ -352,6 +372,7 @@ export default {
     onSave(val) {
       this.dialogs.EDIT.visible = false;
       if (val.success == undefined || val.success == false) {
+        this.onLoad();
         return;
       }
       // 存檔
@@ -363,11 +384,11 @@ export default {
       });
     },
     onBatch(val) {
+      console.log(val);
+      this.dialogs.BATCH.visible = false;
       if (val.success == undefined) {
-        this.dialogs.BATCH.visible = true;
         return;
       }
-      this.dialogs.BATCH.visible = false;
       const data = {
         carrierIds: [],
         isEnable: val.success,
@@ -403,7 +424,7 @@ export default {
     },
     onNew(val) {
       this.dialogs.NEW.visible = false;
-      if (val.success == false) {
+      if (val.success == undefined || val.success == false) {
         return;
       }
       const param = {
@@ -419,9 +440,10 @@ export default {
     },
     onAllowed(val) {
       this.dialogs.ALLOWED.visible = false;
-      if (val.success == false) {
+      if (val.success == undefined || val.success == false) {
         return;
       }
+
       configCarrier(this.allowed).then((resp) => {
         if (resp.status == "OK") {
           this.success("物流箱允入設定成功！");
@@ -431,8 +453,10 @@ export default {
     onSelectionChange(val) {
       this.selected.carriers = val;
     },
-    onSizeChange(val) {},
-    onCurrentChange(val) {},
+    onCurrentChange(val) {
+      this.params.page = val;
+      this.onLoad();
+    },
   },
 };
 </script>

@@ -7,14 +7,13 @@ import { parseMessage } from "@/utils/app";
  * @param {*} data
  * @returns
  */
-export function setStation(storageId, data) {
-  const uri = `/api/station/status/${storageId}`;
+export function setStation(storageId, params) {
+  const uri = `/api/station/status/${storageId}${params}`;
   const method = "PUT";
   return new Promise((resolve) => {
     request({
       url: uri,
       method: method,
-      data,
     }).then((resp) => {
       parseMessage(resp);
       resolve(resp);
@@ -42,14 +41,13 @@ export function setBatch(checkOnLock, data) {
 }
 
 /**
- * https://www.logistics.org.tw/tenacity/api/station/range/status/true?aisle=2&level=1&status=0
- * https://www.logistics.org.tw/tenacity/api/station/range/status/true?aisle=2&level=1
- * @param {*} checkOnLock 
- * @param {*} data 
- * @returns 
+ * A2-6, 設定儲位範圍儲位狀態(更新指定層)
+ * @param {*} checkOnLock
+ * @param {*} data
+ * @returns
  */
-export function setRange(checkOnLock, data) {
-  const uri = `api/station/range/status/${checkOnLock}${data}`;
+export function setRange(checkOnLock, params) {
+  const uri = `api/station/range/status/${checkOnLock}${params}`;
   const method = "PUT";
   return new Promise((resolve) => {
     request({
