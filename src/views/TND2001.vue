@@ -10,6 +10,7 @@
             range-separator="至"
             start-placeholder="開始日期"
             end-placeholder="結束日期"
+            @change="onDatePickeChang"
           >
           </el-date-picker>
         </el-form-item>
@@ -19,6 +20,7 @@
             v-model="params.assignWorkStationId"
             multiple
             placeholder="請選擇"
+            :disabled="workStation().length > 0"
           >
             <el-option
               v-for="item in workStations"
@@ -91,53 +93,60 @@
     <!-- 資料 -->
     <el-table
       :data="content"
+      v-loading="loading"
       class="table-container"
       border
       stripe
       @sort-change="onSortcChange"
+      @cell-dblclick="ondblClick"
     >
-      <el-table-column label="項次" width="100" prop="id" fixed>
+      <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
       <el-table-column
         label="收單來源"
-        prop="code"
+        prop="receiveSource"
         width="180"
         sortable="custom"
       >
       </el-table-column>
-      <el-table-column label="入庫單號碼" prop="name" sortable="custom">
+      <el-table-column
+        label="入庫單號碼"
+        prop="sysOrderNo"
+        width="180"
+        sortable="custom"
+      >
       </el-table-column>
       <el-table-column
         label="料品號"
-        prop="statusName"
+        prop="prodCode"
         width="125"
         sortable="custom"
       >
       </el-table-column>
       <el-table-column
         label="供應商"
-        prop="statusName"
+        prop="supplier"
         width="125"
         sortable="custom"
       >
       </el-table-column>
       <el-table-column
         label="收料數量"
-        prop="statusName"
+        prop="totalPlanQty"
         width="125"
         sortable="custom"
       >
       </el-table-column>
       <el-table-column
         label="入庫單狀態"
-        prop="statusName"
+        prop="docStatusName"
         width="125"
         sortable="custom"
       >
       </el-table-column>
       <el-table-column
         label="綁定站點"
-        prop="statusName"
+        prop="assignWorkStationId"
         width="125"
         sortable="custom"
       >
@@ -152,7 +161,6 @@ import { getInbounds } from "@/api/inbound";
 import { getWorkStation } from "@/api/workStation";
 import { SelectTypeEnum } from "@/utils/enums/index";
 
-
 export default {
   components: {
     ModalDialog,
@@ -160,6 +168,7 @@ export default {
   mixins: [pageMixin],
   data() {
     return {
+      loading: false,
       content: [],
       workStations: [],
       nowDate: [],
@@ -169,7 +178,7 @@ export default {
         docStatus: 0,
         page: 1,
         prodCode: "",
-        properties: "",
+        properties: "id",
         receivedEndDateTime: "",
         receivedStartDateTime: "",
         receiveSource: "",
@@ -181,7 +190,7 @@ export default {
     };
   },
   async created() {
-    this.nowDate.push(this.addDay(-7));
+    this.nowDate.push(this.addDay(-30));
     this.nowDate.push(this.addDay(0));
     // 作業站點
     this.workStations = await this.getSelector(SelectTypeEnum.WORK_STATION);
@@ -189,17 +198,35 @@ export default {
     this.inStatus = await this.getSelector(SelectTypeEnum.INBOUND_STATUS);
     // 收單來源
     this.inSource = await this.getSelector(SelectTypeEnum.INBOUND_SOURCE);
+    // 站點綁定
+    if (this.workStation().length > 0) {
+      this.params.assignWorkStationId.push(this.workStation());
+    }
+    this.onLoad();
   },
   methods: {
     onLoad() {
+      this.loading = true;
       this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);
       this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params, false);
-      getInbounds(query).then((respone) => {
-        if (respone.message) {
-          this.content = respone.message.content;
-        }
-      });
+      getInbounds(query)
+        .then((respone) => {
+          if (respone.message) {
+            this.content = respone.message.content;
+            // 分頁設定
+            this.setPagination(respone.message);
+            // 處理項次
+            for (let item of this.content) {
+              this.page.seq++;
+              item.seq = this.page.seq;
+            }
+            this.loading = false;
+          }
+        })
+        .catch((e) => {
+          this.loading = false;
+        });
     },
     async onSortcChange(val) {
       if (val.order == null) {
@@ -213,6 +240,9 @@ export default {
       this.params.page = val;
       this.onLoad();
     },
+    ondblClick(val) {
+      console.log(val)
+    }
   },
 };
 </script>

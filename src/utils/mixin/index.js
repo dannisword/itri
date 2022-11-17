@@ -1,3 +1,4 @@
+import moment from "moment";
 import { MessageBox, Message } from "element-ui";
 import dateMixin from "@/utils/mixin/date";
 import responeMixin from "@/utils/mixin/respone";
@@ -176,6 +177,15 @@ export default {
             reject(e);
           });
       });
+    },
+    onDatePickeChang(val) {
+
+      const diff = moment(val[1]).diff(val[0], "days");
+      if (diff > 60) {
+        val[0] = this.addDay(-7);
+        val[1] = this.addDay(0);
+        this.warning("日期查詢間隔勿超過60天");
+      }
     },
   },
 };

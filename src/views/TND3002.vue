@@ -1,39 +1,55 @@
 <template>
   <div class="app-container">
-    <div style="width: 320px">
-      <el-form :model="params" label-width="180px" :inline="true">
-        <el-form-item>
-          <h2>輸入出庫空箱數</h2>
-        </el-form-item>
-        <el-form-item>
-          <el-input v-model="params.sysOrderNo"></el-input>
-        </el-form-item>
-        <el-button type="primary" @click="onAction()">空箱出庫</el-button>
-
-        <el-form-item>
-          <p style="color: red">自動倉可用的總儲位數：70個</p>
-        </el-form-item>
-
-        <el-divider class="form-divider"></el-divider>
-
-        <el-form-item>
-          <el-button type="primary" @click="onLoad()"
-            >空箱入庫進度查詢</el-button
+    <el-row>
+      <el-col :span="20">
+        <el-form :inline="true" label-width="260px">
+          <el-form-item
+            class="form-item-label-30 label-blue-color"
+            label="輸入出庫空箱箱數"
           >
-        </el-form-item>
-      </el-form>
-    </div>
+            <el-input
+              v-model="qty"
+              placeholder="輸入出庫空箱箱數"
+              type="number"
+            ></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="primary"
+              @click="onAction('OUT')"
+              :disabled="isRunning == true"
+              >空箱出庫</el-button
+            >
+            <el-button
+              type="danger"
+              @click="onAction('CANCEL')"
+              v-if="isRunning == true"
+              >後續中止</el-button
+            >
+          </el-form-item>
+        </el-form>
+      </el-col>
+      <el-col :span="20">
+        <p style="font-size: 30px; color: crimson">
+          自動倉可用的總儲位數：{{ emptyCount }}個
+        </p>
+      </el-col>
+      <el-col :span="20">
+        <el-button type="primary" @click="dialogs.carrier.visible = true"
+          >空箱入庫進度查詢</el-button
+        >
+      </el-col>
+    </el-row>
 
-    <ModalDialog
-      :title="dialogs.carrier.title"
-      :name="dialogs.carrier.name"
-      :visible.sync="dialogs.carrier.visible"
-      @afterClosed="onModalClose"
-      :optional="optional"
-    >
+    <Dialog @afterClosed="onModalClose" :optional="dialogs.carrier">
       <el-form :model="params" :inline="true">
         <el-form-item label="站點">
-          <el-select v-model="params.assignWorkStationId" placeholder="請選擇">
+          <el-select
+            v-model="params.stationCode"
+            multiple
+            placeholder="請選擇"
+            :disabled="workStation().length > 0"
+          >
             <el-option
               v-for="item in workStations"
               :key="item.id"
@@ -45,7 +61,7 @@
         </el-form-item>
 
         <el-form-item label="作業日期">
-          <el-date-picker v-model="params.dateAt" type="date"> </el-date-picker>
+          <el-date-picker v-model="nowDate" type="date"> </el-date-picker>
         </el-form-item>
         <el-form-item>
           <el-button
@@ -73,62 +89,69 @@
 
       <el-table
         :data="content"
+        v-loading="loading"
         class="table-container"
         border
         stripe
-        height="100%"
       >
-        <el-table-column label="項次" width="100" prop="id" fixed>
+        <el-table-column label="項次" width="100" prop="seq" fixed>
         </el-table-column>
-        <el-table-column label="站點" prop="code" width="180">
+        <el-table-column label="站點" prop="stationCode" width="180">
         </el-table-column>
-        <el-table-column label="物流箱編號" prop="name"> </el-table-column>
-        <el-table-column label="儲位編號" prop="statusName" width="125">
+        <el-table-column label="物流箱編號" prop="carrierId"> </el-table-column>
+        <el-table-column label="儲位編號" prop="storageCode" width="125">
         </el-table-column>
-        <el-table-column label="收到指令時間" prop="statusName" width="125">
+        <el-table-column label="收到指令時間" prop="createTime" width="125">
         </el-table-column>
-        <el-table-column label="完成指令時間" prop="statusName" width="125">
+        <el-table-column label="完成指令時間" prop="finishTime" width="125">
         </el-table-column>
-        <el-table-column label="進度" prop="statusName" width="125">
+        <el-table-column label="進度" prop="carrierStatusName" width="125">
         </el-table-column>
       </el-table>
-    </ModalDialog>
+    </Dialog>
   </div>
 </template>
 <script>
 import ModalDialog from "@/components/ModalDialog/index.vue";
+import Dialog from "@/components/ModalDialog/Dialog.vue";
 import pageMixin from "@/utils/mixin";
 import { getWorkStation } from "@/api/workStation";
+import { getEmptyCount } from "@/api/carrier";
+import { getShuttle, getEmptyRecords } from "@/api/outbound";
 
 export default {
   components: {
     ModalDialog,
+    Dialog,
   },
   mixins: [pageMixin],
   data() {
     return {
       nowDate: "",
+      loading: false,
       content: [],
       workStations: [],
+      emptyCount: "",
+      qty: 0,
+      isRunning: false,
       params: {
-        dateAt: "",
-        assignWorkStationId: "",
-        page: 0,
-        size: 50,
         direction: "ASC",
+        endDate: "",
+        page: 1,
         properties: "id",
-      },
-      optional: {
-        size: "Large",
-        action: "",
-        cancel: "",
-        showAction: false,
+        size: 50,
+        startDate: "",
+        stationCode: [],
       },
       dialogs: {
         carrier: {
-          title: "空箱入庫進度查詢",
+          title: "空箱出庫進度查詢",
           name: "CARRIER",
           visible: false,
+          size: "Large",
+          action: "",
+          cancel: "",
+          showAction: false,
         },
       },
     };
@@ -140,14 +163,72 @@ export default {
         this.workStations = resp.message;
       }
     });
+    // 站點綁定
+    if (this.workStation().length > 0) {
+      this.params.stationCode.push(this.workStation());
+    }
+
+    this.onQuery();
   },
   methods: {
     onLoad() {
-      this.dialogs.carrier.visible = true;
+      this.loading = true;
+      this.params.startDate = this.toDate(this.nowDate);
+      this.params.endDate = this.toDate(this.nowDate);
+      const query = this.getQuery(this.params);
+      getEmptyRecords(query)
+        .then((resp) => {
+          console.log(resp);
+          if (resp.status == "OK") {
+            this.content = resp.message.content;
+            // 分頁設定
+            this.setPagination(resp.message);
+            // 處理項次
+            for (let item of this.content) {
+              this.page.seq++;
+              item.seq = this.page.seq;
+            }
+            this.loading = false;
+          }
+        })
+        .catch((e) => {
+          this.loading = false;
+        });
     },
-    onAction() {},
+    onQuery() {
+      // A2-17, 取得空箱數量
+      getEmptyCount().then((resp) => {
+        if (resp.status != "OK") {
+          return;
+        }
+        this.emptyCount = resp.message.emptyCount;
+      });
+    },
+    onAction(mode) {
+      this.isRunning = false;
+      if (this.qty <= 0) {
+        this.warning("請填寫箱數，才能進行空箱出庫作業");
+        return;
+      }
+      // 空箱出庫
+      if (mode == "OUT") {
+        this.isRunning = true;
+        getShuttle().then((resp) => {
+          if (resp.status == "OK") {
+            this.success("指令接收成功，已安排空箱出庫作業");
+          }
+        });
+      }
+      // 後續中止
+      if (mode == "CANCEL") {
+      }
+    },
     onModalClose(val) {
       this.dialogs.carrier.visible = false;
+    },
+    onCurrentChange(val) {
+      this.params.page = val;
+      this.onLoad();
     },
   },
 };

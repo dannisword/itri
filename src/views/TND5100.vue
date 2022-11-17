@@ -298,9 +298,6 @@ export default {
       this.onNav("/TND5001");
     },
     onFinished(action) {
-      //console.log(this.content[0].totalPlanQty)
-      //console.log(this.content[0].totalProdQty)
-
       // 開窗 FINISHED
       if (action == "FINISHED") {
         this.Small.showAction = false;
@@ -368,7 +365,7 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 .form-item-prev .el-form-item__label {
   font-size: 30px;
   color: #1e88e5;

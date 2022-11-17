@@ -120,7 +120,16 @@ export function printBarcode(data) {
     });
   });
 }
-
+/**
+ * A2-17, 取得空箱數量
+ * @returns 
+ */
+export function getEmptyCount() {
+  return request({
+    url: `/api/carrier/emptyCount`,
+    method: "GET",
+  });
+}
 /**
  * A2-19, 取得物流箱允入條件
  * @returns

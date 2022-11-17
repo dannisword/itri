@@ -71,10 +71,23 @@
     font-size: $--font-size;
 }
 
-.el-input.is-disabled .el-input__inner{
+.el-input.is-disabled .el-input__inner {
     color: #757575;
 }
+
 /*
 .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner{
     background-color: #409EFF;
 }*/
+.form-item-label-30 .el-form-item__label {
+    font-size: 30px;
+
+}
+
+.form-item-label-30 .el-input {
+    width: 300px;
+}
+
+.label-blue-color .el-form-item__label {
+    color: #1e88e5;
+}

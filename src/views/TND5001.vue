@@ -116,6 +116,7 @@
         prop="docStatusLabel"
         width="130"
         sortable="custom"
+        fixed
       >
       </el-table-column>
       <el-table-column
@@ -245,6 +246,7 @@ export default {
     this.nowDate.push(this.addDay(-7));
     this.nowDate.push(this.addDay(0));
     getWorkStation().then((resp) => {
+
       if (resp.message) {
         this.workStations = resp.message;
       }
@@ -255,12 +257,10 @@ export default {
     this.getSelector(SelectTypeEnum.INVENTORY_TYPE).then((resp) => {
       this.types = resp;
     });
+    // 站點綁定
     if (this.workStation().length > 0) {
       this.params.workStnCode.push(this.workStation());
     }
-    //
-    console.log(this.currentModel());
-
     this.onLoad();
   },
   methods: {

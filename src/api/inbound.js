@@ -1,14 +1,48 @@
 import request from "@/utils/request";
 import { parseMessage } from "@/utils/app";
+///api/inbound/detail/{inboundId}
+/**
+ * A3-01 取得所有入庫單明細
+ * @param {*} inboundId
+ * @returns
+ */
+export function getInDetail(inboundId) {
+  return request({
+    url: `api/inbound/detail/${inboundId}`,
+    method: "GET",
+  });
+}
 
 /**
  * A3-3 查詢入庫單(工單/收料單)
- * @param {*} params 
- * @returns 
+ * @param {*} params
+ * @returns
  */
 export function getInbounds(params) {
   return request({
     url: `/api/inbound/search${params}`,
+    method: "GET",
+  });
+}
+
+/**
+ * A3-8 空箱入庫
+ * @returns
+ */
+export function setShuttle(carrierId) {
+  return request({
+    url: `/api/shuttle/empty/pull/${carrierId}`,
+    method: "POST",
+  });
+}
+/**
+ * A3-10 查詢空箱入庫進度
+ * @param {*} params
+ * @returns
+ */
+export function getEmptyRecords(params) {
+  return request({
+    url: `/api/inbound/emptyRecord${params}`,
     method: "GET",
   });
 }

@@ -91,3 +91,25 @@ export function getOutBound() {
     method: "GET",
   });
 }
+/**
+ * A4-22 空箱叫用
+ * @returns 
+ */
+export function getShuttle() {
+  return request({
+    url: `/api/shuttle/empty/go`,
+    method: "POST",
+  });
+}
+
+/**
+ * A4-24 查詢空箱出庫進度
+ * @param {*} params 
+ * @returns 
+ */
+export function getEmptyRecords(params) {
+  return request({
+    url: `/api/outbound/emptyRecord${params}`,
+    method: "GET",
+  });
+}

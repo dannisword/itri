@@ -72,6 +72,17 @@ export function getStations(params) {
 }
 
 /**
+ * A2-09 取得空儲位數量
+ * @returns 
+ */
+export function getEmptyCount() {
+  return request({
+    url: `/api/station/emptyCount`,
+    method: "GET",
+  });
+}
+
+/**
  *  A1-11 簽入人員(今日簽入作業)
  * @param {*} data
  * @returns
