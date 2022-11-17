@@ -209,7 +209,7 @@ export default {
     if (this.workStation().length > 0) {
       this.params.assignWorkStationId.push(this.workStation());
     }
-    // getReceiveInfo
+    // 入庫資訊
     getReceiveInfo("入庫").then((resp) => {
       if (resp.status == "OK") {
         this.receiveInfo = resp.message;

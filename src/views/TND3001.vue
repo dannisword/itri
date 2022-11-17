@@ -2,7 +2,7 @@
   <div class="app-container">
     <!-- 查詢條件 -->
     <div class="form-container">
-      <el-form :model="params" label-width="90px" :inline="true">
+      <el-form :model="params" label-width="100px" :inline="true">
         <el-form-item label="收單日期">
           <el-date-picker
             v-model="nowDate"
@@ -61,8 +61,9 @@
         <el-form-item label="料品號">
           <el-input v-model="params.prodCode"></el-input>
         </el-form-item>
-
+        <!-- 
         <el-divider class="form-divider"></el-divider>
+        -->
 
         <el-form-item>
           <el-button type="primary" @click="onLoad()">查詢</el-button>
@@ -81,7 +82,6 @@
       <el-col :span="16" align="end">
         <el-pagination
           background
-          @size-change="onSizeChange"
           @current-change="onCurrentChange"
           :current-page="page.number"
           :page-size="page.size"
@@ -94,49 +94,49 @@
     <!-- 資料-->
     <el-table
       :data="content"
+      v-loading="loading"
       class="table-container"
       border
       stripe
-      height="500"
     >
       <el-table-column type="selection" width="55"> </el-table-column>
-      <el-table-column label="項次" width="100" prop="id" fixed>
+      <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
       <el-table-column
         label="出貨模式"
-        prop="code"
+        prop="docType"
         width="180"
         sortable="custom"
       >
       </el-table-column>
-      <el-table-column label="出庫單號碼" prop="name" sortable="custom">
+      <el-table-column label="出庫單號碼" prop="sysOrderNo" sortable="custom">
       </el-table-column>
-      <el-table-column label="料品號" prop="statusName" sortable="custom">
+      <el-table-column label="料品號" prop="prodCode" sortable="custom">
       </el-table-column>
       <el-table-column
         label="供應商"
-        prop="statusName"
+        prop="supplier"
         sortable="custom"
         width="100"
       >
       </el-table-column>
       <el-table-column
         label="數量"
-        prop="statusName"
+        prop="totalPlanQty"
         sortable="custom"
         width="100"
       >
       </el-table-column>
       <el-table-column
         label="出庫單狀態"
-        prop="statusName"
+        prop="docStatusName"
         sortable="custom"
         width="100"
       >
       </el-table-column>
       <el-table-column
         label="綁定站點"
-        prop="statusName"
+        prop="assignWorkStationId"
         sortable="custom"
         width="100"
       >
@@ -158,6 +158,7 @@ import pageMixin from "@/utils/mixin";
 import { getWorkStation } from "@/api/workStation";
 import { getOutBounds } from "@/api/outbound";
 import { SelectTypeEnum } from "@/utils/enums/index";
+import { getReceiveInfo } from "@/api/system";
 
 export default {
   components: {
@@ -166,15 +167,19 @@ export default {
   mixins: [pageMixin],
   data() {
     return {
+      loading: false,
+      receiveInfo: "",
       content: [],
       workStations: [],
       nowDate: [],
+      outStatus: [],
+      outSource: [],
       params: {
         assignWorkStationId: "",
         direction: "ASC",
         docStatus: 0,
         docType: "0",
-        page: 0,
+        page: 1,
         prodCode: "",
         properties: "id",
         receivedEndDateTime: "",
@@ -182,8 +187,6 @@ export default {
         size: 50,
         sysOrderNo: "",
       },
-      outStatus: [],
-      outSource: [],
     };
   },
   async created() {
@@ -198,18 +201,40 @@ export default {
     this.outStatus = await this.getSelector(SelectTypeEnum.OUTBOUND_STATUS);
 
     this.outSource = await this.getSelector(SelectTypeEnum.SHIPPING_MODE);
+
+    // 出庫資訊
+    getReceiveInfo("出庫").then((resp) => {
+      if (resp.status == "OK") {
+        this.receiveInfo = resp.message;
+      }
+    });
+
+    this.onLoad();
   },
   methods: {
     onLoad() {
-      //this.onNav("/TND3100");
-
+      this.loading = true;
       this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);
       this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params);
-      getOutBounds(query).then((respone) => {
-        this.content = respone.message;
-        console.log(respone);
-      });
+      getOutBounds(query)
+        .then((respone) => {
+          if (respone.status == "OK") {
+            this.content = respone.message.content;
+
+            // 分頁設定
+            this.setPagination(respone.message);
+            // 處理項次
+            for (let item of this.content) {
+              this.page.seq++;
+              item.seq = this.page.seq;
+            }
+            this.loading = false;
+          }
+        })
+        .catch((e) => {
+          this.loading = false;
+        });
     },
     onAction(val) {},
     onSizeChange(val) {},
