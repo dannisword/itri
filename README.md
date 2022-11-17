@@ -8,6 +8,13 @@
 - A7 盤點模組
 - A8 訊息通知模組？
 
+## 資料庫
+IP:1
+PORT:1433
+資料庫:TENACITY
+帳號:wms_itri
+密碼:U100_wms
+
 ## API URL
 http://www.forelog.org.tw/iwms-web/swagger-ui/index.html
 https://www.logistics.org.tw/tenacity/swagger-ui/index.html

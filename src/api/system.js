@@ -12,4 +12,14 @@ export function getSelector(type) {
   });
 }
 
-
+/**
+ * A1-44 取得單據收單資訊
+ * @param {*} docTypeName
+ * @returns
+ */
+export function getReceiveInfo(docTypeName) {
+  return request({
+    url: `/api/sys/doc/receiveInfo/${docTypeName}`,
+    method: "GET",
+  });
+}

@@ -5,7 +5,9 @@
         <el-input v-model="params.sysOrderNo"></el-input>
       </el-form-item>
       <el-button type="primary" @click="onNav('/TND2001')">回列表</el-button>
-      <el-button type="success" @click="onNav('/TND2001')">結束此單作業</el-button>
+      <el-button type="success" @click="onNav('/TND2001')"
+        >結束此單作業</el-button
+      >
     </el-form>
 
     <div v-for="fit in fits" :key="fit">
@@ -69,8 +71,10 @@
   </div>
 </template>
 <script>
+// 執行入庫工作
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
+import { getInBoundDetail } from "@/api/inbound";
 
 export default {
   components: {
@@ -89,8 +93,18 @@ export default {
       url: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
     };
   },
-  created() {},
-  methods: {},
+  created() {
+    console.log(this.$route.params.id);
+    //
+    this.onLoad();
+  },
+  methods: {
+    onLoad() {
+      getInBoundDetail(this.$route.params.id).then((resp) => {
+        console.log(resp);
+      });
+    },
+  },
 };
 </script>
 <style>

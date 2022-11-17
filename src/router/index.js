@@ -49,7 +49,7 @@ export const constantRoutes = [
         meta: { title: "空箱入庫" },
       },
       {
-        path: "/TND2100",
+        path: "/TND2100/:id",
         name: "TND2100",
         component: () => import("@/views/TND2100"),
         meta: { title: "執行入庫工作" },

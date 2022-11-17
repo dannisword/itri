@@ -6,7 +6,7 @@ import { parseMessage } from "@/utils/app";
  * @param {*} inboundId
  * @returns
  */
-export function getInDetail(inboundId) {
+export function getInBoundDetail(inboundId) {
   return request({
     url: `api/inbound/detail/${inboundId}`,
     method: "GET",

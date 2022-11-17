@@ -75,9 +75,14 @@
         <el-divider class="form-divider"></el-divider>
       </el-form>
     </div>
+
     <!-- 分頁 -->
-    <el-row type="flex">
-      <el-col :span="8"> </el-col>
+    <el-row class="mt-1" type="flex">
+      <el-col :span="8">
+        入庫最新收單時間：{{ receiveInfo.lastDateTime }} 入庫最新收單數量：{{
+          receiveInfo.lastCount
+        }}單
+      </el-col>
       <el-col :span="16" align="end">
         <el-pagination
           background
@@ -112,21 +117,21 @@
       <el-table-column
         label="入庫單號碼"
         prop="sysOrderNo"
-        width="180"
+        min-width="180"
         sortable="custom"
       >
       </el-table-column>
       <el-table-column
         label="料品號"
         prop="prodCode"
-        width="125"
+        min-width="125"
         sortable="custom"
       >
       </el-table-column>
       <el-table-column
         label="供應商"
         prop="supplier"
-        width="125"
+        min-width="125"
         sortable="custom"
       >
       </el-table-column>
@@ -155,15 +160,16 @@
   </div>
 </template>
 <script>
-import ModalDialog from "@/components/ModalDialog/index.vue";
+import Dialog from "@/components/ModalDialog/Dialog.vue";
 import pageMixin from "@/utils/mixin";
-import { getInbounds } from "@/api/inbound";
+import { getInbounds, getInBoundDetail } from "@/api/inbound";
 import { getWorkStation } from "@/api/workStation";
+import { getReceiveInfo } from "@/api/system";
 import { SelectTypeEnum } from "@/utils/enums/index";
 
 export default {
   components: {
-    ModalDialog,
+    Dialog,
   },
   mixins: [pageMixin],
   data() {
@@ -172,6 +178,7 @@ export default {
       content: [],
       workStations: [],
       nowDate: [],
+      receiveInfo: {},
       params: {
         assignWorkStationId: "",
         direction: "ASC",
@@ -202,6 +209,13 @@ export default {
     if (this.workStation().length > 0) {
       this.params.assignWorkStationId.push(this.workStation());
     }
+    // getReceiveInfo
+    getReceiveInfo("入庫").then((resp) => {
+      if (resp.status == "OK") {
+        this.receiveInfo = resp.message;
+      }
+    });
+
     this.onLoad();
   },
   methods: {
@@ -241,8 +255,14 @@ export default {
       this.onLoad();
     },
     ondblClick(val) {
-      console.log(val)
-    }
+      console.log(val.id);
+      getInBoundDetail(val.id).then((resp) => {
+        if (resp.status == "OK") {
+          this.onNav(`/TND2100/${val.id}`);
+        }
+        console.log(resp);
+      });
+    },
   },
 };
 </script>
