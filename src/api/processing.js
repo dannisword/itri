@@ -92,5 +92,3 @@ export function getProcesses(params) {
     method: "GET",
   });
 }
-// /api/processing/status/{docNo}/{status}
-//export function setProcessing

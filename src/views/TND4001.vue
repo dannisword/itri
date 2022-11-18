@@ -16,16 +16,13 @@
         </el-form-item>
 
         <el-form-item label="作業站點">
-          <el-select
-            v-model="params.assignWorkStationId"
-            multiple
-            placeholder="請選擇"
-          >
+          <el-select v-model="params.stationId" multiple placeholder="請選擇">
             <el-option
               v-for="item in workStations"
               :key="item.id"
               :label="item.label"
               :value="item.value"
+              :disabled="workStation().length > 0"
             >
             </el-option>
           </el-select>
@@ -50,8 +47,9 @@
         <el-form-item label="料品號">
           <el-input v-model="params.prodCode"></el-input>
         </el-form-item>
-
-        <el-divider class="form-divider"></el-divider>
+        <!--  
+   <el-divider class="form-divider"></el-divider>
+-->
 
         <el-form-item>
           <el-button type="primary" @click="onLoad()">查詢</el-button>
@@ -62,10 +60,16 @@
     <!-- 分頁 -->
     <el-row type="flex">
       <el-col :span="8">
+        <!--
         <div type="flex">
           <el-button type="primary">執行批次生效</el-button>
           <el-button type="primary">自動叫單生效</el-button>
         </div>
+        -->
+
+        加工最新收單時間：{{ receiveInfo.lastDateTime }} 加工最新收單數量：{{
+          receiveInfo.lastCount
+        }}單
       </el-col>
       <el-col :span="16" align="end">
         <el-pagination
@@ -149,6 +153,7 @@ import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getProcesses } from "@/api/processing";
 import { SelectTypeEnum } from "@/utils/enums/index";
+import { getReceiveInfo } from "@/api/system";
 
 export default {
   components: {
@@ -160,6 +165,7 @@ export default {
       content: [],
       workStations: [],
       nowDate: [],
+      receiveInfo: {},
       params: {
         direction: "ASC",
         docStatus: 0,
@@ -169,7 +175,7 @@ export default {
         receivedEndDate: "",
         receivedStartDate: "",
         size: 50,
-        stationId: "",
+        stationId: [],
         sysOrderNo: "",
       },
       processingStatus: [],
@@ -186,6 +192,16 @@ export default {
     this.getSelector(SelectTypeEnum.PROCESSING_STATUS).then((resp) => {
       this.processingStatus = resp;
     });
+    // 站點綁定
+    if (this.workStation().length > 0) {
+      this.params.stationId.push(this.workStation());
+    }
+    // 入庫資訊
+    getReceiveInfo("入庫").then((resp) => {
+      if (resp.status == "OK") {
+        this.receiveInfo = resp.message;
+      }
+    });
   },
   methods: {
     onLoad() {
@@ -196,7 +212,6 @@ export default {
         console.log(respone);
         if (respone.status == "OK") {
           this.content = respone.message.content;
-          console.log(respone);
           // 分頁設定
           this.setPagination(respone.message);
           // 處理項次

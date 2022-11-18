@@ -19,6 +19,7 @@
             v-model="params.assignWorkStationId"
             multiple
             placeholder="請選擇"
+            :disabled="workStation().length > 0"
           >
             <el-option
               v-for="item in workStations"
@@ -75,8 +76,11 @@
     <el-row type="flex">
       <el-col :span="8">
         <div type="flex">
+          <!--
           <el-button type="primary">執行批次生效</el-button>
           <el-button type="primary">自動叫單生效</el-button>
+          -->
+
         </div>
       </el-col>
       <el-col :span="16" align="end">
