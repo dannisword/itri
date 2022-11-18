@@ -55,7 +55,7 @@
           登入
         </el-button>
         <div class="tips">
-          <span class="version-span">版本 v1.0.0:2202</span>
+          <span class="version-span">版本 v1.0.0:2203</span>
         </div>
       </el-form>
     </div>
