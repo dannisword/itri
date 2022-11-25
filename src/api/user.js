@@ -85,7 +85,7 @@ export function getUser(userId) {
  */
 export function getUserMenus() {
   const url = `/api/menu`;
-  const method = `POST`;
+  const method = `GET`;
 
   return new Promise((resolve) => {
     request({

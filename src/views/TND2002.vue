@@ -149,11 +149,11 @@ export default {
     if (this.workStation().length > 0) {
       this.params.stationCode.push(this.workStation());
     }
-
-    this.onQuery();
+    // 取得空儲位數量
+    this.getEmptyCount();
   },
   methods: {
-    onQuery() {
+    getEmptyCount() {
       getEmptyCount().then((resp) => {
         if (resp.status != "OK") {
           return;
@@ -166,10 +166,9 @@ export default {
       this.params.startDate = this.toDate(this.nowDate);
       this.params.endDate = this.toDate(this.nowDate);
       const query = this.getQuery(this.params);
-
+      // 取得空箱入庫進度
       getEmptyRecords(query)
         .then((resp) => {
-          console.log(resp);
           if (resp.status == "OK") {
             this.content = resp.message.content;
             // 分頁設定
@@ -188,7 +187,7 @@ export default {
     },
     onShuttle() {
       setShuttle(this.carrierId).then((resp) => {
-        if (resp.status == "OK"){
+        if (resp.status == "OK") {
           this.success("指令接收成功，已安排空箱入庫作業");
           this.carrierId = "";
         }
