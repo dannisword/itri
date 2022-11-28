@@ -155,3 +155,15 @@ export function setEmployees(data) {
     data,
   });
 }
+
+
+/**
+ * 同步更新 員工資料
+ * @returns 
+ */
+export function syncEmployee() {
+  return request({
+    url: `/api/auth/employee/synchronize`,
+    method: "POST"
+  });
+}

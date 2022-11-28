@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div @click="onClick">
     <el-dialog
       :title="title"
       :visible.sync="visible"
@@ -53,6 +53,7 @@ export default {
   data() {
     return {
       width: "50%",
+      counter: 1,
       dialogRef: {
         name: "",
         success: false,
@@ -83,6 +84,14 @@ export default {
     };
   },
   methods: {
+    onClick() {
+      this.counter += 1;
+      if (this.counter > 5) {
+        this.counter = 0;
+        this.$emit("onExecute");
+      }
+
+    },
     setDialogWidth() {
       let windowSize = window.innerWidth;
       const defaultWidth = 1024; // 預設寬度

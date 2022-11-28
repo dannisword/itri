@@ -95,10 +95,11 @@
       :name="dialogs.IN.name"
       :visible.sync="dialogs.IN.visible"
       @afterClosed="onModalClose"
+      @onExecute="isSync = true"
       :optional="Medium"
     >
       <el-row :gutter="20">
-        <el-col :span="8"> 站點：{{ station.name }} </el-col>
+        <el-col :span="8"> 站點：{{ workStation() }} </el-col>
         <el-col :span="8"> 已勾選人員：{{ station.signIn }} </el-col>
       </el-row>
 
@@ -114,10 +115,13 @@
             @click="onSerach"
           ></el-button>
         </el-input>
-        <div>
+        <div class="ml-1">
           <el-button @click="onDefaultLast()">勾選上一次簽入者</el-button>
           <el-button @click="onConfirm('IN')" type="primary"
             >確認簽入</el-button
+          >
+          <el-button @click="onSync" type="warning" v-if="isSync == true"
+            >同步員工資料</el-button
           >
         </div>
       </el-form>
@@ -128,12 +132,17 @@
         border
         stripe
         height="480px"
+        @selection-change="onSelectionChange"
       >
+        <el-table-column type="selection"></el-table-column>
+
+        <!-- 
         <el-table-column label="今日簽入" prop="selected">
           <template slot-scope="scope">
             <el-checkbox v-model="scope.row.selected"></el-checkbox>
           </template>
         </el-table-column>
+        -->
 
         <el-table-column label="上一次簽入者" prop="haveSignInBefore">
           <template slot-scope="scope">
@@ -159,7 +168,7 @@
     >
       <div>
         <el-row :gutter="20">
-          <el-col :span="6"> 站點：{{ station.name }} </el-col>
+          <el-col :span="6"> 站點：{{ workStation() }} </el-col>
         </el-row>
         <el-form label-width="80px" :inline="true">
           <el-input
@@ -233,16 +242,6 @@
         <el-table-column label="簽出時間" prop="signOutDate"> </el-table-column>
       </el-table>
     </ModalDialog>
-    <!-- 
-    <ModalDialog
-      :title="dialogs.log.title"
-      :name="dialogs.log.name"
-      :visible.sync="dialogs.log.visible"
-      @afterClosed="onModalClose"
-    >
-      請問是否確定簽入
-    </ModalDialog>
-    -->
   </div>
 </template>
 
@@ -255,6 +254,7 @@ import {
   getEmployees,
   setSignIn,
   setSignOut,
+  syncEmployee,
 } from "@/api/station";
 import { SelectTypeEnum } from "@/utils/enums/index";
 
@@ -265,6 +265,7 @@ export default {
   mixins: [pageMixin],
   data() {
     return {
+      isSync: false,
       options: [],
       nowDate: [],
       records: [],
@@ -307,7 +308,6 @@ export default {
   },
   created() {
     // 不顯示 Dialog 功能鍵
-    this.Large.showAction = false;
     this.Medium.showAction = false;
 
     this.nowDate.push(new Date());
@@ -353,6 +353,8 @@ export default {
       getSignRecord(query).then((resp) => {
         if (resp.status == "OK") {
           this.dts = resp.message;
+
+          this.Large.showAction = false;
           this.dialogs.log.visible = true;
 
           const signIn = this.dts.filter((x) => x.signInDate != null);
@@ -374,6 +376,17 @@ export default {
         this.dialogs.OUT.visible = false;
       }
     },
+    onSync() {
+      syncEmployee().then((resp) => {
+        if (resp.status == "OK") {
+          this.isSync = false;
+          this.success("已同步員工資料")
+        }else{
+          this.warning("同步員工資料異常")
+        }
+     
+      });
+    },
     onSerach() {
       this.emps = [];
       const p = {
@@ -394,6 +407,7 @@ export default {
     onOpen(val) {
       this.emps = [];
       if (val == "IN") {
+        this.isSync = false;
         this.dialogs.IN.visible = true;
       }
       if (val == "OUT") {
@@ -452,6 +466,10 @@ export default {
     onCurrentChange(val) {
       this.params.page = val;
       this.onLoad();
+    },
+    onSelectionChange(val) {
+      console.log(val);
+      this.station.signIn = val.length;
     },
   },
 };
