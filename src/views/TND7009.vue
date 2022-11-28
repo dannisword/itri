@@ -38,7 +38,6 @@
           >
         </el-form-item>
         <el-divider class="form-divider"></el-divider>
-
       </el-form>
     </div>
     <!-- 分頁底部 -->
@@ -69,9 +68,19 @@
       </el-table-column>
       <el-table-column label="帳號" prop="account" fixed sortable="custom">
       </el-table-column>
-      <el-table-column label="姓名" prop="userName" width="120" sortable="custom">
+      <el-table-column
+        label="姓名"
+        prop="userName"
+        width="120"
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="角色名稱" prop="roles" width="200" sortable="custom">
+      <el-table-column
+        label="角色名稱"
+        prop="roles"
+        width="200"
+        sortable="custom"
+      >
         <template slot-scope="scope">
           <span>{{ scope.row.roles | formatRoleName() }}</span>
         </template>
@@ -286,7 +295,6 @@ export default {
             this.page.seq++;
             user.seq = this.page.seq;
           }
-     
         })
         .catch((e) => {
           this.loading = false;
@@ -349,11 +357,18 @@ export default {
             password: "",
           };
           if (user.id == 0) {
-            await addUser(user);
+            addUser(user).then((resp) => {
+              if (resp.message.body) {
+                this.warning(resp.message.body.message);
+              }
+              this.onLoad();
+            });
           } else {
-            await setUser(this.user.id, user);
+            setUser(this.user.id, user).then((resp) => {
+              console.log(resp);
+              this.onLoad();
+            });
           }
-          await this.onLoad();
         });
       }
       // 變更密碼

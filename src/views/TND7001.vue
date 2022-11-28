@@ -84,7 +84,7 @@ export default {
       workStations: [],
       optional: {
         size: "Small",
-        action: "儲存設定",
+        action: "安排作業",
         cancel: "取消",
         showAction: true,
       },

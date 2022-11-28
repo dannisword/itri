@@ -97,7 +97,7 @@
         type="selection"
         :selectable="canSelectRow"
       ></el-table-column>
-      
+
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
       <el-table-column
@@ -182,6 +182,7 @@
             v-model="allowed.weightLimit"
             type="number"
             min="0"
+            step="0.01"
           ></el-input>
         </el-form-item>
         <el-form-item label="誤差允許值(KG)">
@@ -249,6 +250,7 @@ import { getSelector } from "@/api/system";
 import { SelectTypeEnum, CarrierStatusEnum } from "@/utils/enums/index";
 import {
   getCarriers,
+  getCarrier,
   addCarrier,
   configCarrier,
   enableCarrier,
@@ -282,7 +284,7 @@ export default {
         carriedId: "",
         direction: "ASC",
         endDate: "",
-        isEnable: true,
+        isEnable: [],
         page: 1,
         properties: "id",
         size: 50,
@@ -384,9 +386,9 @@ export default {
       }
       // 允入設定
       if (val == "ALLOWED") {
-        getCarrierConfig().then((res) => {
-          if (res.status == "OK") {
-            this.allowed = res.message;
+        getCarrierConfig().then((resp) => {
+          if (resp.status == "OK") {
+            this.allowed = resp.message;
             this.dialogs.ALLOWED.visible = true;
           } else {
             this.warning("取得物流箱允入條件錯誤！");
@@ -403,8 +405,14 @@ export default {
       }
     },
     onEdit(val) {
-      this.carrier = val;
-      this.dialogs.EDIT.visible = true;
+      getCarrier(val.id).then((resp) => {
+        if (resp.status == "OK") {
+          this.carrier = resp.message;
+          this.dialogs.EDIT.visible = true;
+        } else {
+          this.warning("編輯物流箱異常！");
+        }
+      });
     },
     onSave(val) {
       this.dialogs.EDIT.visible = false;
@@ -412,13 +420,21 @@ export default {
         this.onLoad();
         return;
       }
-      // 存檔
-      enableCarrier(this.carrier.id, this.carrier.isEnable).then((resp) => {
-        if (resp.status == "OK") {
-          this.success("編輯狀態");
-          this.onLoad();
-        }
-      });
+      // 0: 已達儲位、 5: 取下
+      if (
+        this.carrier.status == CarrierStatusEnum.ALLOWED ||
+        this.carrier.status == CarrierStatusEnum.Remove
+      ) {
+        // 存檔
+        enableCarrier(this.carrier.id, this.carrier.isEnable).then((resp) => {
+          if (resp.status == "OK") {
+            this.success("編輯物流箱成功！");
+            this.onLoad();
+          }
+        });
+      } else {
+        this.warning(`物流箱狀態已為${val.statusName}，不可編輯`);
+      }
     },
     onBatch(val) {
       this.dialogs.BATCH.visible = false;
@@ -479,7 +495,8 @@ export default {
       if (val.success == undefined || val.success == false) {
         return;
       }
-
+      // 轉型
+      this.allowed.weightLimit = parseInt(this.allowed.weightLimit);
       configCarrier(this.allowed).then((resp) => {
         if (resp.status == "OK") {
           this.success("物流箱允入設定成功！");

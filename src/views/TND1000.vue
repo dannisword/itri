@@ -18,6 +18,7 @@
             v-model="params.workStationId"
             multiple
             placeholder="請選擇"
+            :disabled="workStation().length > 0"
           >
             <el-option
               v-for="item in options"
@@ -314,6 +315,11 @@ export default {
     this.getSelector(SelectTypeEnum.WORK_STATION).then((resp) => {
       this.options = resp;
     });
+    // 站點綁定
+    if (this.workStation().length > 0) {
+      this.params.workStationId.push(this.workStation());
+    }
+    this.onLoad();
   },
   methods: {
     onLoad() {
