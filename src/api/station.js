@@ -73,7 +73,7 @@ export function getStations(params) {
 
 /**
  * A2-09 取得空儲位數量
- * @returns 
+ * @returns
  */
 export function getEmptyCount() {
   return request({
@@ -156,14 +156,24 @@ export function setEmployees(data) {
   });
 }
 
+///api/auth/today/signIn/search
+/**
+ * A1-43, 查詢今日簽入人員
+ */
+export function getTodaySignIn() {
+  return request({
+    url: `/api/auth/today/signIn/search`,
+    method: "GET",
+  });
+}
 
 /**
- * 同步更新 員工資料
- * @returns 
+ * A1-48 同步更新 員工資料
+ * @returns
  */
 export function syncEmployee() {
   return request({
     url: `/api/auth/employee/synchronize`,
-    method: "POST"
+    method: "POST",
   });
 }

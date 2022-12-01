@@ -244,8 +244,10 @@
   </div>
 </template>
 <script>
+import moment from "moment";
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
+import { getToken } from "@/utils/localStorage";
 import { getSelector } from "@/api/system";
 import { SelectTypeEnum, CarrierStatusEnum } from "@/utils/enums/index";
 import {
@@ -255,7 +257,6 @@ import {
   configCarrier,
   enableCarrier,
   enableCarriers,
-  printBarcode,
   getCarrierConfig,
 } from "@/api/carrier";
 
@@ -468,11 +469,44 @@ export default {
           printCounts: 1,
         });
       });
+      // 下載檔案
+      const url = process.env.VUE_APP_BASE_API + "/api/carrier/barcode";
+      const config = {
+        Authorization: getToken(),
+        "Content-Type": "application/json",
+      };
+
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: config,
+        responseType: "blob",
+      })
+        .then((response) => {
+          if (response.ok) {
+            return response.blob();
+          }
+        })
+        .then((blob) => {
+          const file = moment().format("YYYYMMDDHHmmss");
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = file;
+          link.click();
+          URL.revokeObjectURL(link.href);
+        });
+      /*
       printBarcode(data).then((resp) => {
         if (resp.status == "OK") {
           this.success("列印物流箱條碼成功！");
         }
-      });
+      });*/
+    },
+    blobToFile(theBlob, fileName) {
+      //A Blob() is almost a File() - it's just missing the two properties below which we will add
+      theBlob.lastModifiedDate = new Date();
+      theBlob.name = fileName;
+      return theBlob;
     },
     onNew(val) {
       this.dialogs.NEW.visible = false;

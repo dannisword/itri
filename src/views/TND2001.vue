@@ -160,10 +160,10 @@
   </div>
 </template>
 <script>
+import mqtt from "mqtt";
 import Dialog from "@/components/ModalDialog/Dialog.vue";
 import pageMixin from "@/utils/mixin";
 import { getInbounds, getInBoundDetail } from "@/api/inbound";
-import { getWorkStation } from "@/api/workStation";
 import { getReceiveInfo } from "@/api/system";
 import { SelectTypeEnum } from "@/utils/enums/index";
 
@@ -194,6 +194,23 @@ export default {
       },
       inStatus: [],
       inSource: [],
+      client: {},
+      connection: {
+        protocol: "tcp",
+        host: "210.242.68.168",
+        port: 1883,
+        endpoint: "",
+        clean: true,
+        connectTimeout: 30 * 1000, // ms
+        reconnectPeriod: 4000, // ms
+        clientId: "itri_" + Math.random().toString(16).substring(2, 8),
+        username: "",
+        password: "",
+      },
+      subscription: {
+        topic: "wms/itri",
+        qos: 0,
+      },
     };
   },
   async created() {
@@ -217,8 +234,56 @@ export default {
     });
 
     this.onLoad();
+    this.connect();
   },
   methods: {
+    handleOnReConnect() {
+      this.retryTimes += 1;
+      if (this.retryTimes > 5) {
+        try {
+          this.client.end();
+          console.log("Connection maxReconnectTimes limit, stop retry");
+          //this.initData();
+          //this.$message.error("Connection maxReconnectTimes limit, stop retry");
+        } catch (error) {
+          this.$message.error(error.toString());
+        }
+      }
+    },
+    connect() {
+      try {
+        const { protocol, host, port, endpoint, ...options } = this.connection;
+        const connectUrl = `${protocol}://${host}:${port}`;
+        this.client = mqtt.connect("ws://210.242.68.168:8083", {
+          clean: true,
+          defaultProtocol: "tcp",
+          connectTimeout: 4000,
+          reconnectPeriod: 1000,
+          clientId: Math.random().toString(16).substring(2, 8),
+          username: "",
+          password: "",
+        });
+        console.log(this.client);
+
+        const { topic, qos } = this.subscription;
+        this.client.subscribe(topic, { qos }, (error, res) => {
+          if (error) {
+            console.log("Subscribe to topics error", error);
+            return;
+          }
+          // this.subscribeSuccess = true;
+          console.log("Subscribe to topics res", res);
+        });
+
+        this.client.on("message", function (topic, message) {
+          // message is Buffer
+          console.log(message.toString());
+          //this.client.end();
+        });
+      } catch (e) {
+        console.log("mqtt.connect error", e);
+      }
+    },
     onLoad() {
       this.loading = true;
       this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);

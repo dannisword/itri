@@ -100,7 +100,7 @@
     >
       <el-row :gutter="20">
         <el-col :span="8"> 站點：{{ workStation() }} </el-col>
-        <el-col :span="8"> 已勾選人員：{{ station.signIn }} </el-col>
+        <el-col :span="8"> 已勾選人員：{{ station.signInCount }} </el-col>
       </el-row>
 
       <el-form label-width="80px" :inline="true">
@@ -115,7 +115,7 @@
             @click="onSerach"
           ></el-button>
         </el-input>
-        <div class="ml-1">
+        <div class="mt-1">
           <el-button @click="onDefaultLast()">勾選上一次簽入者</el-button>
           <el-button @click="onConfirm('IN')" type="primary"
             >確認簽入</el-button
@@ -127,12 +127,13 @@
       </el-form>
 
       <el-table
+        ref="signInTable"
         :data="emps"
         class="table-container"
         border
         stripe
         height="480px"
-        @selection-change="onSelectionChange"
+        @selection-change="onSelectionInChange"
       >
         <el-table-column type="selection"></el-table-column>
 
@@ -179,7 +180,7 @@
             <el-button
               slot="append"
               icon="el-icon-search"
-              @click="onSerach"
+              @click="getSingIn"
             ></el-button>
           </el-input>
           <div>
@@ -197,12 +198,16 @@
         border
         stripe
         height="480px"
+        @selection-change="onSelectionOutChange"
       >
+        <el-table-column type="selection"></el-table-column>
+        <!-- 
         <el-table-column label="今日簽出" prop="selected">
           <template slot-scope="scope">
             <el-checkbox v-model="scope.row.selected"></el-checkbox>
           </template>
         </el-table-column>
+        -->
         <el-table-column label="員工編號" prop="employeeId"></el-table-column>
         <el-table-column label="員工姓名" prop="employeeName">
         </el-table-column>
@@ -223,8 +228,8 @@
         </el-row>
 
         <el-row :gutter="20">
-          <el-col :span="6"> 已簽入人數：{{ station.signIn }} </el-col>
-          <el-col :span="6"> 已簽出人數：{{ station.signOut }} </el-col>
+          <el-col :span="6"> 已簽入人數：{{ station.signInCount }} </el-col>
+          <el-col :span="6"> 已簽出人數：{{ station.signOutCount }} </el-col>
         </el-row>
       </div>
 
@@ -255,6 +260,7 @@ import {
   setSignIn,
   setSignOut,
   syncEmployee,
+  getTodaySignIn,
 } from "@/api/station";
 import { SelectTypeEnum } from "@/utils/enums/index";
 
@@ -284,8 +290,10 @@ export default {
       },
       station: {
         name: "",
-        signIn: 0,
-        signOut: 0,
+        signInCount: 0,
+        signIns: [],
+        signOutCount: 0,
+        signOuts: [],
       },
       dialogs: {
         log: {
@@ -342,8 +350,8 @@ export default {
     },
     onDetail(val) {
       this.station.name = val.workStationId;
-      this.station.signIn = 0;
-      this.station.signOut = 0;
+      this.station.signInCount = 0;
+      this.station.signOutCount = 0;
       var p = {
         endDate: val.signInDate,
         startDate: val.signInDate,
@@ -357,11 +365,11 @@ export default {
           this.Large.showAction = false;
           this.dialogs.log.visible = true;
 
-          const signIn = this.dts.filter((x) => x.signInDate != null);
-          const signOut = this.dts.filter((x) => x.signOutDate != null);
+          const sign_in = this.dts.filter((x) => x.signInDate != null);
+          const sign_out = this.dts.filter((x) => x.signOutDate != null);
 
-          this.station.signIn = signIn.length;
-          this.station.signOut = signOut.length;
+          this.station.signInCount = sign_in.length;
+          this.station.signOutCount = sign_out.length;
         }
       });
     },
@@ -380,11 +388,10 @@ export default {
       syncEmployee().then((resp) => {
         if (resp.status == "OK") {
           this.isSync = false;
-          this.success("已同步員工資料")
-        }else{
-          this.warning("同步員工資料異常")
+          this.success("已同步員工資料");
+        } else {
+          this.warning("同步員工資料異常");
         }
-     
       });
     },
     onSerach() {
@@ -396,11 +403,7 @@ export default {
       const query = this.getQuery(p);
       getEmployees(query).then((resp) => {
         if (resp.status == "OK") {
-          const data = resp.message;
-          data.forEach((elm) => {
-            const value = this.clone(elm);
-            this.emps.push(value);
-          });
+          this.emps = resp.message;
         }
       });
     },
@@ -409,18 +412,18 @@ export default {
       if (val == "IN") {
         this.isSync = false;
         this.dialogs.IN.visible = true;
+        this.onSerach();
       }
       if (val == "OUT") {
+        this.getSingIn();
         this.dialogs.OUT.visible = true;
       }
-      this.onSerach();
     },
     onDefaultLast() {
-      const data = this.clone(this.emps);
-      data.forEach((elm) => {
-        elm.selected = elm.haveSignInBefore;
+      const data = this.emps.filter((x) => x.haveSignInBefore == true);
+      data.forEach((element) => {
+        this.$refs.signInTable.toggleRowSelection(element, true);
       });
-      this.emps = data;
     },
     onSelectAll() {
       const data = this.clone(this.emps);
@@ -430,11 +433,6 @@ export default {
       this.emps = data;
     },
     async onConfirm(val) {
-      const values = this.emps.filter((x) => x.selected == true);
-      const data = [];
-      values.forEach((elm) => {
-        data.push(elm.employeeId);
-      });
       let msg = "請問是否簽入？";
       if (val == "OUT") {
         msg = "請問是否簽出？";
@@ -445,16 +443,43 @@ export default {
         return;
       }
       if (val == "IN") {
-        await setSignIn(data);
+        const data = [];
+        for (let item of this.station.signIns) {
+          data.push(item.employeeId);
+        }
+        setSignIn(data).then((resp) => {
+          if (resp.status == "OK") {
+            this.success("簽入成功");
+            this.onLoad();
+          } else {
+            this.warning("簽入失敗");
+          }
+        });
         this.dialogs.IN.visible = false;
       }
       if (val == "OUT") {
-        await setSignOut(data);
+        const data = [];
+        for (let item of this.station.signOuts) {
+          data.push(item.employeeId);
+        }
+        setSignOut(data).then((resp) => {
+          if (resp.status == "OK") {
+            this.success("簽出成功");
+            this.onLoad();
+          } else {
+            this.warning("簽出失敗");
+          }
+        });
         this.dialogs.OUT.visible = false;
       }
-      await this.onLoad();
     },
-    handleClose() {},
+    getSingIn() {
+      getTodaySignIn().then((resp) => {
+        if (resp.status == "OK") {
+          this.emps = resp.message;
+        }
+      });
+    },
     async onSortcChange(val) {
       if (val.order == null) {
         return;
@@ -467,9 +492,13 @@ export default {
       this.params.page = val;
       this.onLoad();
     },
-    onSelectionChange(val) {
-      console.log(val);
-      this.station.signIn = val.length;
+    onSelectionInChange(val) {
+      this.station.signInCount = val.length;
+      this.station.signIns = val;
+    },
+    onSelectionOutChange(val) {
+      this.station.signOutCount = val.length;
+      this.station.signOuts = val;
     },
   },
 };
