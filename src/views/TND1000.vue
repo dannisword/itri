@@ -51,7 +51,7 @@
           @current-change="onCurrentChange"
           :current-page="page.number"
           :page-size="page.size"
-          layout="total,jumper,prev, pager, next"
+          layout="total,jumper,prev,pager,next,sizes"
           :total="page.totalElements"
         ></el-pagination>
       </el-col>

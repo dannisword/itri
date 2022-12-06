@@ -55,7 +55,7 @@
           登入
         </el-button>
         <div class="tips">
-          <span class="version-span">版本 v1.0.0:2205</span>
+          <span class="version-span">版本 {{version}}</span>
         </div>
       </el-form>
     </div>
@@ -69,6 +69,7 @@
 <script>
 import { validEmpty } from "@/utils/validate";
 import { _login } from "@/api/auth";
+import config from "@/utils/mixin/config.json";
 
 export default {
   name: "Login",
@@ -108,6 +109,7 @@ export default {
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
       },
+      version:config.version
     };
   },
   created() {},

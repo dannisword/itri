@@ -197,7 +197,7 @@ export default {
       this.params.stationId.push(this.workStation());
     }
     // 入庫資訊
-    getReceiveInfo("入庫").then((resp) => {
+    getReceiveInfo("加工").then((resp) => {
       if (resp.status == "OK") {
         this.receiveInfo = resp.message;
       }

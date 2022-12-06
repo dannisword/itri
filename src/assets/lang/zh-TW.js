@@ -75,8 +75,8 @@ exports.default = {
     },
     pagination: {
       goto: '前往',
-      pagesize: '項/頁',
-      total: '共 {total} 項',
+      pagesize: '筆/頁',
+      total: '共 {total} 筆',
       pageClassifier: '頁'
     },
     messagebox: {

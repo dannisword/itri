@@ -2,7 +2,7 @@ import moment from "moment";
 import { MessageBox, Message } from "element-ui";
 import dateMixin from "@/utils/mixin/date";
 import responeMixin from "@/utils/mixin/respone";
-import example from "@/utils/mixin/exapmle.json";
+//import example from "@/utils/mixin/exapmle.json";
 import { getUserInfo } from "@/utils/localStorage";
 import { getSelector } from "@/api/system";
 
@@ -42,9 +42,10 @@ export default {
     }
   },
   computed: {
+    /*
     source() {
       return example;
-    },
+    },*/
     getQuery() {
       return function (params, num = true) {
         let query = "";

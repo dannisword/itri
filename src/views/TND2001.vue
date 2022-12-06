@@ -78,18 +78,18 @@
 
     <!-- 分頁 -->
     <el-row class="mt-1" type="flex">
-      <el-col :span="8">
+      <el-col :span="10">
         入庫最新收單時間：{{ receiveInfo.lastDateTime }} 入庫最新收單數量：{{
           receiveInfo.lastCount
         }}單
       </el-col>
-      <el-col :span="16" align="end">
+      <el-col :span="14" align="end">
         <el-pagination
           background
           @current-change="onCurrentChange"
           :current-page="page.number"
           :page-size="page.size"
-          layout="total,jumper,prev, pager, next"
+          layout="total,jumper,prev,pager,next"
           :total="page.totalElements"
         ></el-pagination>
       </el-col>
@@ -163,7 +163,7 @@
 import mqtt from "mqtt";
 import Dialog from "@/components/ModalDialog/Dialog.vue";
 import pageMixin from "@/utils/mixin";
-import { getInbounds, getInBoundDetail } from "@/api/inbound";
+import { getInbounds, getInboundDetail } from "@/api/inbound";
 import { getReceiveInfo } from "@/api/system";
 import { SelectTypeEnum } from "@/utils/enums/index";
 
@@ -234,7 +234,7 @@ export default {
     });
 
     this.onLoad();
-    this.connect();
+    //this.connect();
   },
   methods: {
     handleOnReConnect() {
@@ -242,7 +242,7 @@ export default {
       if (this.retryTimes > 5) {
         try {
           this.client.end();
-          console.log("Connection maxReconnectTimes limit, stop retry");
+        
           //this.initData();
           //this.$message.error("Connection maxReconnectTimes limit, stop retry");
         } catch (error) {
@@ -320,12 +320,10 @@ export default {
       this.onLoad();
     },
     ondblClick(val) {
-      console.log(val.id);
-      getInBoundDetail(val.id).then((resp) => {
+      getInboundDetail(val.id).then((resp) => {
         if (resp.status == "OK") {
           this.onNav(`/TND2100/${val.id}`);
         }
-        console.log(resp);
       });
     },
   },

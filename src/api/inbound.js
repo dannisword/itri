@@ -6,7 +6,7 @@ import { parseMessage } from "@/utils/app";
  * @param {*} inboundId
  * @returns
  */
-export function getInBoundDetail(inboundId) {
+export function getInboundDetail(inboundId) {
   return request({
     url: `api/inbound/detail/${inboundId}`,
     method: "GET",
@@ -22,6 +22,30 @@ export function getInbounds(params) {
   return request({
     url: `/api/inbound/search${params}`,
     method: "GET",
+  });
+}
+/**
+ * A3-6 回報單據明細入庫資料
+ * @param {*} data 
+ * @returns 
+ */
+export function setInboundDetail(data){
+  return request({
+    url: `api/inbound/detail`,
+    method: "PUT",
+    data
+  });
+}
+
+/**
+ * A3-7 結束此單作業
+ * @param {*} carrierId
+ * @returns
+ */
+export function closeInbound(docNo) {
+  return request({
+    url: `/api/inbound/finish/${docNo}`,
+    method: "POST",
   });
 }
 
@@ -83,7 +107,7 @@ export function preInBound(isAssign) {
 }
 
 /**
- * 新增入庫叫單數
+ * A3-13 新增入庫叫單數
  * @param {*} data
  * @returns
  */
@@ -118,9 +142,33 @@ export function setInbound(data) {
  * @param {*} params
  * @returns
  */
-export function getInbound() {
+export function getInboundParam() {
   return request({
     url: `/api/inbound/sysParam`,
+    method: "GET",
+  });
+}
+
+/**
+ * A3-16 取得入庫工作
+ * @param {*} inboundId
+ * @returns
+ */
+export function getInbound(inboundId) {
+  return request({
+    url: `/api/inbound/${inboundId}`,
+    method: "GET",
+  });
+}
+
+/**
+ * A3-18 查詢單據照片
+ * @param {*} docNo 
+ * @returns 
+ */
+export function getInboundImage(docNo){
+  return request({
+    url: `/api/inbound/getInboundImage/${docNo}`,
     method: "GET",
   });
 }

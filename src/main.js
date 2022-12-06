@@ -6,9 +6,9 @@ import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 import "element-ui/lib/theme-chalk/display.css";
 
-import locale from "element-ui/lib/locale/lang/en"; // lang i18n
-import zhLocale from "element-ui/lib/locale/lang/zh-CN";
-//import zhLocale from "@/assets/lang/zh-CN";
+//import locale from "element-ui/lib/locale/lang/en"; // lang i18n
+//import locale from "element-ui/lib/locale/lang/zh-TW";
+import locale from "@/assets/lang/zh-TW";
 import "@/styles/index.scss"; // global css
 
 import App from "./App";
@@ -33,7 +33,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // set ElementUI lang to EN
-Vue.use(ElementUI, { zhLocale });
+Vue.use(ElementUI, { locale });
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
 Vue.mixin(mixin);

@@ -73,17 +73,13 @@
     </div>
 
     <!-- 分頁 -->
-    <el-row type="flex">
-      <el-col :span="8">
-        <div type="flex">
-          <!--
-          <el-button type="primary">執行批次生效</el-button>
-          <el-button type="primary">自動叫單生效</el-button>
-          -->
-
-        </div>
+    <el-row class="mt-1" type="flex">
+      <el-col :span="10">
+        出庫最新收單時間：{{ receiveInfo.lastDateTime }} 出庫最新收單數量：{{
+          receiveInfo.lastCount
+        }}單
       </el-col>
-      <el-col :span="16" align="end">
+      <el-col :span="14" align="end">
         <el-pagination
           background
           @current-change="onCurrentChange"
@@ -145,6 +141,7 @@
         width="100"
       >
       </el-table-column>
+      <!-- 
       <el-table-column label="動作" width="200" align="center">
         <template slot-scope="scope">
           <el-button @click="onAction(scope.row)" size="mini" type="primary"
@@ -153,6 +150,7 @@
           <el-button @click="onAction(scope.row)" size="mini">失效 </el-button>
         </template>
       </el-table-column>
+    -->
     </el-table>
   </div>
 </template>

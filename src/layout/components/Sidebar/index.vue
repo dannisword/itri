@@ -103,10 +103,12 @@ export default {
           id++;
         }
       }
+      
       this.menus = menus;
     },
     handleSelect(key, keyPath) {},
     onNav(menu) {
+      console.log(menu);
       // 檢查權限
       this.$router.push(menu.path);
     },

@@ -11,7 +11,7 @@
           type="success"
           @click="onFinished('FINISHED')"
           :disabled="canFinish == false"
-          >結束此單</el-button
+          >結束此單作業</el-button
         >
       </el-form-item>
     </el-form>
@@ -282,7 +282,6 @@ export default {
             }
             return -1;
           });
-          console.log(this.canFinish);
         }
       });
     },
