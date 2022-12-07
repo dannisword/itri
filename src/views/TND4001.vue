@@ -16,13 +16,17 @@
         </el-form-item>
 
         <el-form-item label="作業站點">
-          <el-select v-model="params.stationId" multiple placeholder="請選擇">
+          <el-select
+            v-model="params.stationId"
+            multiple
+            placeholder="請選擇"
+            :disabled="workStation().length > 0"
+          >
             <el-option
               v-for="item in workStations"
               :key="item.id"
               :label="item.label"
               :value="item.value"
-              :disabled="workStation().length > 0"
             >
             </el-option>
           </el-select>
@@ -58,20 +62,29 @@
     </div>
 
     <!-- 分頁 -->
-    <el-row type="flex">
-      <el-col :span="8">
-        <!--
-        <div type="flex">
-          <el-button type="primary">執行批次生效</el-button>
-          <el-button type="primary">自動叫單生效</el-button>
-        </div>
-        -->
-
-        加工最新收單時間：{{ receiveInfo.lastDateTime }} 加工最新收單數量：{{
-          receiveInfo.lastCount
-        }}單
+    <el-row class="mt-1" type="flex">
+      <el-col :span="16">
+        <el-form class="mt-1" label-width="140px" :inline="true">
+          <el-form-item label="請輸入操作單號">
+            <!-- 
+            <el-input v-model="params.sysOrderNo">
+              <el-button slot="append" icon="el-icon-search"> </el-button>
+            </el-input>
+            -->
+            <el-autocomplete
+              class="inline-input"
+              v-model="state1"
+              :fetch-suggestions="querySearch"
+              placeholder="请输入内容"
+              @select="handleSelect"
+            ></el-autocomplete>
+          </el-form-item>
+          加工最新收單時間：{{ receiveInfo.lastDateTime }} 加工最新收單數量：{{
+            receiveInfo.lastCount
+          }}單
+        </el-form>
       </el-col>
-      <el-col :span="16" align="end">
+      <el-col :span="8" align="end">
         <el-pagination
           background
           @current-change="onCurrentChange"
@@ -91,13 +104,12 @@
       stripe
       @sort-change="onSortcChange"
     >
-      <el-table-column type="selection" width="55"> </el-table-column>
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
       <el-table-column
         label="加工單號碼"
         prop="sysOrderNo"
-        width="180"
+        min-width="330"
         sortable="custom"
       >
       </el-table-column>
@@ -112,30 +124,31 @@
         label="供應商"
         prop="supplier"
         sortable="custom"
-        width="100"
+        min-width="100"
       >
       </el-table-column>
       <el-table-column
         label="數量"
         prop="totalProcQty"
         sortable="custom"
-        width="100"
+        min-width="100"
       >
       </el-table-column>
       <el-table-column
         label="單據狀態"
         prop="docStatus"
         sortable="custom"
-        width="120"
+        min-width="120"
       >
       </el-table-column>
       <el-table-column
         label="綁定站點"
         prop="statusName"
         sortable="custom"
-        width="120"
+        min-width="120"
       >
       </el-table-column>
+      <!-- 
       <el-table-column label="動作" width="200" align="center">
         <template slot-scope="scope">
           <el-button @click="onAction(scope.row)" size="mini" type="primary"
@@ -144,6 +157,7 @@
           <el-button @click="onAction(scope.row)" size="mini">失效 </el-button>
         </template>
       </el-table-column>
+      -->
     </el-table>
   </div>
 </template>
@@ -151,7 +165,7 @@
 import moment from "moment";
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
-import { getProcesses } from "@/api/processing";
+import { getProcesses, getProcessDocOption } from "@/api/processing";
 import { SelectTypeEnum } from "@/utils/enums/index";
 import { getReceiveInfo } from "@/api/system";
 
@@ -202,6 +216,11 @@ export default {
         this.receiveInfo = resp.message;
       }
     });
+
+    this.onLoad();
+    getProcessDocOption().then((resp) => {
+      console.log(resp);
+    });
   },
   methods: {
     onLoad() {
@@ -242,6 +261,15 @@ export default {
     onCurrentChange(val) {
       this.params.page = val;
       this.onLoad();
+    },
+
+    querySearch(queryString, cb) {
+      var restaurants = this.restaurants;
+      var results = queryString
+        ? restaurants.filter(this.createFilter(queryString))
+        : restaurants;
+      // 调用 callback 返回建议列表的数据
+      cb(results);
     },
   },
 };

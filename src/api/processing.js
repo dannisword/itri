@@ -61,13 +61,12 @@ export function setProcess(data) {
     request({
       url: uri,
       method: method,
-      data
+      data,
     }).then((resp) => {
       parseMessage(resp);
       resolve(resp);
     });
   });
-
 }
 /**
  * A5-5 查詢出庫叫單數
@@ -83,12 +82,23 @@ export function getProcess() {
 
 /**
  * A5-6 分頁查詢加工單
- * @param {*} params 
- * @returns 
+ * @param {*} params
+ * @returns
  */
 export function getProcesses(params) {
   return request({
     url: `/api/processing/search${params}`,
+    method: "GET",
+  });
+}
+
+/**
+ * A5-27 取得操作單號的下拉選單選項
+ * @returns 
+ */
+export function getProcessDocOption() {
+  return request({
+    url: `/api/processing/processDocOption`,
     method: "GET",
   });
 }

@@ -24,6 +24,19 @@ export function getInbounds(params) {
     method: "GET",
   });
 }
+
+/**
+ * A3-5 執行入庫(生效入庫單)
+ * @param {*} docNo 
+ * @returns 
+ */
+export function startInbound(docNo) {
+  return request({
+    url: `/api/inbound/start/${docNo}`,
+    method: "POST",
+  });
+}
+
 /**
  * A3-6 回報單據明細入庫資料
  * @param {*} data

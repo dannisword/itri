@@ -169,25 +169,29 @@ export async function getMenus() {
   return menus;
 }
 /**
- * 
- * @param {*} url 
- * @param {*} data 
+ *  POST 方法
+ * @param {*} url
+ * @param {*} data
  */
-export function fetchPost(url, data) {
-  const option = {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: config,
-    responseType: "blob",
-  };
-  fetch(url, option)
-    .then((response) => {
-      return response.json();
-    })
-    .then((jsonData) => {
-      return jsonData;
-    })
-    .catch((err) => {
-      return err;
-    });
+export function fetchPost(uri, value) {
+  return new Promise((resolve, reject) => {
+    const option = {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    fetch(url, option)
+      .then((response) => {
+        return response.json();
+      })
+      .then((jsonData) => {
+        const value = JSON.parse(jsonData);
+        resolve(value);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
 }

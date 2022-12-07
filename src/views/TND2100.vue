@@ -56,13 +56,12 @@
           type="primary"
           @click="onCallback()"
           :disabled="this.carrierId.length <= 0"
-          v-if="isDevelopment == true"
           >料盒連動測試</el-button
         >
       </el-form-item>
     </el-form>
 
-    <!-- 明細 -->
+    <!-- 明細 v-if="isDevelopment == true" -->
     <el-table :data="details" class="table-container" border>
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
@@ -91,6 +90,7 @@
         min-width="180"
       >
       </el-table-column>
+
       <el-table-column label="實際已入庫總數" prop="prodQty" min-width="180">
         <template slot-scope="scope">
           <el-input
@@ -114,6 +114,7 @@
             class="cell-button"
             type="number"
             v-model="scope.row.inQty"
+            min="0"
             @keyup.enter.native="onAddProdQty(scope.row)"
             v-if="scope.row.isFinished == false"
           >
@@ -124,7 +125,19 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="帳差" prop="differenceQty"> </el-table-column>
+      <el-table-column label="帳差" prop="differenceQty">
+        <template slot-scope="scope">
+          <el-input
+            class="cell-button"
+            type="number"
+            v-model="scope.row.differenceQty"
+            v-if="scope.row.isFinished == false"
+          >
+          </el-input>
+          <span v-else>{{ scope.row.differenceQty }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column label="動作" width="180">
         <template slot-scope="scope">
           <div v-if="scope.row.isFinished == false">
@@ -223,6 +236,10 @@ export default {
       this.getInboundDetail(inboundId);
     },
     setBarcode(carrierId) {
+      if (carrierId.length != 5){
+        this.warning("請輸入正確物流箱編號！");
+        return;
+      }
       const detail = this.newDetail(carrierId);
       this.setInboundDetail(detail);
     },
@@ -296,8 +313,6 @@ export default {
       };
       // http://10.248.82.109:18090/device/carrierCallback
       const url = `${this.call_back_url}/device/carrierCallback`;
-      console.log(url);
-      console.log(data);
       fetchPost(url, data).then((resp) => {
         console.log(resp);
       });

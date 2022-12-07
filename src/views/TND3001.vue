@@ -235,7 +235,7 @@ export default {
       this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);
       this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params);
-      
+
       getOutBounds(query)
         .then((respone) => {
           if (respone.status == "OK") {
@@ -254,6 +254,8 @@ export default {
         .catch((e) => {
           this.loading = false;
         });
+
+        // A4-2 取得出庫單明細
     },
     onAction(val) {},
     onSizeChange(val) {},
@@ -269,7 +271,6 @@ export default {
     },
     ondblClick(val) {
       console.log(val);
-      // getOutBoundDetail
       getOutBoundDetail(val.id).then((resp) => {
         if (resp.status == "OK") {
           this.onNav(`/TND3100/${val.id}`);

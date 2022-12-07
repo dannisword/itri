@@ -163,7 +163,7 @@
 import mqtt from "mqtt";
 import Dialog from "@/components/ModalDialog/Dialog.vue";
 import pageMixin from "@/utils/mixin";
-import { getInbounds, getInboundDetail } from "@/api/inbound";
+import { getInbounds, startInbound } from "@/api/inbound";
 import { getReceiveInfo } from "@/api/system";
 import { SelectTypeEnum } from "@/utils/enums/index";
 
@@ -242,7 +242,7 @@ export default {
       if (this.retryTimes > 5) {
         try {
           this.client.end();
-        
+
           //this.initData();
           //this.$message.error("Connection maxReconnectTimes limit, stop retry");
         } catch (error) {
@@ -320,7 +320,7 @@ export default {
       this.onLoad();
     },
     ondblClick(val) {
-      getInboundDetail(val.id).then((resp) => {
+      startInbound(val.sysOrderNo).then((resp) => {
         if (resp.status == "OK") {
           this.onNav(`/TND2100/${val.id}`);
         }

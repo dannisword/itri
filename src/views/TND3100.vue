@@ -66,7 +66,11 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { SelectTypeEnum } from "@/utils/enums/index";
-import { getOutbound, setOutBoundDetail } from "@/api/outbound";
+import {
+  getOutbound,
+  getOutBoundDetail,
+  setOutBoundDetail,
+} from "@/api/outbound";
 
 export default {
   components: {
@@ -113,6 +117,10 @@ export default {
           }
           this.outbounds.push(this.outbound);
         }
+      });
+
+      getOutBoundDetail(outboundId).then((resp) => {
+        console.log(resp);
       });
     },
     onAction(val) {},
