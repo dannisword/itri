@@ -98,6 +98,8 @@
       class="table-container"
       border
       stripe
+      @sort-change="onSortcChange"
+      @cell-dblclick="ondblClick"
     >
       <el-table-column type="selection" width="55"> </el-table-column>
       <el-table-column label="項次" width="100" prop="seq" fixed>
@@ -105,40 +107,50 @@
       <el-table-column
         label="出貨模式"
         prop="docType"
-        width="180"
+        min-width="180"
         sortable="custom"
       >
       </el-table-column>
-      <el-table-column label="出庫單號碼" prop="sysOrderNo" sortable="custom">
+      <el-table-column
+        label="出庫單號碼"
+        prop="sysOrderNo"
+        min-width="180"
+        sortable="custom"
+      >
       </el-table-column>
-      <el-table-column label="料品號" prop="prodCode" sortable="custom">
+      <el-table-column
+        label="料品號"
+        prop="prodCode"
+        min-width="180"
+        sortable="custom"
+      >
       </el-table-column>
       <el-table-column
         label="供應商"
         prop="supplier"
         sortable="custom"
-        width="100"
+        min-width="180"
       >
       </el-table-column>
       <el-table-column
         label="數量"
         prop="totalPlanQty"
         sortable="custom"
-        width="100"
+        min-width="100"
       >
       </el-table-column>
       <el-table-column
         label="出庫單狀態"
         prop="docStatusName"
         sortable="custom"
-        width="100"
+        min-width="180"
       >
       </el-table-column>
       <el-table-column
         label="綁定站點"
         prop="assignWorkStationId"
         sortable="custom"
-        width="100"
+        min-width="180"
       >
       </el-table-column>
       <!-- 
@@ -158,7 +170,7 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getWorkStation } from "@/api/workStation";
-import { getOutBounds } from "@/api/outbound";
+import { getOutBounds, getOutBoundDetail } from "@/api/outbound";
 import { SelectTypeEnum } from "@/utils/enums/index";
 import { getReceiveInfo } from "@/api/system";
 
@@ -177,7 +189,7 @@ export default {
       outStatus: [],
       outSource: [],
       params: {
-        assignWorkStationId: "",
+        assignWorkStationId: [],
         direction: "ASC",
         docStatus: 0,
         docType: "0",
@@ -192,7 +204,8 @@ export default {
     };
   },
   async created() {
-    this.nowDate.push(this.addDay(-7));
+    // TODO -7
+    this.nowDate.push(this.addDay(-60));
     this.nowDate.push(this.addDay(0));
     getWorkStation().then((resp) => {
       if (resp.message) {
@@ -203,7 +216,10 @@ export default {
     this.outStatus = await this.getSelector(SelectTypeEnum.OUTBOUND_STATUS);
 
     this.outSource = await this.getSelector(SelectTypeEnum.SHIPPING_MODE);
-
+    // 站點綁定
+    if (this.workStation().length > 0) {
+      this.params.assignWorkStationId.push(this.workStation());
+    }
     // 出庫資訊
     getReceiveInfo("出庫").then((resp) => {
       if (resp.status == "OK") {
@@ -219,6 +235,7 @@ export default {
       this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);
       this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params);
+      
       getOutBounds(query)
         .then((respone) => {
           if (respone.status == "OK") {
@@ -240,6 +257,25 @@ export default {
     },
     onAction(val) {},
     onSizeChange(val) {},
+    async onSortcChange(val) {
+      console.log(val);
+      return;
+      if (val.order == null) {
+        return;
+      }
+      this.params.direction = val.order == "ascending" ? "ASC" : "DESC";
+      this.params.properties = val.prop;
+      await this.onLoad();
+    },
+    ondblClick(val) {
+      console.log(val);
+      // getOutBoundDetail
+      getOutBoundDetail(val.id).then((resp) => {
+        if (resp.status == "OK") {
+          this.onNav(`/TND3100/${val.id}`);
+        }
+      });
+    },
     onCurrentChange(val) {},
   },
 };

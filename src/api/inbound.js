@@ -26,14 +26,14 @@ export function getInbounds(params) {
 }
 /**
  * A3-6 回報單據明細入庫資料
- * @param {*} data 
- * @returns 
+ * @param {*} data
+ * @returns
  */
-export function setInboundDetail(data){
+export function setInboundDetail(data) {
   return request({
     url: `api/inbound/detail`,
     method: "PUT",
-    data
+    data,
   });
 }
 
@@ -163,12 +163,32 @@ export function getInbound(inboundId) {
 
 /**
  * A3-18 查詢單據照片
- * @param {*} docNo 
- * @returns 
+ * @param {*} docNo
+ * @returns
  */
-export function getInboundImage(docNo){
+export function getInboundImage(docNo) {
   return request({
     url: `/api/inbound/getInboundImage/${docNo}`,
     method: "GET",
+  });
+}
+
+/**
+ * A3-19 刪除出庫單明細
+ * @param {*} docNo
+ * @param {*} carrieId
+ * @returns
+ */
+export function deleteInboundDetail(docNo, carrieId) {
+  const uri = `/api/inbound/deleteDetail/${docNo}/${carrieId}`;
+  const method = "POST";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
 }

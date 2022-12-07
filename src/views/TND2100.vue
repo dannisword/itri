@@ -12,8 +12,8 @@
         >結束此單作業</el-button
       >
     </el-form>
-    
-    <div v-for="img in imgs" >
+
+    <div v-for="img in imgs">
       <el-image
         class="floated_box"
         style="width: 150px; height: 100px"
@@ -21,7 +21,7 @@
         fit="fit"
       ></el-image>
     </div>
-    
+
     <!-- 主檔-->
     <el-table
       :data="inbounds"
@@ -41,14 +41,24 @@
       <el-table-column label="實際已入庫總數" prop="totalProdQty" width="180">
       </el-table-column>
     </el-table>
+
     <!-- 條碼 -->
     <el-form class="mt-1" label-width="180px" :inline="true">
       <el-form-item label="請刷讀物流箱編號條碼">
         <el-input
-          v-model="barcode"
-          @keyup.enter.native="setBarcode(barcode)"
+          v-model="carrierId"
+          @keyup.enter.native="setBarcode(carrierId)"
           :disabled="isFinished == true"
         ></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button
+          type="primary"
+          @click="onCallback()"
+          :disabled="this.carrierId.length <= 0"
+          v-if="isDevelopment == true"
+          >料盒連動測試</el-button
+        >
       </el-form-item>
     </el-form>
 
@@ -85,6 +95,7 @@
         <template slot-scope="scope">
           <el-input
             class="cell-button"
+            type="number"
             v-model="scope.row.prodQty"
             :disabled="scope.row.prodQtyEdit == false"
             v-if="scope.row.isFinished == false"
@@ -101,6 +112,7 @@
         <template slot-scope="scope">
           <el-input
             class="cell-button"
+            type="number"
             v-model="scope.row.inQty"
             @keyup.enter.native="onAddProdQty(scope.row)"
             v-if="scope.row.isFinished == false"
@@ -140,9 +152,11 @@ import {
   closeInbound,
   setInboundDetail,
   getInboundImage,
+  deleteInboundDetail,
 } from "@/api/inbound";
 
 import { SelectTypeEnum } from "@/utils/enums/index";
+import { fetchPost } from "@/utils/app";
 
 export default {
   components: {
@@ -151,7 +165,7 @@ export default {
   mixins: [pageMixin],
   data() {
     return {
-      barcode: "",
+      carrierId: "",
       inbound: {},
       inbounds: [],
       details: [],
@@ -178,11 +192,16 @@ export default {
       // 判斷主檔
       return this.inbound.docStatus >= 3 ? true : false;
     },
+    canClose() {
+      const dts = this.details.filter((x) => x.isFinished == false);
+      return dts.length > 0 ? false : true;
+    },
   },
   methods: {
     onLoad() {
       const inboundId = this.$route.params.id;
-
+      this.inbound = {};
+      this.inbounds = [];
       //  主檔資料
       getInbound(inboundId).then((resp) => {
         if (resp.status == "OK") {
@@ -191,47 +210,61 @@ export default {
           var status = this.inStatus.filter(
             (x) => x.value == this.inbound.docStatus
           );
-          if (status.label > 0) {
+          if (status.length > 0) {
             this.inbound.docStatusName = status[0].label;
           } else {
             this.inbound.docStatusName = "狀態錯誤";
           }
-          this.inbounds.push(resp.message);
-          // 圖檔資料
-          /*
-          getInboundImage(this.inbound.sysOrderNo).then((resp) => {
-            console.log(resp);
-          });*/
+          this.inbounds.push(this.inbound);
+          this.getInboundImage(this.inbound.sysOrderNo);
         }
       });
       // 明細資料
       this.getInboundDetail(inboundId);
-      // TODO
-      this.imgs.push(config.coming_soon);
-      this.imgs.push(config.coming_soon);
-      this.imgs.push(config.coming_soon);
-      this.imgs.push(config.coming_soon);
-      this.imgs.push(config.coming_soon);
-      console.log(this.imgs);
     },
-    setBarcode(barcode) {
-      const detail = this.newDetail(barcode);
+    setBarcode(carrierId) {
+      const detail = this.newDetail(carrierId);
       this.setInboundDetail(detail);
     },
     // 結束此單
-    onClose() {
-      closeInbound(this.inbound.sysOrderNo).then((resp) => {
-        if (resp.status == "OK") {
-          this.onNav("/TND2001");
-        } else {
-          this.warning(resp.message);
+    async onClose() {
+      if (this.canClose == false) {
+        this.warning("入庫工作，尚未完成，請完成放置，回送！");
+        return;
+      }
+      // 判斷數量
+      if (this.inbound.totalProdQty <= this.inbound.totalPlanQty) {
+        const isConfirm = await this.confirm(
+          "入庫總數小於收料數量，是否結束此單！"
+        );
+        if (isConfirm == false) {
+          return;
         }
-      });
+        closeInbound(this.inbound.sysOrderNo).then((resp) => {
+          if (resp.status == "OK") {
+            this.onNav("/TND2001");
+          } else {
+            this.warning(resp.message);
+          }
+        });
+      }
     },
     onDelete(val) {
-      console.log(val);
+      deleteInboundDetail(val.sysOrderNo, val.carrierId).then((resp) => {
+        if (resp.status == "OK") {
+          this.onLoad();
+        } else {
+        }
+        console.log(resp);
+      });
     },
     onProdQtyEdit(val) {
+      if (val.prodQty == null || val.prodQty.length <= 0) {
+        val.prodQtyEdit = true;
+        val.prodQtyEditName = "存檔";
+        this.warning("請輸入數量");
+        return;
+      }
       val.prodQtyEdit = !val.prodQtyEdit;
       val.prodQtyEditName = "編輯";
       if (val.prodQtyEdit == true) {
@@ -241,6 +274,13 @@ export default {
       }
     },
     onAddProdQty(val) {
+      val.prodQtyEdit = false;
+      val.prodQtyEditName = "編輯";
+
+      if (val.inQty == "") {
+        this.warning("請輸入數量");
+        return;
+      }
       val.prodQty = parseInt(val.inQty) + parseInt(val.prodQty);
       val.inQty = "";
     },
@@ -248,7 +288,21 @@ export default {
       val.isFinished = true;
       this.setInboundDetail(val);
     },
-    newDetail(barcode) {
+    onCallback() {
+      const data = {
+        location: "BCR111",
+        carrierNo: this.carrierId,
+        callbackType: "locactionChanged",
+      };
+      // http://10.248.82.109:18090/device/carrierCallback
+      const url = `${this.call_back_url}/device/carrierCallback`;
+      console.log(url);
+      console.log(data);
+      fetchPost(url, data).then((resp) => {
+        console.log(resp);
+      });
+    },
+    newDetail(carrierId) {
       return {
         sysOrderNo: this.inbound.sysOrderNo,
         prodCode: this.inbound.prodCode,
@@ -257,7 +311,7 @@ export default {
         prodQty: 0,
         differenceQty: 0,
         weight: 0,
-        carrierId: barcode,
+        carrierId: carrierId,
         isFinished: false,
       };
     },
@@ -283,10 +337,25 @@ export default {
         }
       });
     },
+    getInboundImage(sysOrderNo) {
+      // TODO
+      this.imgs = [];
+
+      this.imgs.push(config.coming_soon);
+      this.imgs.push(config.coming_soon);
+      this.imgs.push(config.coming_soon);
+      this.imgs.push(config.coming_soon);
+      this.imgs.push(config.coming_soon);
+      return;
+      // 圖檔資料
+      getInboundImage(sysOrderNo).then((resp) => {
+        console.log(resp);
+      });
+    },
     setInboundDetail(data) {
       setInboundDetail(data).then((resp) => {
         if (resp.status == "OK") {
-          this.getInboundDetail(this.inbound.id);
+          this.onLoad();
         } else {
           if (resp.message) {
             this.warning(resp.message);

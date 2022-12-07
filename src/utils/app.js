@@ -168,3 +168,26 @@ export async function getMenus() {
   }
   return menus;
 }
+/**
+ * 
+ * @param {*} url 
+ * @param {*} data 
+ */
+export function fetchPost(url, data) {
+  const option = {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: config,
+    responseType: "blob",
+  };
+  fetch(url, option)
+    .then((response) => {
+      return response.json();
+    })
+    .then((jsonData) => {
+      return jsonData;
+    })
+    .catch((err) => {
+      return err;
+    });
+}

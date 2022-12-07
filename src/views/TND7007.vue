@@ -207,15 +207,19 @@
       :title="dialogs.assign.title"
       :name="dialogs.assign.name"
       :visible.sync="dialogs.assign.visible"
-      :optional="optional"
+      :optional="dialogs.assign.optional"
       @afterClosed="onModalClose"
     >
-      <el-form :model="storage" label-width="100px">
+      <el-form :model="assign" label-width="100px">
         <el-form-item label="走道">
           <el-input v-model="assign.aisle"></el-input>
         </el-form-item>
         <el-form-item label="層">
           <el-input v-model="assign.level"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onAssign()">保留</el-button>
+          <el-button type="primary" @click="onAssign()">可用</el-button>
         </el-form-item>
       </el-form>
     </ModalDialog>
@@ -287,6 +291,12 @@ export default {
           title: "更新指定層",
           name: "ASSIGN",
           visible: false,
+          optional: {
+            size: "Small",
+            action: "",
+            cancel: "",
+            showAction: false,
+          },
         },
         LOCK: {
           title: "物流箱允入設定",
@@ -419,6 +429,9 @@ export default {
 
         this.setAssign(this.assign);
       }
+    },
+    onAssign(){
+
     },
     onMessage(dialogRef) {
       this.dialogs.LOCK.visible = false;

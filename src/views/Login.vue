@@ -34,7 +34,7 @@
             placeholder="密碼"
             tabindex="2"
             auto-complete="on"
-            @keyup.enter.native="handleLogin"
+            @keyup.enter.native="onLogin"
           >
             <template slot="append">
               <span class="show-pwd" @click="showPwd">
@@ -55,7 +55,7 @@
           登入
         </el-button>
         <div class="tips">
-          <span class="version-span">版本 {{version}}</span>
+          <span class="version-span">版本 {{ version }}</span>
         </div>
       </el-form>
     </div>
@@ -109,7 +109,7 @@ export default {
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
       },
-      version:config.version
+      version: config.version,
     };
   },
   created() {},

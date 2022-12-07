@@ -42,10 +42,18 @@ export default {
     }
   },
   computed: {
-    /*
-    source() {
-      return example;
-    },*/
+    env() {
+      return process.env.NODE_ENV;
+    },
+    isDevelopment() {
+      return process.env.NODE_ENV == "development";
+    },
+    call_back_url() {
+      return process.env.VUE_APP_CALLBACK_API;
+    },
+    mqtt_path() {
+      return process.env.VUE_APP_MQTT_ENTRY_POINT;
+    },
     getQuery() {
       return function (params, num = true) {
         let query = "";
@@ -180,7 +188,6 @@ export default {
       });
     },
     onDatePickeChang(val) {
-
       const diff = moment(val[1]).diff(val[0], "days");
       if (diff > 60) {
         val[0] = this.addDay(-7);

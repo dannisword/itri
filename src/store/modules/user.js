@@ -8,6 +8,7 @@ import {
 } from "@/utils/localStorage";
 
 import { resetRouter } from "@/router";
+import { MessageBox, Message } from "element-ui";
 
 const getDefaultState = () => {
   return {
@@ -51,6 +52,15 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ account: account.trim(), password: password })
         .then((response) => {
+          if (response.status != "OK") {
+            resolve(false);
+            Message({
+              message: response.errorMessage,
+              type: "warning",
+              duration: 3000,
+            });
+            return;
+          }
           var data = getUserData(response.message.token);
           const isFirst = account == password ? true : false;
           if (data) {
@@ -70,7 +80,6 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      
       var data = getUserInfo();
       if (data == null) {
         reject(undefined);
