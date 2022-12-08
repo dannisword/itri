@@ -24,7 +24,8 @@ function parseError(response) {
   }
   if (response.status == 404 || response.status == 400) {
     Message({
-      message: `錯誤的請求(${response.status})`,
+      //message: `錯誤的請求(${response.status})`,
+      message: response.message,
       type: "warning",
       duration: 5000,
     });

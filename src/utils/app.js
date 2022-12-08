@@ -173,7 +173,7 @@ export async function getMenus() {
  * @param {*} url
  * @param {*} data
  */
-export function fetchPost(uri, value) {
+export function fetchPost(url, data) {
   return new Promise((resolve, reject) => {
     const option = {
       method: "POST",

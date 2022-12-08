@@ -170,7 +170,7 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getWorkStation } from "@/api/workStation";
-import { getOutBounds, getOutBoundDetail } from "@/api/outbound";
+import { getOutBounds, getOutBoundDetail, startInbound } from "@/api/outbound";
 import { SelectTypeEnum } from "@/utils/enums/index";
 import { getReceiveInfo } from "@/api/system";
 
@@ -255,7 +255,7 @@ export default {
           this.loading = false;
         });
 
-        // A4-2 取得出庫單明細
+      // A4-2 取得出庫單明細
     },
     onAction(val) {},
     onSizeChange(val) {},
@@ -271,7 +271,7 @@ export default {
     },
     ondblClick(val) {
       console.log(val);
-      getOutBoundDetail(val.id).then((resp) => {
+      startInbound(val.sysOrderNo).then((resp) => {
         if (resp.status == "OK") {
           this.onNav(`/TND3100/${val.id}`);
         }

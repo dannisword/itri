@@ -73,11 +73,12 @@
             -->
             <el-autocomplete
               class="inline-input"
-              v-model="state1"
+              v-model="docNo"
               :fetch-suggestions="querySearch"
-              placeholder="请输入内容"
-              @select="handleSelect"
-            ></el-autocomplete>
+              placeholder="請輸入操作單號"
+            >
+              <el-button slot="append" icon="el-icon-search" @click="getProcessDocOption"> </el-button>
+            </el-autocomplete>
           </el-form-item>
           加工最新收單時間：{{ receiveInfo.lastDateTime }} 加工最新收單數量：{{
             receiveInfo.lastCount
@@ -180,6 +181,8 @@ export default {
       workStations: [],
       nowDate: [],
       receiveInfo: {},
+      docs: [],
+      docNo: "",
       params: {
         direction: "ASC",
         docStatus: 0,
@@ -216,11 +219,8 @@ export default {
         this.receiveInfo = resp.message;
       }
     });
-
     this.onLoad();
-    getProcessDocOption().then((resp) => {
-      console.log(resp);
-    });
+    this.getProcessDocOption();
   },
   methods: {
     onLoad() {
@@ -228,7 +228,6 @@ export default {
       this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params);
       getProcesses(query).then((respone) => {
-        console.log(respone);
         if (respone.status == "OK") {
           this.content = respone.message.content;
           // 分頁設定
@@ -262,14 +261,25 @@ export default {
       this.params.page = val;
       this.onLoad();
     },
-
+    getProcessDocOption() {
+      getProcessDocOption().then((resp) => {
+        if (resp.status == "OK") {
+          this.docs = resp.message;
+        }
+        console.log(resp);
+      });
+    },
     querySearch(queryString, cb) {
-      var restaurants = this.restaurants;
+      var restaurants = this.docs;
       var results = queryString
         ? restaurants.filter(this.createFilter(queryString))
         : restaurants;
-      // 调用 callback 返回建议列表的数据
       cb(results);
+    },
+    createFilter(val) {
+      return (resp) => {
+        return resp.value.toLowerCase().indexOf(val.toLowerCase()) === 0;
+      };
     },
   },
 };

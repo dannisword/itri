@@ -5,6 +5,7 @@ import responeMixin from "@/utils/mixin/respone";
 //import example from "@/utils/mixin/exapmle.json";
 import { getUserInfo } from "@/utils/localStorage";
 import { getSelector } from "@/api/system";
+import { fetchPost } from "@/utils/app";
 
 export default {
   mixins: [dateMixin, responeMixin],
@@ -194,6 +195,20 @@ export default {
         val[1] = this.addDay(0);
         this.warning("日期查詢間隔勿超過60天");
       }
+    },
+    callback(carrierId) {
+      const data = {
+        location: "BCR111",
+        carrierNo: carrierId,
+        callbackType: "locactionChanged",
+      };
+      // http://10.248.82.109:18090/device/carrierCallback
+      const url = `${this.call_back_url}/device/carrierCallback`;
+      console.log(url);
+      console.log(carrierId);
+      fetchPost(url, data).then((resp) => {
+        console.log(resp);
+      });
     },
   },
 };

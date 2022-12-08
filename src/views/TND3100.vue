@@ -36,27 +36,68 @@
     </el-form>
 
     <el-table :data="details" class="table-container" border>
-      <el-table-column label="項次" width="100" prop="id" fixed>
+      <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="物流箱編號" prop="name"> </el-table-column>
-      <el-table-column label="物流箱內數量" prop="statusName" width="125">
+      <el-table-column label="物流箱編號" prop="carrierId"> </el-table-column>
+      <el-table-column label="物流箱內數量" prop="planQty" width="125">
       </el-table-column>
-      <el-table-column label="已揀數量" prop="statusName" width="125">
-      </el-table-column>
-      <el-table-column label="輸入已揀數量" prop="statusName" width="125">
-      </el-table-column>
-      <el-table-column label="帳差" prop="statusName" width="125">
-      </el-table-column>
-      <el-table-column label="動作" prop="statusName" width="125">
+
+      <el-table-column label="已揀數量" prop="prodQty" min-width="180">
         <template slot-scope="scope">
-          <div>
-            <el-button @click="onAction(scope.row)" size="mini" type="primary"
+          <el-input
+            class="cell-button"
+            type="number"
+            v-model="scope.row.prodQty"
+            :disabled="scope.row.prodQtyEdit == false"
+            v-if="scope.row.isFinished == false"
+          >
+            <el-button slot="append" @click="onProdQtyEdit(scope.row)">{{
+              scope.row.prodQtyEditName
+            }}</el-button>
+          </el-input>
+          <span v-else>{{ scope.row.prodQty }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="輸入已揀數量" prop="outQty" min-width="180">
+        <template slot-scope="scope">
+          <el-input
+            class="cell-button"
+            type="number"
+            v-model="scope.row.outQty"
+            min="0"
+            @keyup.enter.native="onAddProdQty(scope.row)"
+            v-if="scope.row.isFinished == false"
+          >
+            <el-button slot="append" @click="onAddProdQty(scope.row)"
+              >加總數量</el-button
+            >
+          </el-input>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="帳差" prop="differenceQty" min-width="180">
+        <template slot-scope="scope">
+          <el-input
+            class="cell-button"
+            type="number"
+            v-model="scope.row.differenceQty"
+            v-if="scope.row.isFinished == false"
+          >
+          </el-input>
+          <span v-else>{{ scope.row.differenceQty }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="動作" prop="statusName" width="280">
+        <template slot-scope="scope">
+          <el-row>
+            <el-button @click="onRemove(scope.row)" size="mini" type="danger"
               >取下
             </el-button>
-            <el-button @click="onAction(scope.row)" size="mini" type="primary"
+            <el-button @click="onFinish(scope.row)" size="mini" type="primary"
               >放置完成，送回
             </el-button>
-          </div>
+          </el-row>
         </template>
       </el-table-column>
     </el-table>
@@ -102,7 +143,6 @@ export default {
       this.outbound = {};
       this.outbounds = [];
       getOutbound(outboundId).then((resp) => {
-        console.log(resp);
         if (resp.status == "OK") {
           this.outbound = resp.message;
           this.outbound.seq = 1;
@@ -118,19 +158,47 @@ export default {
           this.outbounds.push(this.outbound);
         }
       });
-
-      getOutBoundDetail(outboundId).then((resp) => {
-        console.log(resp);
-      });
+      this.getOutBoundDetail(outboundId);
     },
-    onAction(val) {},
+    onRemove(val) {
+      console.log(val);
+    },
+    onFinish(val){
+      val.isFinished = true;
+      this.setOutBoundDetail(val);
+    },
+    onProdQtyEdit(val) {
+      if (val.prodQty == null || val.prodQty.length <= 0) {
+        val.prodQtyEdit = true;
+        val.prodQtyEditName = "存檔";
+        this.warning("請輸入數量");
+        return;
+      }
+      val.prodQtyEdit = !val.prodQtyEdit;
+      val.prodQtyEditName = "編輯";
+      if (val.prodQtyEdit == true) {
+        val.prodQtyEditName = "存檔";
+      } else {
+        this.setOutBoundDetail(val);
+      }
+    },
+    onAddProdQty(val) {
+      val.prodQtyEdit = false;
+      val.prodQtyEditName = "編輯";
+
+      if (val.outQty == "") {
+        this.warning("請輸入數量");
+        return;
+      }
+      val.prodQty = parseInt(val.outQty) + parseInt(val.prodQty);
+      val.inQty = "";
+    },
     setBarcode(carrierId) {
       const detail = this.newDetail(carrierId);
       this.setOutBoundDetail(detail);
     },
     setOutBoundDetail(detail) {
       setOutBoundDetail(detail).then((resp) => {
-        console.log(resp);
         if (resp.status == "OK") {
           this.onLoad();
         } else {
@@ -154,6 +222,29 @@ export default {
         isFinished: false,
         stockQty: 0,
       };
+    },
+    getOutBoundDetail(outboundId) {
+      this.details = [];
+      getOutBoundDetail(outboundId).then((resp) => {
+        if (resp.status == "OK") {
+          let seq = 1;
+          for (let detail of resp.message) {
+            detail.seq = seq++;
+            detail.prodQtyEdit = false;
+            detail.prodQtyEditName = "編輯";
+            detail.outQty = "";
+            const data = this.clone(detail);
+            this.details.push(data);
+          }
+          this.details.sort(function (a, b) {
+            if (a.isFinished == true) {
+              return 0;
+            }
+            return -1;
+          });
+          console.log(this.details);
+        }
+      });
     },
   },
 };

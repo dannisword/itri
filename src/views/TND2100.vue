@@ -73,7 +73,7 @@
       >
         <template slot-scope="scope">
           <span>{{ scope.row.carrierId }}</span>
-          <el-button
+          <el-button class="mt-1 ml-1"
             slot="append"
             @click="onDelete(scope.row)"
             v-if="scope.row.isFinished == false"
@@ -142,7 +142,7 @@
         <template slot-scope="scope">
           <div v-if="scope.row.isFinished == false">
             <el-button
-              @click="onSetDetail(scope.row)"
+              @click="onFinish(scope.row)"
               size="mini"
               type="primary"
               >放置完成，送回
@@ -169,7 +169,6 @@ import {
 } from "@/api/inbound";
 
 import { SelectTypeEnum } from "@/utils/enums/index";
-import { fetchPost } from "@/utils/app";
 
 export default {
   components: {
@@ -236,7 +235,7 @@ export default {
       this.getInboundDetail(inboundId);
     },
     setBarcode(carrierId) {
-      if (carrierId.length != 5){
+      if (carrierId.length != 5) {
         this.warning("請輸入正確物流箱編號！");
         return;
       }
@@ -301,21 +300,12 @@ export default {
       val.prodQty = parseInt(val.inQty) + parseInt(val.prodQty);
       val.inQty = "";
     },
-    onSetDetail(val) {
+    onFinish(val) {
       val.isFinished = true;
       this.setInboundDetail(val);
     },
     onCallback() {
-      const data = {
-        location: "BCR111",
-        carrierNo: this.carrierId,
-        callbackType: "locactionChanged",
-      };
-      // http://10.248.82.109:18090/device/carrierCallback
-      const url = `${this.call_back_url}/device/carrierCallback`;
-      fetchPost(url, data).then((resp) => {
-        console.log(resp);
-      });
+      this.callback(this.carrierId);
     },
     newDetail(carrierId) {
       return {

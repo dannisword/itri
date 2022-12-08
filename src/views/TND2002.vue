@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-row>
       <el-col :span="20">
-        <el-form :inline="false" label-width="260px">
+        <el-form :inline="true" label-width="260px">
           <el-form-item
             class="form-item-label-30 label-blue-color"
             label="請刷讀物流箱編號"
@@ -12,6 +12,14 @@
               placeholder="系統刷讀物流箱條碼"
               @keyup.enter.native="onShuttle"
             ></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="primary"
+              @click="onCallback()"
+              :disabled="this.carrierId.length <= 0"
+              >料盒連動測試</el-button
+            >
           </el-form-item>
         </el-form>
       </el-col>
@@ -201,6 +209,9 @@ export default {
     onCurrentChange(val) {
       this.params.page = val;
       this.onLoad();
+    },
+    onCallback() {
+      this.callback(this.carrierId);
     },
   },
 };

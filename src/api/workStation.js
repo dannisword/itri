@@ -22,6 +22,14 @@ export function setWorkStations(data) {
  * A1-22 查詢站點
  * @returns 
  */
+export function getWorkStationa() {
+  return request({
+    url: `/api/workStation/search`,
+    method: "GET",
+  });
+}
+
+
 export function getWorkStation() {
   return request({
     url: `/api/workStation/search`,

@@ -22,6 +22,19 @@ export function getOutBoundDetail(outboundId) {
     method: "GET",
   });
 }
+
+/**
+ * A4-5 執行出庫單(生效)
+ * @param {*} docNo
+ * @returns
+ */
+export function startInbound(docNo) {
+  return request({
+    url: `/api/outbound/start/${docNo}`,
+    method: "POST",
+  });
+}
+
 /**
  * A4-11 回報單據明細出庫資料(編輯/放置完成，回送)
  * @param {*} data
