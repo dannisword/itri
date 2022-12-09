@@ -17,7 +17,7 @@
     <div v-for="img in imgs">
       <el-image
         class="floated_box"
-        style="width: 150px; height: 100px;"
+        style="width: 150px; height: 100px"
         :src="img"
         fit="fit"
       ></el-image>
@@ -37,22 +37,41 @@
         prop="seq"
         fixed
       ></el-table-column>
-      <el-table-column label="入庫單號碼" prop="sysOrderNo"></el-table-column>
-      <el-table-column label="料品號" prop="prodCode"></el-table-column>
+
+      <el-table-column
+        label="入庫單號碼"
+        prop="sysOrderNo"
+        min-width="180"
+      ></el-table-column>
+
+      <el-table-column
+        label="料品號"
+        prop="prodCode"
+        min-width="180"
+      ></el-table-column>
+
+      <el-table-column
+        label="事務號"
+        prop="transNo"
+        min-width="125"
+        sortable="custom"
+      >
+      </el-table-column>
+
       <el-table-column
         label="供應商"
         prop="supplierProdCode"
-        width="125"
+        min-width="125"
       ></el-table-column>
       <el-table-column
         label="收料數量"
         prop="totalPlanQty"
-        width="125"
+        min-width="125"
       ></el-table-column>
       <el-table-column
         label="實際已入庫總數"
         prop="totalProdQty"
-        width="180"
+        min-width="180"
       ></el-table-column>
     </el-table>
 
@@ -95,6 +114,8 @@
           <el-button
             class="mt-1 ml-1"
             slot="append"
+            size="mini"
+            type="danger"
             @click="onDelete(scope.row)"
             v-if="scope.row.isFinished == false"
           >
@@ -162,7 +183,7 @@
       <el-table-column label="動作" width="180">
         <template slot-scope="scope">
           <div v-if="scope.row.isFinished == false">
-            <el-button @click="onFinish(scope.row)" size="mini" type="primary">
+            <el-button @click="onFinish(scope.row)" size="mini" type="success">
               放置完成，送回
             </el-button>
           </div>
@@ -173,9 +194,9 @@
 </template>
 <script>
 // 執行入庫工作
-import ModalDialog from '@/components/ModalDialog/index.vue'
-import pageMixin from '@/utils/mixin'
-import config from '@/utils/mixin/config.json'
+import ModalDialog from "@/components/ModalDialog/index.vue";
+import pageMixin from "@/utils/mixin";
+import config from "@/utils/mixin/config.json";
 
 import {
   getInbound,
@@ -184,10 +205,9 @@ import {
   setInboundDetail,
   getInboundImage,
   deleteInboundDetail,
-} from '@/api/inbound'
+} from "@/api/inbound";
 
-import { SelectTypeEnum } from '@/utils/enums/index'
-import { fetchPost } from '@/utils/app'
+import { SelectTypeEnum } from "@/utils/enums/index";
 
 export default {
   components: {
@@ -196,146 +216,146 @@ export default {
   mixins: [pageMixin],
   data() {
     return {
-      carrierId: '',
+      carrierId: "",
       inbound: {},
       inbounds: [],
       details: [],
       inStatus: [],
       loading: false,
       params: {
-        sysOrderNo: '',
+        sysOrderNo: "",
         page: 0,
         size: 50,
-        direction: 'ASC',
-        properties: 'id',
+        direction: "ASC",
+        properties: "id",
       },
-      fits: ['fill', 'fill', 'fill', 'fill', 'fill'],
+      fits: ["fill", "fill", "fill", "fill", "fill"],
       imgs: [],
-    }
+    };
   },
   async created() {
-    // https://www.logistics.org.tw/tenacity/api/outbound/start/IS20221122000002.1
-    /*
-    const url = 'https://www.logistics.org.tw/tenacity/api/auth/login'
-    console.log(url)
-
-    fetchPost(url, {
-      account: 'admin',
-      password: 'admin',
-    }).then((resp) => {
-      console.log(resp)
-    })*/
     // 入庫單狀態
-    this.inStatus = await this.getSelector(SelectTypeEnum.INBOUND_STATUS)
-    this.onLoad()
+    this.inStatus = await this.getSelector(SelectTypeEnum.INBOUND_STATUS);
+    this.onLoad();
   },
   computed: {
     isFinished() {
       // 判斷主檔
-      return this.inbound.docStatus >= 3 ? true : false
+      return this.inbound.docStatus >= 3 ? true : false;
     },
     canClose() {
-      const dts = this.details.filter((x) => x.isFinished == false)
-      return dts.length > 0 ? false : true
+      const dts = this.details.filter((x) => x.isFinished == false);
+      return dts.length > 0 ? false : true;
     },
   },
   methods: {
     onLoad() {
-      const inboundId = this.$route.params.id
-      this.inbound = {}
-      this.inbounds = []
+      const inboundId = this.$route.params.id;
+      this.inbound = {};
+      this.inbounds = [];
       //  主檔資料
       getInbound(inboundId).then((resp) => {
-        if (resp.status == 'OK') {
-          this.inbound = resp.message
-          this.inbound.seq = 1
+        if (resp.status == "OK") {
+          this.inbound = resp.message;
+          this.inbound.seq = 1;
           var status = this.inStatus.filter(
-            (x) => x.value == this.inbound.docStatus,
-          )
+            (x) => x.value == this.inbound.docStatus
+          );
           if (status.length > 0) {
-            this.inbound.docStatusName = status[0].label
+            this.inbound.docStatusName = status[0].label;
           } else {
-            this.inbound.docStatusName = '狀態錯誤'
+            this.inbound.docStatusName = "狀態錯誤";
           }
-          this.inbounds.push(this.inbound)
-          this.getInboundImage(this.inbound.sysOrderNo)
+          this.inbounds.push(this.inbound);
+          this.getInboundImage(this.inbound.sysOrderNo);
         }
-      })
+      });
       // 明細資料
-      this.getInboundDetail(inboundId)
+      this.getInboundDetail(inboundId);
     },
     setBarcode(carrierId) {
       if (carrierId.length != 5) {
-        this.warning('請輸入正確物流箱編號！')
-        return
+        this.warning("請輸入正確物流箱編號！");
+        return;
       }
-      const detail = this.newDetail(carrierId)
-      this.setInboundDetail(detail)
+      // 確認是否未完成
+      const isFinished = this.details.filter((x) => x.isFinished == false);
+      if (isFinished.length > 0) {
+        this.warning("尚有未完成放置，回送明細！");
+        return;
+      }
+      const detail = this.newDetail(carrierId);
+      this.setInboundDetail(detail);
     },
     // 結束此單
     async onClose() {
       if (this.canClose == false) {
-        this.warning('入庫工作，尚未完成，請完成放置，回送！')
-        return
+        this.warning("入庫工作，尚未完成，請完成放置，回送！");
+        return;
       }
       // 判斷數量
       if (this.inbound.totalProdQty <= this.inbound.totalPlanQty) {
         const isConfirm = await this.confirm(
-          '入庫總數小於收料數量，是否結束此單！',
-        )
+          "入庫總數小於收料數量，是否結束此單！"
+        );
         if (isConfirm == false) {
-          return
+          return;
         }
         closeInbound(this.inbound.sysOrderNo).then((resp) => {
-          if (resp.status == 'OK') {
-            this.onNav('/TND2001')
+          if (resp.status == "OK") {
+            this.onNav("/TND2001");
           } else {
-            this.warning(resp.message)
+            this.warning(resp.message);
           }
-        })
+        });
       }
     },
     onDelete(val) {
       deleteInboundDetail(val.sysOrderNo, val.carrierId).then((resp) => {
-        if (resp.status == 'OK') {
-          this.onLoad()
-        } else {
+        if (resp.status == "OK") {
+          this.onLoad();
         }
-        console.log(resp)
-      })
+      });
     },
     onProdQtyEdit(val) {
       if (val.prodQty == null || val.prodQty.length <= 0) {
-        val.prodQtyEdit = true
-        val.prodQtyEditName = '存檔'
-        this.warning('請輸入數量')
-        return
+        val.prodQtyEdit = true;
+        val.prodQtyEditName = "存檔";
+        this.warning("請輸入數量");
+        return;
       }
-      val.prodQtyEdit = !val.prodQtyEdit
-      val.prodQtyEditName = '編輯'
+      val.prodQtyEdit = !val.prodQtyEdit;
+      val.prodQtyEditName = "編輯";
       if (val.prodQtyEdit == true) {
-        val.prodQtyEditName = '存檔'
+        val.prodQtyEditName = "存檔";
       } else {
-        this.setInboundDetail(val)
+        this.setInboundDetail(val);
       }
     },
     onAddProdQty(val) {
-      val.prodQtyEdit = false
-      val.prodQtyEditName = '編輯'
+      val.prodQtyEdit = false;
+      val.prodQtyEditName = "編輯";
 
-      if (val.inQty == '') {
-        this.warning('請輸入數量')
-        return
+      if (val.inQty == "") {
+        this.warning("請輸入數量");
+        return;
       }
-      val.prodQty = parseInt(val.inQty) + parseInt(val.prodQty)
-      val.inQty = ''
+      val.prodQty = parseInt(val.inQty) + parseInt(val.prodQty);
+      val.inQty = "";
     },
-    onFinish(val) {
-      val.isFinished = true
-      this.setInboundDetail(val)
+    async onFinish(val) {
+      if (val.totalProdQty <= 0) {
+        // 是否新增提示
+        const isConfirm = await this.confirm('');
+        if (isConfirm == false) {
+          return;
+        }
+        val.isFinished = true;
+        this.setInboundDetail(val);
+      }
     },
     onCallback() {
-      this.callback(this.carrierId)
+      this.callback(this.carrierId);
     },
     newDetail(carrierId) {
       return {
@@ -348,60 +368,57 @@ export default {
         weight: 0,
         carrierId: carrierId,
         isFinished: false,
-      }
+      };
     },
     getInboundDetail(inboundId) {
-      this.details = []
+      this.details = [];
       getInboundDetail(inboundId).then((resp) => {
-        if (resp.status == 'OK') {
-          let seq = 1
-          for (let detail of resp.message) {
-            detail.seq = seq++
-            detail.prodQtyEdit = false
-            detail.prodQtyEditName = '編輯'
-            detail.inQty = ''
-            const data = this.clone(detail)
-            this.details.push(data)
-          }
+        console.log(resp);
+        if (resp.status == "OK") {
+          this.details = resp.message;
           this.details.sort(function (a, b) {
             if (a.isFinished == true) {
-              return 0
+              return 0;
             }
-            return -1
-          })
+            return -1;
+          });
+          let seq = 1;
+          for (let detail of this.details) {
+            detail.seq = seq++;
+          }
         }
-      })
+      });
     },
     getInboundImage(sysOrderNo) {
       // TODO
-      this.imgs = []
+      this.imgs = [];
 
-      this.imgs.push(config.coming_soon)
-      this.imgs.push(config.coming_soon)
-      this.imgs.push(config.coming_soon)
-      this.imgs.push(config.coming_soon)
-      this.imgs.push(config.coming_soon)
-      return
+      this.imgs.push(config.coming_soon);
+      this.imgs.push(config.coming_soon);
+      this.imgs.push(config.coming_soon);
+      this.imgs.push(config.coming_soon);
+      this.imgs.push(config.coming_soon);
+      return;
       // 圖檔資料
       getInboundImage(sysOrderNo).then((resp) => {
-        console.log(resp)
-      })
+        console.log(resp);
+      });
     },
     setInboundDetail(data) {
-      data.prodQty = parseInt(data.prodQty)
+      data.prodQty = parseInt(data.prodQty);
       setInboundDetail(data).then((resp) => {
-        if (resp.status == 'OK') {
-          this.onLoad()
+        if (resp.status == "OK") {
+          this.onLoad();
         } else {
           if (resp.message) {
-            this.warning(resp.message)
+            this.warning(resp.message);
           }
-          this.warning(resp.errorMessage)
+          this.warning(resp.errorMessage);
         }
-      })
+      });
     },
   },
-}
+};
 </script>
 <style scoped>
 .floated_box {
@@ -409,6 +426,11 @@ export default {
   margin: 10px;
 }
 .cell-button .el-input-group__append {
+  background-color: #67c23a;
+  color: white;
+}
+
+.cell-button .el-button {
   background-color: #67c23a;
   color: white;
 }

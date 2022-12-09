@@ -21,17 +21,23 @@
     >
       <el-table-column label="站點代碼" width="100" prop="id" fixed>
       </el-table-column>
-      <el-table-column label="站點名稱" prop="description" fixed>
+      <el-table-column
+        label="站點名稱"
+        prop="description"
+        min-width="180"
+        fixed
+      >
       </el-table-column>
 
       <el-table-column
         label="現況作業模式"
         prop="currentModel"
         fixed
-        width="180"
+        min-width="180"
       >
       </el-table-column>
-      <el-table-column label="入庫作業" width="100" prop="inBound">
+
+      <el-table-column label="入庫作業" min-width="100" prop="inBound">
         <template slot-scope="scope">
           <el-checkbox
             class="remarks"
@@ -41,7 +47,7 @@
           ></el-checkbox>
         </template>
       </el-table-column>
-      <el-table-column label="出庫作業" width="100" prop="outBound">
+      <el-table-column label="出庫作業" min-width="100" prop="outBound">
         <template slot-scope="scope">
           <el-checkbox
             class="remarks"
@@ -51,7 +57,7 @@
           ></el-checkbox>
         </template>
       </el-table-column>
-      <el-table-column label="加工作業" width="100" prop="process">
+      <el-table-column label="加工作業" min-width="100" prop="process">
         <template slot-scope="scope">
           <el-checkbox
             v-model="scope.row.isProcessEnable"
@@ -60,7 +66,7 @@
           ></el-checkbox>
         </template>
       </el-table-column>
-      <el-table-column label="盤點作業" width="100" prop="inventory">
+      <el-table-column label="盤點作業" min-width="100" prop="inventory">
         <template slot-scope="scope">
           <el-checkbox
             v-model="scope.row.isInventoryEnable"
@@ -70,11 +76,19 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="空箱出庫箱數限制" width="180" prop="emptyLimit">
+      <el-table-column
+        label="空箱出庫箱數限制"
+        min-width="180"
+        prop="emptyLimit"
+      >
       </el-table-column>
-      <el-table-column label="緩衝區箱數限制" width="180" prop="bufferLimit">
+      <el-table-column
+        label="緩衝區箱數限制"
+        min-width="180"
+        prop="bufferLimit"
+      >
       </el-table-column>
-      <el-table-column label="站點對應IP" width="220" prop="ipAddress">
+      <el-table-column label="站點對應IP" min-width="220" prop="ipAddress">
         <template slot-scope="scope">
           <el-input
             v-model="scope.row.ipAddress"
@@ -90,6 +104,7 @@
 <script>
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
+import { mapState } from "vuex";
 
 import { getWorkStation, setWorkStations } from "@/api/workStation";
 export default {
@@ -105,11 +120,15 @@ export default {
   },
   created() {
     this.onLoad();
+    // 2
+    this.$store.subscribe((mutation, state) => {
+      this.onLoad();
+    });
   },
   methods: {
     async onLoad() {
       this.workStations = [];
-      let resp = await getWorkStation();
+      let resp = await getWorkStation().then(resp);
       this.workStations = resp.message;
     },
     async onEdit() {

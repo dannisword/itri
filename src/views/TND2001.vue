@@ -121,6 +121,15 @@
         sortable="custom"
       >
       </el-table-column>
+
+      <el-table-column
+        label="事務號"
+        prop="transNo"
+        min-width="125"
+        sortable="custom"
+      >
+      </el-table-column>
+
       <el-table-column
         label="料品號"
         prop="prodCode"

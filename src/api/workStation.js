@@ -3,8 +3,8 @@ import { parseMessage } from "@/utils/app";
 
 /**
  * A1-19 批次修改站點
- * @param {*} data 
- * @returns 
+ * @param {*} data
+ * @returns
  */
 export function setWorkStations(data) {
   return new Promise((resolve) => {
@@ -20,19 +20,22 @@ export function setWorkStations(data) {
 }
 /**
  * A1-22 查詢站點
- * @returns 
+ * @returns
  */
-export function getWorkStationa() {
+export function getWorkStation() {
   return request({
     url: `/api/workStation/search`,
     method: "GET",
   });
 }
-
-
-export function getWorkStation() {
+/**
+ * A1-23 切換站點作業模式
+ * @param {*} currentModel
+ * @returns
+ */
+export function changeWorkStation(currentModel) {
   return request({
-    url: `/api/workStation/search`,
-    method: "GET",
+    url: `/api/workStation/model?currentModel=${currentModel}`,
+    method: "PUT",
   });
 }

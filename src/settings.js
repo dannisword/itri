@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: '特奈第庫存系統',
+  title: '特耐第庫存系統',
 
   /**
    * @type {boolean} true | false

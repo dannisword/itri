@@ -76,7 +76,6 @@ const actions = {
         });
     });
   },
-
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
@@ -89,7 +88,6 @@ const actions = {
       }
     });
   },
-
   // user logout
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {

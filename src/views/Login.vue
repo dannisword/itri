@@ -59,10 +59,14 @@
         </div>
       </el-form>
     </div>
+    <!-- 
     <div id="logo">
       <img src="../assets/logo-itri.png" alt="logo" class="logo" />
       <p>Copyright 工業技術研究院 All Rights Reserved.</p>
     </div>
+
+    -->
+
   </div>
 </template>
 

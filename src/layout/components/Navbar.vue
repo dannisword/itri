@@ -16,14 +16,14 @@
         v-model="workType"
         placeholder="請選擇"
         style="margin-right: 10px"
-        @change="onChange"
+        @change="onChange(workType)"
       >
         <el-option
           class="zh-input"
           v-for="item in operating"
           :key="item.id"
           :label="item.label"
-          :value="item.id"
+          :value="item"
         >
         </el-option>
       </el-select>
@@ -47,10 +47,15 @@
 import { mapGetters } from "vuex";
 import Breadcrumb from "@/components/Breadcrumb";
 import Hamburger from "@/components/Hamburger";
-import { setStorageItem, clearStorageItem } from "@/utils/localStorage";
+import {
+  getStorageItem,
+  setStorageItem,
+  clearStorageItem,
+} from "@/utils/localStorage";
 import { logout } from "@/api/auth";
 import { getSelector } from "@/api/system";
 import { SelectTypeEnum } from "@/utils/enums/index";
+import { changeWorkStation } from "@/api/workStation";
 
 export default {
   components: {
@@ -64,17 +69,21 @@ export default {
     return {
       user: {},
       operating: [],
-      workType: 0,
+      workType: {
+        id: 0,
+        value: "無",
+        label: "無",
+      },
     };
   },
   created() {
     this.$store.dispatch("user/getInfo").then((data) => {
       this.user = data;
     });
-    this.onChange(0);
     getSelector(SelectTypeEnum.OPERATING_MODE).then((resp) => {
       this.operating = resp.message;
     });
+    this.workType = getStorageItem("currentModel");
   },
   methods: {
     toggleSideBar() {
@@ -86,8 +95,16 @@ export default {
       this.$router.push(`/login?redirect=${this.$route.fullPath}`);
     },
     onChange(val) {
-      setStorageItem("currentModel", val);
-      this.$store.dispatch("settings/changeModel", val);
+      changeWorkStation(val.value).then((resp) => {
+        if (resp.title == "successful") {
+          setStorageItem("currentModel", val);
+          this.$store.dispatch("settings/changeModel", val);
+        } else {
+          if (resp.message) {
+            this.warning(resp.message);
+          }
+        }
+      });
     },
   },
 };

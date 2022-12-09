@@ -88,7 +88,7 @@ export default {
     async onLoad() {
       //this.menus = await getMenus();
       const data = await getUserMenus();
-      
+
       const menus = data.message;
       let id = 1;
       for (let menu of menus) {
@@ -103,7 +103,7 @@ export default {
           id++;
         }
       }
-      
+
       this.menus = menus;
     },
     handleSelect(key, keyPath) {},

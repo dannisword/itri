@@ -6,7 +6,7 @@ const state = {
   showSettings: showSettings,
   fixedHeader: fixedHeader,
   sidebarLogo: sidebarLogo,
-  currentModel: 0
+  currentModel: {}
 };
 
 const mutations = {
@@ -18,7 +18,6 @@ const mutations = {
   },
   // 工作模式切換
   CHANGE_MODEL: (state, value) => {
-    //console.log(value);
     state.currentModel = value;
   },
 };
@@ -30,6 +29,9 @@ const actions = {
   changeModel({ commit }, data) {
     commit("CHANGE_MODEL", data);
   },
+  getCurrentModel({commit}, state){
+    return "12"
+  }
 };
 
 export default {
