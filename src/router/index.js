@@ -181,6 +181,12 @@ export const constantRoutes = [
         component: () => import("@/views/TND7011"),
         meta: { title: "物流箱歷程查詢" },
       },
+      {
+        path: "/Tracking",
+        name: "Tracking",
+        component: () => import("@/views/tracking/Tracking"),
+        meta: { title: "Tracking" },
+      },
     ],
   },
   // 404 page must be placed at the end !!!

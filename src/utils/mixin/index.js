@@ -6,6 +6,7 @@ import responeMixin from "@/utils/mixin/respone";
 import { getUserInfo } from "@/utils/localStorage";
 import { getSelector } from "@/api/system";
 import { fetchPost } from "@/utils/app";
+import { callback } from "@/api/carrier";
 
 export default {
   mixins: [dateMixin, responeMixin],
@@ -48,9 +49,6 @@ export default {
     },
     isDevelopment() {
       return process.env.NODE_ENV == "development";
-    },
-    call_back_url() {
-      return process.env.VUE_APP_CALLBACK_API;
     },
     mqtt_path() {
       return process.env.VUE_APP_MQTT_ENTRY_POINT;
@@ -202,11 +200,7 @@ export default {
         carrierNo: carrierId,
         callbackType: "locactionChanged",
       };
-      // http://10.248.82.109:18090/device/carrierCallback
-      const url = `${this.call_back_url}/device/carrierCallback`;
-      console.log(url);
-      console.log(carrierId);
-      fetchPost(url, data).then((resp) => {
+      callback(data).then((resp) => {
         console.log(resp);
       });
     },

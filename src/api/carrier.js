@@ -152,3 +152,36 @@ export function getShuttles(params) {
     method: "GET",
   });
 }
+
+
+/**
+ * 物流箱到站
+ * @param {*} data 
+ * @returns 
+ */
+export function callback(data){
+  const uri = `/device/carrierCallback`;
+  const method = "POST";
+
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+      data,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
+  });
+}
+/**
+ * 
+ * @returns 
+ */
+export function getPositions() {
+  return request({
+    url: `/api/carrier/position`,
+    method: "GET",
+  });
+}
+
