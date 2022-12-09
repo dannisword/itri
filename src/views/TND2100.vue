@@ -293,14 +293,23 @@ export default {
         this.warning("入庫工作，尚未完成，請完成放置，回送！");
         return;
       }
+      if (this.inbound.totalProdQty <= 0){
+        let isConfirm = await this.confirm(
+          "實際入庫數量小於0，是否結束此單！"
+        );
+        if (isConfirm == false) {
+          return;
+        }
+      }
       // 判斷數量
       if (this.inbound.totalProdQty <= this.inbound.totalPlanQty) {
-        const isConfirm = await this.confirm(
+        let isConfirm = await this.confirm(
           "入庫總數小於收料數量，是否結束此單！"
         );
         if (isConfirm == false) {
           return;
         }
+
         closeInbound(this.inbound.sysOrderNo).then((resp) => {
           if (resp.status == "OK") {
             this.onNav("/TND2001");
@@ -344,15 +353,8 @@ export default {
       val.inQty = "";
     },
     async onFinish(val) {
-      if (val.totalProdQty <= 0) {
-        // 是否新增提示
-        const isConfirm = await this.confirm('');
-        if (isConfirm == false) {
-          return;
-        }
-        val.isFinished = true;
-        this.setInboundDetail(val);
-      }
+      val.isFinished = true;
+      this.setInboundDetail(val);
     },
     onCallback() {
       this.callback(this.carrierId);
