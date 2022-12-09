@@ -39,7 +39,7 @@
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
       <el-table-column label="物流箱編號" prop="carrierId"> </el-table-column>
-      <el-table-column label="物流箱內數量" prop="planQty" width="125">
+      <el-table-column label="物流箱內數量" prop="stockQty" width="125">
       </el-table-column>
 
       <el-table-column label="已揀數量" prop="prodQty" min-width="180">

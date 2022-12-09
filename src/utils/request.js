@@ -25,7 +25,7 @@ function parseError(response) {
   if (response.status == 404 || response.status == 400) {
     Message({
       //message: `錯誤的請求(${response.status})`,
-      message: response.message,
+      message: response.data.message,
       type: "warning",
       duration: 5000,
     });
@@ -34,7 +34,7 @@ function parseError(response) {
   }
   if (response.status == 500) {
     Message({
-      message: `服務發生問題(${response.status})`,
+      message: `服務錯誤，請聯繫管理員!`,
       type: "warning",
       duration: 5000,
     });

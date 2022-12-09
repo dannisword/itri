@@ -73,7 +73,8 @@
       >
         <template slot-scope="scope">
           <span>{{ scope.row.carrierId }}</span>
-          <el-button class="mt-1 ml-1"
+          <el-button
+            class="mt-1 ml-1"
             slot="append"
             @click="onDelete(scope.row)"
             v-if="scope.row.isFinished == false"
@@ -141,10 +142,7 @@
       <el-table-column label="動作" width="180">
         <template slot-scope="scope">
           <div v-if="scope.row.isFinished == false">
-            <el-button
-              @click="onFinish(scope.row)"
-              size="mini"
-              type="primary"
+            <el-button @click="onFinish(scope.row)" size="mini" type="primary"
               >放置完成，送回
             </el-button>
           </div>
@@ -195,6 +193,8 @@ export default {
     };
   },
   async created() {
+
+    fetchPost()
     // 入庫單狀態
     this.inStatus = await this.getSelector(SelectTypeEnum.INBOUND_STATUS);
     this.onLoad();
@@ -358,6 +358,7 @@ export default {
       });
     },
     setInboundDetail(data) {
+      data.prodQty = parseInt(data.prodQty);
       setInboundDetail(data).then((resp) => {
         if (resp.status == "OK") {
           this.onLoad();
