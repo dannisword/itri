@@ -24,5 +24,17 @@ export function getReceiveInfo(docTypeName) {
   });
 }
 
+/**
+ * A1-46 取得物流箱進度(分子分母)
+ * @param {*} docNo 
+ * @param {*} docType 
+ * @returns 
+ */
+export function carrierArrived(docNo, docType){
+  return request({
+    url: `/api/sys/carrierArrived/${docNo}/${docType}`,
+    method: "GET",
+  });
+}
 
 

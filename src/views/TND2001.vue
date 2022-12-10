@@ -289,7 +289,7 @@ export default {
       }
       // 確認作業模式
       if (this.currentModel().id != 1) {
-        this.warning("請切換入庫工作，作業模式");
+        this.warning("請切換作業模式");
         return;
       }
       const isExecute = await this.handleExecute("TND2001");

@@ -102,10 +102,10 @@ export default {
       content: [],
       params: {
         carrierId: "",
-        direction: "ASC",
+        direction: "DESC",
         endDate: "",
         page: 1,
-        properties: "id",
+        properties: "createTime",
         size: 50,
         startDate: "",
       },

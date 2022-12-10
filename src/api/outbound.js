@@ -28,23 +28,58 @@ export function getOutBoundDetail(outboundId) {
  * @param {*} docNo
  * @returns
  */
-export function startInbound(docNo) {
-  return request({
-    url: `/api/outbound/start/${docNo}`,
-    method: "POST",
+export function startOutbound(docNo) {
+  const uri = `/api/outbound/start/${docNo}`;
+  const method = "POST";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
 }
-
+/**
+ * A4-10
+ * @param {*} data
+ * @returns
+ */
+export function takeOutBoundDetail(data) {
+  return request({
+    url: `/api/outbound/detail/takeOut/`,
+    method: "GET",
+    data,
+  });
+}
 /**
  * A4-11 回報單據明細出庫資料(編輯/放置完成，回送)
  * @param {*} data
  * @returns
  */
 export function setOutBoundDetail(data) {
+  const uri = `/api/outbound/detail/`;
+  const method = "PUT";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
+  });
+}
+/**
+ * A4-12 結束此單作業
+ * @param {*} docNo
+ * @returns
+ */
+export function closeOutbound(docNo) {
   return request({
-    url: `/api/outbound/detail/`,
-    method: "PUT",
-    data,
+    url: `/api/outbound/finish/${docNo}`,
+    method: "GET",
   });
 }
 

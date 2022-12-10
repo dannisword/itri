@@ -228,8 +228,35 @@ export default {
      * @param {*} carrierId
      */
     carrierCallback(carrierId) {
+      let location = "";
+      switch (this.workStation()) {
+        case "STN101":
+          location = "BCR111";
+          break;
+        case "STN102":
+          location = "BCR121";
+          break;
+        case "STN103":
+          location = "BCR131";
+          break;
+        case "STN104":
+          location = "BCR141";
+          break;
+        case "STN201":
+          location = "BCR211";
+          break;
+        case "STN202":
+          location = "BCR221";
+          break;
+        case "STN203":
+          location = "BCR231";
+          break;
+        case "STN204":
+          location = "BCR241";
+          break;
+      }
       const data = {
-        location: "BCR111",
+        location: location,
         carrierNo: carrierId,
         callbackType: "locactionChanged",
       };

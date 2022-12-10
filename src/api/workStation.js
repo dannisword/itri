@@ -18,6 +18,7 @@ export function setWorkStations(data) {
     });
   });
 }
+// A1-21 取得站點
 /**
  * A1-22 查詢站點
  * @returns

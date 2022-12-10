@@ -33,7 +33,7 @@
         </el-form-item>
       </el-form>
     </div>
-
+    <!-- 分頁-->
     <el-row type="flex">
       <el-col :span="8"> </el-col>
       <el-col :span="16" align="end">
@@ -59,7 +59,7 @@
       </el-table-column>
       <el-table-column
         label="料品號"
-        width="100"
+        min-width="180"
         prop="prodCode"
         fixed
         sortable="custom"
@@ -67,7 +67,7 @@
       </el-table-column>
       <el-table-column
         label="入庫時間"
-        width="120"
+        min-width="180"
         prop="entryDate"
         sortable="custom"
       >

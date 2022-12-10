@@ -170,7 +170,7 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { getWorkStation } from "@/api/workStation";
-import { getOutBounds, getOutBoundDetail, startInbound } from "@/api/outbound";
+import { getOutBounds, getOutBoundDetail, startOutbound } from "@/api/outbound";
 import { SelectTypeEnum } from "@/utils/enums/index";
 import { getReceiveInfo } from "@/api/system";
 
@@ -260,8 +260,6 @@ export default {
     onAction(val) {},
     onSizeChange(val) {},
     async onSortcChange(val) {
-      console.log(val);
-      return;
       if (val.order == null) {
         return;
       }
@@ -270,9 +268,9 @@ export default {
       await this.onLoad();
     },
     ondblClick(val) {
-      console.log(val);
-      startInbound(val.sysOrderNo).then((resp) => {
-        if (resp.status == "OK") {
+      startOutbound(val.sysOrderNo).then((resp) => {
+        if (resp.title == "successful") {
+          this.warning(resp.message)
           this.onNav(`/TND3100/${val.id}`);
         }
       });
