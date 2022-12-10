@@ -42,14 +42,14 @@ export function startOutbound(docNo) {
   });
 }
 /**
- * A4-10
+ * A4-10 移至暫存區(取下)
  * @param {*} data
  * @returns
  */
 export function takeOutBoundDetail(data) {
   return request({
     url: `/api/outbound/detail/takeOut/`,
-    method: "GET",
+    method: "PUT",
     data,
   });
 }

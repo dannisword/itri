@@ -8,9 +8,9 @@
     </el-form>
     <el-row type="flex" class="row-bg" justify="end">
       <el-col>
-        <el-button type="primary"
-          >物流箱進度查詢({{ info.part }}/{{ info.total }})</el-button
-        >
+        <el-button type="primary" @click="handleFlow">
+          物流箱進度查詢({{ info.part }}/{{ info.total }})
+        </el-button>
       </el-col>
       <el-col> </el-col>
       <el-col>
@@ -334,7 +334,7 @@ export default {
         this.info.lastCount = resp.message.lastCount;
       }
       // A1-46 I,O,PR,IN
-      resp = await carrierArrived(this.outbound.sysOrderNo, "O");
+      resp = await carrierArrived(this.outbound.sysOrderNo, "出庫");
       if (resp.title == "successful") {
         this.info.part = resp.message.part;
         this.info.total = resp.message.total;
