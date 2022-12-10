@@ -69,7 +69,7 @@
           <el-button
             type="success"
             @click="onAdd()"
-            :disabled="currentModel() != 4"
+            :disabled="currentModelId() != 4"
             >新增盤點單</el-button
           >
         </el-form-item>
@@ -179,7 +179,7 @@
 
       <el-table-column label="動作" width="200" align="center">
         <template slot-scope="scope">
-          <div v-if="currentModel() == 4">
+          <div v-if="currentModelId() == 4">
             <el-button
               @click="onEffect(scope.row)"
               size="mini"

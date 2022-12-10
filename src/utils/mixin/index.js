@@ -8,6 +8,7 @@ import { getSelector } from "@/api/system";
 import { carrierCallback } from "@/api/carrier";
 import { getWorkStationIsRun } from "@/api/workStation";
 import { SelectTypeEnum, RunModelEnum } from "@/utils/enums/index";
+import { isExternal } from "../validate";
 
 export default {
   mixins: [dateMixin, responeMixin],
@@ -91,7 +92,7 @@ export default {
     },
     /**
      * 站點資訊
-     * @returns 
+     * @returns
      */
     workStation() {
       return function () {
@@ -108,19 +109,24 @@ export default {
     isReadOnly() {
       return function () {
         const user = getUserInfo();
-        if (user == null){
+        if (user == null) {
           return true;
         }
-        return user.workStation == null? true : false;
+        return user.workStation == null ? true : false;
       };
     },
     /**
-     * 作業模式
-     * @returns 
+     * 作業模式編號
+     * @returns
      */
-    currentModel() {
+    currentModelId() {
       return function () {
         return this.$store.state.settings.currentModel.id;
+      };
+    },
+    currentModel() {
+      return function () {
+        return this.$store.state.settings.currentModel;
       };
     },
   },
@@ -232,22 +238,27 @@ export default {
       });
     },
     /**
-     * 換頁確認
+     * 確認執行作業
      * @param {*} path
      * @returns
      */
-    async handlePage(mode, path) {
-      //
-      const currentModal = this.$store.state.settings.currentModel;
-      if (mode == RunModelEnum.Inbound) {
-        console.log(mode);
-      }
+    handleExecute(path) {
       // 是否切換到 作業模式
-      const resp = await getWorkStationIsRun(this.workStation());
-      if (resp.title == "successful") {
-        console.log(resp);
-      }
-      return true;
+      return new Promise((resolve) => {
+        getWorkStationIsRun(this.workStation()).then((resp) => {
+          if (resp.title == "successful") {
+            const value = Object.keys(resp.message).find(
+              (key) => resp.message[key] === true
+            );
+            if (value == undefined) {
+              return resolve(false);
+            }
+            const isExecute = value == path ? true : false;
+            resolve(isExecute);
+          }
+          return resolve(false);
+        });
+      });
     },
   },
   beforeDestroy() {

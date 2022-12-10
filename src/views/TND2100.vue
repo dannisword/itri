@@ -8,7 +8,7 @@
       <el-button
         type="success"
         @click="onClose()"
-        :disabled="isFinished == true"
+        :disabled="isFinished == true || isReadOnly() == true"
       >
         結束此單作業
       </el-button>

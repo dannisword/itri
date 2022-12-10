@@ -115,12 +115,16 @@ export default {
     return {
       isEdit: false,
       workStations: [],
+      cModel: {},
     };
   },
   created() {
     this.onLoad();
     this.$store.subscribe((mutation, state) => {
-      this.onLoad();
+      if (this.cModel != state.settings.currentModel) {
+        this.cModel = state.settings.currentModel;
+        this.onLoad();
+      }
     });
   },
   methods: {

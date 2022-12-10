@@ -103,12 +103,11 @@ export default {
     }
     // 預設工作模式
     this.workModel = getStorageItem("currentModel");
-
     if (this.workModel != null) {
       this.$store.dispatch("settings/changeModel", this.workModel);
     } else {
       this.workModel = this.operating[0];
-      this.onChange(this.workModel.id);
+      this.onChange(this.workModel);
     }
   },
   methods: {
@@ -121,6 +120,9 @@ export default {
       this.$router.push(`/login?redirect=${this.$route.fullPath}`);
     },
     onChange(val) {
+      if (val.id == 0) {
+        return;
+      }
       changeWorkStation(val.value).then((resp) => {
         if (resp.title == "successful") {
           setStorageItem("currentModel", val);

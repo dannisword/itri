@@ -238,7 +238,7 @@ export default {
     },
     canFinish() {
       // 切換盤點作業
-      if (this.currentModel() != 4) {
+      if (this.currentModelId() != 4) {
         return false;
       }
       let finished =

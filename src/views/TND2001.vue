@@ -246,6 +246,64 @@ export default {
     //this.connect();
   },
   methods: {
+    onLoad() {
+      this.loading = true;
+      this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);
+      this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
+      const query = this.getQuery(this.params, false);
+      getInbounds(query)
+        .then((respone) => {
+          if (respone.message) {
+            this.content = respone.message.content;
+            // 分頁設定
+            this.setPagination(respone.message);
+            // 處理項次
+            for (let item of this.content) {
+              this.page.seq++;
+              item.seq = this.page.seq;
+            }
+            this.loading = false;
+          }
+        })
+        .catch((e) => {
+          this.loading = false;
+        });
+    },
+    async onSortcChange(val) {
+      if (val.order == null) {
+        return;
+      }
+      this.params.direction = val.order == "ascending" ? "ASC" : "DESC";
+      this.params.properties = val.prop;
+      await this.onLoad();
+    },
+    onCurrentChange(val) {
+      this.params.page = val;
+      this.onLoad();
+    },
+    async ondblClick(val) {
+      // 唯讀模式
+      if (this.isReadOnly() == true) {
+        this.onNav(`/TND2100/${val.id}`);
+        return;
+      }
+      // 確認作業模式
+      if (this.currentModel().id != 1) {
+        this.warning("請切換入庫工作，作業模式");
+        return;
+      }
+      const isExecute = await this.handleExecute("TND2001");
+      console.log(isExecute);
+      if (isExecute == true) {
+        startInbound(val.sysOrderNo).then((resp) => {
+          if (resp.status == "OK") {
+            this.onNav(`/TND2100/${val.id}`);
+          }
+        });
+      } else {
+        this.warning("尚有入庫工作未完成！");
+      }
+    },
     handleOnReConnect() {
       this.retryTimes += 1;
       if (this.retryTimes > 5) {
@@ -291,53 +349,6 @@ export default {
         });
       } catch (e) {
         console.log("mqtt.connect error", e);
-      }
-    },
-    onLoad() {
-      this.loading = true;
-      this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);
-      this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
-      const query = this.getQuery(this.params, false);
-      getInbounds(query)
-        .then((respone) => {
-          if (respone.message) {
-            this.content = respone.message.content;
-            // 分頁設定
-            this.setPagination(respone.message);
-            // 處理項次
-            for (let item of this.content) {
-              this.page.seq++;
-              item.seq = this.page.seq;
-            }
-            this.loading = false;
-          }
-        })
-        .catch((e) => {
-          this.loading = false;
-        });
-    },
-    async onSortcChange(val) {
-      if (val.order == null) {
-        return;
-      }
-      this.params.direction = val.order == "ascending" ? "ASC" : "DESC";
-      this.params.properties = val.prop;
-      await this.onLoad();
-    },
-    onCurrentChange(val) {
-      this.params.page = val;
-      this.onLoad();
-    },
-    ondblClick(val) {
-      const canChang = this.handlePage(RunModelEnum.Inbound, "TND2100");
-      if (canChang == true) {
-        startInbound(val.sysOrderNo).then((resp) => {
-          if (resp.status == "OK") {
-            this.onNav(`/TND2100/${val.id}`);
-          }
-        });
-      } else {
-        this.warning("尚有入庫工作未完成！");
       }
     },
   },
