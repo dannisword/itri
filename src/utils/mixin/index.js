@@ -5,8 +5,9 @@ import responeMixin from "@/utils/mixin/respone";
 //import example from "@/utils/mixin/exapmle.json";
 import { getUserInfo } from "@/utils/localStorage";
 import { getSelector } from "@/api/system";
-import { fetchPost } from "@/utils/app";
-import { callback } from "@/api/carrier";
+import { carrierCallback } from "@/api/carrier";
+import { getWorkStationIsRun } from "@/api/workStation";
+import { SelectTypeEnum, RunModelEnum } from "@/utils/enums/index";
 
 export default {
   mixins: [dateMixin, responeMixin],
@@ -40,7 +41,6 @@ export default {
   },
   created() {
     if (process.env.NODE_ENV == "development") {
-      //console.log(process.env.NODE_ENV);
     }
   },
   computed: {
@@ -89,15 +89,38 @@ export default {
         return getUserInfo();
       };
     },
+    /**
+     * 站點資訊
+     * @returns 
+     */
     workStation() {
       return function () {
         const user = getUserInfo();
+        if (user.workStation == null) {
+          return "";
+        }
         return user.workStation;
       };
     },
+    /**
+     * 唯讀模式
+     */
+    isReadOnly() {
+      return function () {
+        const user = getUserInfo();
+        if (user == null){
+          return true;
+        }
+        return user.workStation == null? true : false;
+      };
+    },
+    /**
+     * 作業模式
+     * @returns 
+     */
     currentModel() {
       return function () {
-        return this.$store.state.settings.currentModel;
+        return this.$store.state.settings.currentModel.id;
       };
     },
   },
@@ -194,15 +217,40 @@ export default {
         this.warning("日期查詢間隔勿超過60天");
       }
     },
-    callback(carrierId) {
+    /**
+     *
+     * @param {*} carrierId
+     */
+    carrierCallback(carrierId) {
       const data = {
         location: "BCR111",
         carrierNo: carrierId,
         callbackType: "locactionChanged",
       };
-      callback(data).then((resp) => {
+      carrierCallback(data).then((resp) => {
         console.log(resp);
       });
     },
+    /**
+     * 換頁確認
+     * @param {*} path
+     * @returns
+     */
+    async handlePage(mode, path) {
+      //
+      const currentModal = this.$store.state.settings.currentModel;
+      if (mode == RunModelEnum.Inbound) {
+        console.log(mode);
+      }
+      // 是否切換到 作業模式
+      const resp = await getWorkStationIsRun(this.workStation());
+      if (resp.title == "successful") {
+        console.log(resp);
+      }
+      return true;
+    },
+  },
+  beforeDestroy() {
+    //console.log("beforeDestroy");
   },
 };

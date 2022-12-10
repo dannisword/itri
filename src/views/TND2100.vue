@@ -293,10 +293,8 @@ export default {
         this.warning("入庫工作，尚未完成，請完成放置，回送！");
         return;
       }
-      if (this.inbound.totalProdQty <= 0){
-        let isConfirm = await this.confirm(
-          "實際入庫數量小於0，是否結束此單！"
-        );
+      if (this.inbound.totalProdQty <= 0) {
+        let isConfirm = await this.confirm("實際入庫數量小於0，是否結束此單！");
         if (isConfirm == false) {
           return;
         }
@@ -357,7 +355,7 @@ export default {
       this.setInboundDetail(val);
     },
     onCallback() {
-      this.callback(this.carrierId);
+      this.carrierCallback(this.carrierId);
     },
     newDetail(carrierId) {
       return {

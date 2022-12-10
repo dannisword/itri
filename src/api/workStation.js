@@ -39,3 +39,15 @@ export function changeWorkStation(currentModel) {
     method: "PUT",
   });
 }
+
+/**
+ * A1-51, 取得該站點的當前模式下是否有未完成單據
+ * @param {*} workStationId
+ * @returns
+ */
+export function getWorkStationIsRun(workStationId) {
+  return request({
+    url: `/api/workStation/isUnfinished/${workStationId}`,
+    method: "GET",
+  });
+}

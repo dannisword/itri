@@ -1,4 +1,5 @@
 //import { login, logout, getInfo } from '@/api/user'
+
 import { login } from "@/api/auth";
 import {
   getUserInfo,
@@ -86,6 +87,12 @@ const actions = {
         commit("SET_NAME", data.userName);
         resolve(data);
       }
+    });
+  },
+  // isExp
+  isExp({ commit, state } ){
+    return new Promise((resolve, reject) => {
+      resolve(true);
     });
   },
   // user logout

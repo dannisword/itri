@@ -1,6 +1,7 @@
 import router from "./router";
+import moment from "moment";
 import store from "./store";
-import { Message } from "element-ui";
+import { MessageBox, Message } from "element-ui";
 import NProgress from "nprogress"; // progress bar
 import "nprogress/nprogress.css"; // progress bar style
 import { getToken } from "@/utils/auth"; // get token from cookie
@@ -21,9 +22,18 @@ router.beforeEach(async (to, from, next) => {
 
   // determine whether the user has logged in
   const userInfo = getUserInfo(); //getToken();
- 
+
+  // token 過期時間
+  let diff = 0;
   if (userInfo) {
-    if (to.path === "/login") {
+    const day = moment.unix(userInfo.exp).format("YYYY-MM-DD HH:mm");
+    diff = moment().diff(day, "hour");
+  }
+
+  if (userInfo) {
+    //console.log(diff)
+    if (to.path === "/login" || diff >= 0) {
+      localStorage.clear();
       next({ path: "/" });
     } else {
       next();

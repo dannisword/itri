@@ -174,7 +174,7 @@ import Dialog from "@/components/ModalDialog/Dialog.vue";
 import pageMixin from "@/utils/mixin";
 import { getInbounds, startInbound } from "@/api/inbound";
 import { getReceiveInfo } from "@/api/system";
-import { SelectTypeEnum } from "@/utils/enums/index";
+import { SelectTypeEnum, RunModelEnum } from "@/utils/enums/index";
 
 export default {
   components: {
@@ -329,11 +329,16 @@ export default {
       this.onLoad();
     },
     ondblClick(val) {
-      startInbound(val.sysOrderNo).then((resp) => {
-        if (resp.status == "OK") {
-          this.onNav(`/TND2100/${val.id}`);
-        }
-      });
+      const canChang = this.handlePage(RunModelEnum.Inbound, "TND2100");
+      if (canChang == true) {
+        startInbound(val.sysOrderNo).then((resp) => {
+          if (resp.status == "OK") {
+            this.onNav(`/TND2100/${val.id}`);
+          }
+        });
+      } else {
+        this.warning("尚有入庫工作未完成！");
+      }
     },
   },
 };

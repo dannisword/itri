@@ -7,16 +7,16 @@
     />
 
     <breadcrumb class="breadcrumb-container" />
-
-    <div class="right-menu">
+    <!-- 站點管理 -->
+    <div class="right-menu" v-if="readOnly == false">
       站別：
       <span style="margin-right: 10px">{{ user.workStation }}</span>
       作業模式：
       <el-select
-        v-model="workType"
+        v-model="workModel"
         placeholder="請選擇"
         style="margin-right: 10px"
-        @change="onChange(workType)"
+        @change="onChange(workModel)"
       >
         <el-option
           class="zh-input"
@@ -28,6 +28,20 @@
         </el-option>
       </el-select>
 
+      <el-dropdown class="avatar-container" trigger="click">
+        <div class="avatar-wrapper">
+          {{ this.$store.state.user.name }}
+          <i class="el-icon-caret-bottom"></i>
+        </div>
+        <el-dropdown-menu slot="dropdown" class="user-dropdown">
+          <el-dropdown-item @click.native="logout">
+            <span style="display: block">登出</span>
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+    </div>
+    <!-- 非站點管理 -->
+    <div class="right-menu" v-else>
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           {{ this.$store.state.user.name }}
@@ -69,21 +83,33 @@ export default {
     return {
       user: {},
       operating: [],
-      workType: {
+      readOnly: true,
+      workModel: {
         id: 0,
         value: "無",
         label: "無",
       },
     };
   },
-  created() {
+  async created() {
     this.$store.dispatch("user/getInfo").then((data) => {
       this.user = data;
+      this.readOnly = this.user.workStation == null ? true : false;
     });
-    getSelector(SelectTypeEnum.OPERATING_MODE).then((resp) => {
+    // 工作模式下拉選單
+    const resp = await getSelector(SelectTypeEnum.OPERATING_MODE);
+    if (resp.title == "successful") {
       this.operating = resp.message;
-    });
-    this.workType = getStorageItem("currentModel");
+    }
+    // 預設工作模式
+    this.workModel = getStorageItem("currentModel");
+
+    if (this.workModel != null) {
+      this.$store.dispatch("settings/changeModel", this.workModel);
+    } else {
+      this.workModel = this.operating[0];
+      this.onChange(this.workModel.id);
+    }
   },
   methods: {
     toggleSideBar() {

@@ -211,7 +211,7 @@ export default {
       this.onLoad();
     },
     onCallback() {
-      this.callback(this.carrierId);
+      this.carrierCallback(this.carrierId);
     },
   },
 };

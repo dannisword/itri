@@ -159,7 +159,7 @@ export function getShuttles(params) {
  * @param {*} data 
  * @returns 
  */
-export function callback(data){
+export function carrierCallback(data){
   const uri = `/device/carrierCallback`;
   const method = "POST";
 

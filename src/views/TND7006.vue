@@ -104,7 +104,6 @@
 <script>
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
-import { mapState } from "vuex";
 
 import { getWorkStation, setWorkStations } from "@/api/workStation";
 export default {
@@ -120,7 +119,6 @@ export default {
   },
   created() {
     this.onLoad();
-    // 2
     this.$store.subscribe((mutation, state) => {
       this.onLoad();
     });
@@ -128,8 +126,13 @@ export default {
   methods: {
     async onLoad() {
       this.workStations = [];
-      let resp = await getWorkStation().then(resp);
-      this.workStations = resp.message;
+      getWorkStation().then((resp) => {
+        if (resp.title == "successful") {
+          this.workStations = resp.message;
+        } else {
+          this.warning(resp.message);
+        }
+      });
     },
     async onEdit() {
       this.isEdit = false;
