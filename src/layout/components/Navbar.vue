@@ -129,16 +129,19 @@ export default {
       // 檢查作業模式
       const resp = await getWorkStation(this.user.workStation);
       if (resp.title == "successful") {
-        if (resp.message.currentModel != val.value) {
-          const ws = this.operating.find(
+        if (resp.message.currentModel == val.value) {
+          return;
+        }
+      }
+    /**
+     
+       const ws = this.operating.find(
             (x) => x.value == resp.message.currentModel
           );
           this.workModel = ws;
           this.warning(`請先完成${resp.message.currentModel}`);
-          return;
-        }
-      }
-    
+          
+     */
       changeWorkStation(val.value).then((resp) => {
         if (resp.title == "successful") {
           setStorageItem("currentModel", val);

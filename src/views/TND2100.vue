@@ -307,7 +307,7 @@ export default {
         }
       }
       // 判斷數量
-      if (this.inbound.totalProdQty <= this.inbound.totalPlanQty) {
+      if (this.inbound.totalProdQty < this.inbound.totalPlanQty) {
         let isConfirm = await this.confirm(
           "實際入庫數量小於收料數量，是否結束此單！"
         );
