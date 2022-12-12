@@ -165,9 +165,9 @@ export function getOutBound() {
  * A4-22 空箱叫用
  * @returns
  */
-export function getShuttle() {
+export function getShuttle(carrieNum) {
   return request({
-    url: `/api/shuttle/empty/go`,
+    url: `/api/shuttle/empty/go/${carrieNum}`,
     method: "POST",
   });
 }
@@ -191,5 +191,25 @@ export function getEmptyRecords(params) {
   return request({
     url: `/api/outbound/emptyRecord${params}`,
     method: "GET",
+  });
+}
+
+// /api/shuttle/empty/wait/stop/{station}
+/**
+ * 停止空箱出庫
+ * @param {*} station 
+ * @returns 
+ */
+export function stopOutbound(station){
+  const uri = `/api/shuttle/empty/wait/stop/${station}`;
+  const method = "POST";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
 }

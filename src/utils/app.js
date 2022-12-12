@@ -155,7 +155,8 @@ export async function getPrivileges() {
 export async function getMenus() {
   const source = await getPrivileges();
   // 父選單
-  let menus = source.filter((x) => x.parentCode == 0);
+  let menus = source.filter((x) => x.parentCode == 0 && x.isShow == true);
+  console.log(menus)
   // 子選單
   for (let menu of menus) {
     const childrens = source.filter((p) => p.parentCode == menu.displaySeq);

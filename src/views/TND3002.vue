@@ -11,19 +11,18 @@
               v-model="qty"
               placeholder="輸入出庫空箱箱數"
               type="number"
+              min="1"
+              @keyup.enter.native="onShuttle"
             ></el-input>
           </el-form-item>
           <el-form-item>
             <el-button
               type="primary"
-              @click="onAction('OUT')"
+              @click="onShuttle()"
               :disabled="isRunning == true"
               >空箱出庫</el-button
             >
-            <el-button
-              type="danger"
-              @click="onAction('CANCEL')"
-              v-if="isRunning == true"
+            <el-button type="danger" @click="onStop()" v-if="isRunning == true"
               >後續中止</el-button
             >
           </el-form-item>
@@ -36,7 +35,7 @@
       </el-col>
       <el-col :span="20">
         <el-button type="primary" @click="dialogs.carrier.visible = true"
-          >空箱入庫進度查詢</el-button
+          >空箱出庫進度查詢</el-button
         >
       </el-col>
     </el-row>
@@ -117,7 +116,7 @@ import Dialog from "@/components/ModalDialog/Dialog.vue";
 import pageMixin from "@/utils/mixin";
 import { getWorkStations } from "@/api/workStation";
 import { getEmptyCount } from "@/api/carrier";
-import { getShuttle, getEmptyRecords } from "@/api/outbound";
+import { getShuttle, getEmptyRecords, stopOutbound } from "@/api/outbound";
 
 export default {
   components: {
@@ -204,24 +203,33 @@ export default {
         this.emptyCount = resp.message.emptyCount;
       });
     },
-    onAction(mode) {
-      this.isRunning = false;
+    onShuttle() {
       if (this.qty <= 0) {
         this.warning("請填寫箱數，才能進行空箱出庫作業");
         return;
       }
+      //
+      if (this.qty > this.emptyCount) {
+        this.warning("庫內空箱數不足！");
+        return;
+      }
       // 空箱出庫
-      if (mode == "OUT") {
-        this.isRunning = true;
-        getShuttle().then((resp) => {
-          if (resp.status == "OK") {
-            this.success("指令接收成功，已安排空箱出庫作業");
-          }
-        });
-      }
+      this.isRunning = true;
+      getShuttle(this.qty).then((resp) => {
+        if (resp.status == "OK") {
+          this.success("指令接收成功，已安排空箱出庫作業");
+        }
+      });
+    },
+    onStop() {
+      this.isRunning = false;
       // 後續中止
-      if (mode == "CANCEL") {
-      }
+      console.log(this.workStation());
+      stopOutbound(this.workStation()).then((resp) => {
+        if (resp.title != "successful") {
+          this.warning(resp.message);
+        }
+      });
     },
     onModalClose(val) {
       this.dialogs.carrier.visible = false;
