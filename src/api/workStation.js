@@ -35,9 +35,19 @@ export function getWorkStation() {
  * @returns
  */
 export function changeWorkStation(currentModel) {
-  return request({
-    url: `/api/workStation/model?currentModel=${currentModel}`,
-    method: "PUT",
+  return new Promise((resolve, reject) => {
+    request({
+      url: `/api/workStation/model?currentModel=${currentModel}`,
+      method: "PUT",
+    })
+      .then((respone) => {
+        parseMessage(respone);
+        resolve(respone);
+      })
+      .catch((e) => {
+        console.log(e)
+        resolve(null);
+      });
   });
 }
 
@@ -54,16 +64,23 @@ export function getWorkStationIsRun(workStationId, path) {
     }).then((respone) => {
       parseMessage(respone);
       if (respone.title == "successful") {
+       
+        if (respone.message == null) {
+          resolve("");
+          return;
+        }
         const value = Object.keys(respone.message).find(
           (key) => respone.message[key] === true
         );
+
         if (value == undefined) {
-          return resolve(false);
+          resolve("");
+          return;
         }
-        const isExecute = value == path ? true : false;
-        resolve(isExecute);
+        //const isExecute = value == path ? true : false;
+        resolve(value);
       }
-      resolve(false);
+      resolve("");
     });
   });
 }

@@ -51,7 +51,7 @@ import { Message } from "element-ui";
 import variables from "@/styles/variables.scss";
 import { getUserMenus } from "@/api/user";
 import { getWorkStationIsRun } from "@/api/workStation";
-import { getUserInfo } from "@/utils/localStorage";
+import { getUserInfo, getStorageItem } from "@/utils/localStorage";
 
 export default {
   components: { Logo },
@@ -111,18 +111,25 @@ export default {
     },
     handleSelect(key, keyPath) {},
     async onNav(menu) {
-      console.log(menu);
       const user = getUserInfo();
+      // 作業模式：無
+      const value = getStorageItem("currentModel");
+      console.log(value);
+      if (value == null || value.id == 0) {
+        this.$router.push(menu.path);
+        return;
+      }
       // 檢查權限
+      console.log(user.workStation);
       if (user.workStation != null) {
-        const isExecute = await getWorkStationIsRun(
+        const executePage = await getWorkStationIsRun(
           user.workStation,
           menu.index
         );
-
-        if (isExecute == false) {
+        console.log(executePage);
+        if (executePage != menu.index && this.getControlPage(menu.index)) {
           Message({
-            message: `尚未完成${menu.name}，無法切換功能`,
+            message: `尚未完成工作，無法切換功能`,
             type: "warning",
             duration: 5000,
           });
@@ -130,6 +137,18 @@ export default {
         }
       }
       this.$router.push(menu.path);
+    },
+    getControlPage(path) {
+      switch (path) {
+        case "TND2001":
+        case "TND3001":
+        case "TND3002":
+        case "TND4001":
+        case "TND5001":
+          return true;
+        default:
+          return false;
+      }
     },
     getIcon(code) {
       switch (code) {

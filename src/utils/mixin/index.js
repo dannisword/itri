@@ -2,7 +2,6 @@ import moment from "moment";
 import { MessageBox, Message } from "element-ui";
 import dateMixin from "@/utils/mixin/date";
 import responeMixin from "@/utils/mixin/respone";
-//import example from "@/utils/mixin/exapmle.json";
 import { getUserInfo } from "@/utils/localStorage";
 import { getSelector } from "@/api/system";
 import { carrierCallback } from "@/api/carrier";
@@ -108,6 +107,11 @@ export default {
     isReadOnly() {
       return function () {
         const user = getUserInfo();
+        // 作業模式:無
+        if (this.currentModelId() == 0) {
+          return true;
+        }
+        // 無綁定站點
         if (user == null) {
           return true;
         }
@@ -270,8 +274,8 @@ export default {
      */
     async handleExecute(path) {
       // 是否切換到 作業模式
-      const isExecute = await getWorkStationIsRun(this.workStation(), path);
-      return isExecute;
+      const execPath = await getWorkStationIsRun(this.workStation(), path);
+      return execPath.length > 0;
     },
   },
   beforeDestroy() {

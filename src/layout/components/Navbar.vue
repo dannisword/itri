@@ -107,7 +107,7 @@ export default {
       this.$store.dispatch("settings/changeModel", this.workModel);
     } else {
       this.workModel = this.operating[0];
-      this.onChange(this.workModel);
+      //this.onChange(this.workModel);
     }
   },
   methods: {
@@ -120,7 +120,6 @@ export default {
       this.$router.push(`/login?redirect=${this.$route.fullPath}`);
     },
     onChange(val) {
-
       changeWorkStation(val.value).then((resp) => {
         if (resp.title == "successful") {
           setStorageItem("currentModel", val);
