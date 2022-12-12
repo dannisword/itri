@@ -210,7 +210,6 @@ export function getEmptyRecords(params) {
   });
 }
 
-// /api/shuttle/empty/wait/stop/{station}
 /**
  * 停止空箱出庫
  * @param {*} station
@@ -227,5 +226,18 @@ export function stopOutbound(station) {
       parseMessage(resp);
       resolve(resp);
     });
+  });
+}
+
+/**
+ * A4-27
+ * @param {*} docNo 
+ * @param {*} carrieId 
+ * @returns 
+ */
+export function callOutbound(docNo, carrieId) {
+  return request({
+    url: `/api/outbound/detail/${docNo}/${carrieId}`,
+    method: "GET",
   });
 }

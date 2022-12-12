@@ -70,7 +70,8 @@
     <el-table :data="details" class="table-container" border>
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="物流箱編號" prop="carrierId" min-width="180"> </el-table-column>
+      <el-table-column label="物流箱編號" prop="carrierId" min-width="180">
+      </el-table-column>
       <el-table-column label="物流箱內數量" prop="planQty" min-width="180">
       </el-table-column>
 
@@ -149,7 +150,7 @@
         <el-col :span="6"> 站點：{{ workStation() }} </el-col>
       </el-row>
       <el-row class="mt-1" :gutter="20">
-        <el-col :span="6"> 出庫單號碼{{ outbound.sysOrderNo }} </el-col>
+        <el-col :span="20"> 出庫單號碼{{ outbound.sysOrderNo }} </el-col>
       </el-row>
       <el-table
         :data="outRecords"
@@ -181,6 +182,7 @@ import {
   setOutBoundDetail,
   takeOutBoundDetail,
   closeOutbound,
+  callOutbound,
 } from "@/api/outbound";
 
 import {
@@ -259,7 +261,7 @@ export default {
           this.outbounds.push(this.outbound);
         }
       });
-      this.getOutBoundDetail(outboundId);
+      //this.getOutBoundDetail(outboundId);
     },
     onRemove(val) {
       takeOutBoundDetail(val).then((resp) => {
@@ -338,9 +340,20 @@ export default {
       this.dialogs.log.visible = false;
     },
     setBarcode(carrierId) {
-      //this.handleFlow();
-      //const detail = this.newDetail(carrierId);
-      //this.setOutBoundDetail(detail);
+      callOutbound(this.outbound.sysOrderNo, carrierId).then((resp) => {
+        if (resp.title != "successful") {
+          this.warning(resp.message);
+        }else{
+          this.details = resp.message;
+          let seq = 1;
+          for (let detail of this.details) {
+            detail.seq = seq++;
+            detail.outQty = "";
+          }
+        }
+      });
+
+      this.handleFlow();
     },
     onCallback() {
       this.carrierCallback(this.carrierId);
@@ -357,21 +370,6 @@ export default {
           this.warning(resp.errorMessage);
         }
       });
-    },
-    newDetail(carrierId) {
-      return {
-        sysOrderNo: this.outbound.sysOrderNo,
-        prodCode: this.outbound.prodCode,
-        //prodInboundDate: this.addDay(0),
-        inboundDate: this.addDay(0),
-        weightPlanQty: 0,
-        prodQty: 0,
-        differenceQty: 0,
-        weight: 0,
-        carrierId: carrierId,
-        isFinished: false,
-        stockQty: 0,
-      };
     },
     getOutBoundDetail(outboundId) {
       this.details = [];
