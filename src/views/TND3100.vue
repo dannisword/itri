@@ -141,6 +141,12 @@
       @afterClosed="onModalClose"
       :optional="Large"
     >
+      <el-row :gutter="20">
+        <el-col :span="6"> 站點：{{ workStation() }} </el-col>
+      </el-row>
+      <el-row class="mt-1" :gutter="20">
+        <el-col :span="6"> 出庫單號碼{{ outbound.sysOrderNo }} </el-col>
+      </el-row>
       <el-table
         :data="outRecords"
         class="table-container"
@@ -151,9 +157,12 @@
         <el-table-column label="項次" prop="seq"> </el-table-column>
         <el-table-column label="物流箱編號" prop="carrierId"> </el-table-column>
 
-        <el-table-column label="收到指令時間" prop="createTime"> </el-table-column>
-        <el-table-column label="完成指令時間" prop="finishTime"> </el-table-column>
-        <el-table-column label="狀態" prop="carrierStatusName"> </el-table-column>
+        <el-table-column label="收到指令時間" prop="createTime">
+        </el-table-column>
+        <el-table-column label="完成指令時間" prop="finishTime">
+        </el-table-column>
+        <el-table-column label="狀態" prop="carrierStatusName">
+        </el-table-column>
       </el-table>
     </ModalDialog>
   </div>

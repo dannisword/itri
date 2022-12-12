@@ -65,6 +65,7 @@ export function setOutBoundDetail(data) {
     request({
       url: uri,
       method: method,
+      data
     }).then((resp) => {
       parseMessage(resp);
       resolve(resp);
