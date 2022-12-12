@@ -205,7 +205,7 @@ export default {
   },
   async created() {
     // TODO -7
-    this.nowDate.push(this.addDay(-60));
+    this.nowDate.push(this.addDay(-30));
     this.nowDate.push(this.addDay(0));
     getWorkStations().then((resp) => {
       if (resp.message) {
@@ -270,7 +270,6 @@ export default {
     ondblClick(val) {
       startOutbound(val.sysOrderNo).then((resp) => {
         if (resp.title == "successful") {
-          this.warning(resp.message)
           this.onNav(`/TND3100/${val.id}`);
         }
       });

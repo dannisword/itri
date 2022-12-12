@@ -119,7 +119,7 @@ export default {
         this.$router.push(menu.path);
         return;
       }
-     
+
       const user = getUserInfo();
       // 作業模式 限制
       const resp = await getWorkStation(user.workStation);
@@ -142,7 +142,6 @@ export default {
           user.workStation,
           menu.index
         );
-        console.log(executePage.length);
         if (
           executePage.length > 0 &&
           executePage != menu.index &&

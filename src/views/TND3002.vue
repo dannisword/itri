@@ -34,7 +34,7 @@
         </p>
       </el-col>
       <el-col :span="20">
-        <el-button type="primary" @click="dialogs.carrier.visible = true"
+        <el-button type="primary" @click="onOpen"
           >空箱出庫進度查詢</el-button
         >
       </el-col>
@@ -97,14 +97,14 @@
         </el-table-column>
         <el-table-column label="站點" prop="stationCode" width="180">
         </el-table-column>
-        <el-table-column label="物流箱編號" prop="carrierId"> </el-table-column>
-        <el-table-column label="儲位編號" prop="storageCode" width="125">
+        <el-table-column label="物流箱編號" prop="carrierId" min-width="180"> </el-table-column>
+        <el-table-column label="儲位編號" prop="storageCode" min-width="180">
         </el-table-column>
-        <el-table-column label="收到指令時間" prop="createTime" width="125">
+        <el-table-column label="收到指令時間" prop="createTime" min-width="125">
         </el-table-column>
-        <el-table-column label="完成指令時間" prop="finishTime" width="125">
+        <el-table-column label="完成指令時間" prop="finishTime" min-width="125">
         </el-table-column>
-        <el-table-column label="進度" prop="carrierStatusName" width="125">
+        <el-table-column label="進度" prop="carrierStatusName" min-width="125">
         </el-table-column>
       </el-table>
     </Dialog>
@@ -193,6 +193,10 @@ export default {
         .catch((e) => {
           this.loading = false;
         });
+    },
+    onOpen(){
+      this.dialogs.carrier.visible = true;
+      this.onLoad();
     },
     onQuery() {
       // A2-17, 取得空箱數量

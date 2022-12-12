@@ -38,3 +38,15 @@ export function carrierArrived(docNo, docType){
 }
 
 
+/**
+ * A1-47 查詢物流箱進度
+ * @param {*} params 
+ * @returns 
+ */
+export function getCarrierArrived(params){
+  return request({
+    url: `/api/sys/doc/carrierArrived${params}`,
+    method: "GET",
+  });
+}
+

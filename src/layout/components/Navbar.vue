@@ -140,7 +140,6 @@ export default {
           );
           this.workModel = ws;
           this.warning(`請先完成${resp.message.currentModel}`);
-          
      */
       changeWorkStation(val.value).then((resp) => {
         if (resp.title == "successful") {

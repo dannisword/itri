@@ -8,7 +8,7 @@
     </el-form>
     <el-row type="flex" class="row-bg" justify="end">
       <el-col>
-        <el-button type="primary" @click="handleFlow">
+        <el-button type="primary" @click="onOpenLog">
           物流箱進度查詢({{ info.part }}/{{ info.total }})
         </el-button>
       </el-col>
@@ -66,7 +66,7 @@
         </el-form>
       </el-col>
     </el-row>
-
+    <!-- 資料-->
     <el-table :data="details" class="table-container" border>
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
@@ -133,6 +133,29 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <ModalDialog
+      :title="dialogs.log.title"
+      :name="dialogs.log.name"
+      :visible.sync="dialogs.log.visible"
+      @afterClosed="onModalClose"
+      :optional="Large"
+    >
+      <el-table
+        :data="outRecords"
+        class="table-container"
+        border
+        stripe
+        height="400px"
+      >
+        <el-table-column label="項次" prop="seq"> </el-table-column>
+        <el-table-column label="物流箱編號" prop="carrierId"> </el-table-column>
+
+        <el-table-column label="收到指令時間" prop="createTime"> </el-table-column>
+        <el-table-column label="完成指令時間" prop="finishTime"> </el-table-column>
+        <el-table-column label="狀態" prop="carrierStatusName"> </el-table-column>
+      </el-table>
+    </ModalDialog>
   </div>
 </template>
 <script>
@@ -147,7 +170,11 @@ import {
   closeOutbound,
 } from "@/api/outbound";
 
-import { getReceiveInfo, carrierArrived } from "@/api/system";
+import {
+  getReceiveInfo,
+  carrierArrived,
+  getCarrierArrived,
+} from "@/api/system";
 
 export default {
   components: {
@@ -167,11 +194,19 @@ export default {
       outbounds: [],
       details: [],
       outStatus: [],
+      outRecords: [],
       params: {
         page: 0,
         size: 50,
         direction: "ASC",
         properties: "id",
+      },
+      dialogs: {
+        log: {
+          title: "物流箱進度查詢",
+          name: "LOG",
+          visible: false,
+        },
       },
     };
   },
@@ -188,6 +223,7 @@ export default {
   async created() {
     this.outStatus = await this.getSelector(SelectTypeEnum.OUTBOUND_STATUS);
     await this.onLoad();
+    this.handleFlow();
   },
   methods: {
     onLoad() {
@@ -229,7 +265,7 @@ export default {
           return;
         }
       }
-      console.log(this.outbound.sysOrderNo);
+
       const resp = await closeOutbound(this.outbound.sysOrderNo);
 
       if (resp.title == "successful") {
@@ -267,6 +303,28 @@ export default {
       }
       val.prodQty = parseInt(val.outQty) + parseInt(val.prodQty);
       val.inQty = "";
+    },
+    onOpenLog() {
+      this.dialogs.log.visible = true;
+      this.Large.showAction = false;
+      const params = {
+        docNo: this.outbound.sysOrderNo,
+        workStn: this.workStation(),
+      };
+      const query = this.getQuery(params);
+      getCarrierArrived(query).then((resp) => {
+        if (resp.title == "successful") {
+          this.outRecords = resp.message.content;
+          let seq = 1;
+          for (let item of this.outRecords) {
+            item.seq = seq++;
+          }
+        }
+      });
+      this.handleFlow();
+    },
+    onModalClose(val) {
+      this.dialogs.log.visible = false;
     },
     setBarcode(carrierId) {
       this.handleFlow();
