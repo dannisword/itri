@@ -272,7 +272,6 @@ export default {
   },
   async created() {
     getSelector(SelectTypeEnum.USER_ROLE).then((resp) => {
-      console.log(resp);
       if (resp.title == "successful") {
         this.roles = resp.message;
       }
