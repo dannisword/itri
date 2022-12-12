@@ -292,7 +292,15 @@ export default {
         this.warning("請切換作業模式");
         return;
       }
+      startInbound(val.sysOrderNo).then((resp) => {
+        if (resp.status == "OK") {
+          this.onNav(`/TND2100/${val.id}`);
+        }
+      });
+
+      /*
       const isExecute = await this.handleExecute("TND2001");
+      //console.log(isExecute)
       if (isExecute == true) {
         startInbound(val.sysOrderNo).then((resp) => {
           if (resp.status == "OK") {
@@ -301,7 +309,7 @@ export default {
         });
       } else {
         this.warning("尚有入庫工作未完成！");
-      }
+      }*/
     },
     handleOnReConnect() {
       this.retryTimes += 1;

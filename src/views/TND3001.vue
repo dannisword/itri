@@ -268,6 +268,7 @@ export default {
       await this.onLoad();
     },
     ondblClick(val) {
+      console.log(val)
       startOutbound(val.sysOrderNo).then((resp) => {
         if (resp.title == "successful") {
           this.onNav(`/TND3100/${val.id}`);

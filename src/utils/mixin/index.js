@@ -275,6 +275,7 @@ export default {
     async handleExecute(path) {
       // 是否切換到 作業模式
       const execPath = await getWorkStationIsRun(this.workStation(), path);
+      console.log(execPath)
       return execPath.length > 0;
     },
   },
