@@ -134,7 +134,7 @@
         min-width="180"
       ></el-table-column>
 
-      <el-table-column label="實際已入庫總數" prop="prodQty" min-width="180">
+      <el-table-column label="實際已入數量" prop="prodQty" min-width="180">
         <template slot-scope="scope">
           <el-input
             class="cell-button"
@@ -352,6 +352,10 @@ export default {
     },
     async onFinish(val) {
       val.isFinished = true;
+      if (val.prodQty <= 0) {
+        this.warning("實際已入數量等於0，不可入庫！");
+        return;
+      }
       this.setInboundDetail(val);
     },
     onCallback() {
