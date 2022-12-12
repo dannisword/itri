@@ -311,7 +311,7 @@ export default {
         return;
       }
       val.prodQty = parseInt(val.outQty) + parseInt(val.prodQty);
-      val.inQty = "";
+      val.outQty = "";
     },
     onOpenLog() {
       this.dialogs.log.visible = true;
@@ -380,6 +380,7 @@ export default {
           let seq = 1;
           for (let detail of this.details) {
             detail.seq = seq++;
+            detail.outQty = "";
           }
           this.details.sort(function (a, b) {
             if (a.isFinished == true) {

@@ -47,10 +47,18 @@ export function startOutbound(docNo) {
  * @returns
  */
 export function takeOutBoundDetail(data) {
-  return request({
-    url: `/api/outbound/detail/takeOut/`,
-    method: "PUT",
-    data,
+  const uri = `/api/outbound/detail/takeOut/`;
+  const method = "PUT";
+
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+      data,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
 }
 /**
@@ -65,7 +73,7 @@ export function setOutBoundDetail(data) {
     request({
       url: uri,
       method: method,
-      data
+      data,
     }).then((resp) => {
       parseMessage(resp);
       resolve(resp);
@@ -78,9 +86,16 @@ export function setOutBoundDetail(data) {
  * @returns
  */
 export function closeOutbound(docNo) {
-  return request({
-    url: `/api/outbound/finish/${docNo}`,
-    method: "GET",
+  const uri = `/api/outbound/finish/${docNo}`;
+  const method = "POST";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
   });
 }
 
@@ -198,16 +213,16 @@ export function getEmptyRecords(params) {
 // /api/shuttle/empty/wait/stop/{station}
 /**
  * 停止空箱出庫
- * @param {*} station 
- * @returns 
+ * @param {*} station
+ * @returns
  */
-export function stopOutbound(station){
+export function stopOutbound(station) {
   const uri = `/api/shuttle/empty/wait/stop/${station}`;
   const method = "POST";
   return new Promise((resolve) => {
     request({
       url: uri,
-      method: method
+      method: method,
     }).then((resp) => {
       parseMessage(resp);
       resolve(resp);
