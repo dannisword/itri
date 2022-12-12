@@ -183,8 +183,12 @@
       <el-table-column label="動作" width="180">
         <template slot-scope="scope">
           <div v-if="scope.row.isFinished == false">
-            <el-button @click="onFinish(scope.row)" size="mini" type="success"
-            :disabled="scope.row.prodQty <= 0">
+            <el-button
+              @click="onFinish(scope.row)"
+              size="mini"
+              type="success"
+              :disabled="scope.row.prodQty <= 0"
+            >
               放置完成，送回
             </el-button>
           </div>
@@ -290,10 +294,12 @@ export default {
     },
     // 結束此單
     async onClose() {
-      if (this.canClose == false) {
+      const dts = this.details.filter((x) => x.isFinished == false);
+      if (dts.length > 0) {
         this.warning("入庫工作，尚未完成，請完成放置，回送！");
         return;
       }
+
       if (this.inbound.totalProdQty <= 0) {
         let isConfirm = await this.confirm("實際入庫數量小於0，是否結束此單！");
         if (isConfirm == false) {
@@ -308,15 +314,15 @@ export default {
         if (isConfirm == false) {
           return;
         }
-
-        closeInbound(this.inbound.sysOrderNo).then((resp) => {
-          if (resp.status == "OK") {
-            this.onNav("/TND2001");
-          } else {
-            this.warning(resp.message);
-          }
-        });
       }
+
+      closeInbound(this.inbound.sysOrderNo).then((resp) => {
+        if (resp.status == "OK") {
+          this.onNav("/TND2001");
+        } else {
+          this.warning(resp.message);
+        }
+      });
     },
     onDelete(val) {
       deleteInboundDetail(val.sysOrderNo, val.carrierId).then((resp) => {
