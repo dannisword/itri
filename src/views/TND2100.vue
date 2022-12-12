@@ -196,7 +196,7 @@
 // 執行入庫工作
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
-import config from "@/utils/mixin/config.json";
+import config from "@/config.json";
 
 import {
   getInbound,

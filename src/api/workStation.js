@@ -45,7 +45,7 @@ export function changeWorkStation(currentModel) {
         resolve(respone);
       })
       .catch((e) => {
-        console.log(e)
+        console.log(e);
         resolve(null);
       });
   });
@@ -64,7 +64,6 @@ export function getWorkStationIsRun(workStationId, path) {
     }).then((respone) => {
       parseMessage(respone);
       if (respone.title == "successful") {
-       
         if (respone.message == null) {
           resolve("");
           return;

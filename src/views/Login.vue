@@ -73,7 +73,7 @@
 <script>
 import { validEmpty } from "@/utils/validate";
 import { _login } from "@/api/auth";
-import config from "@/utils/mixin/config.json";
+import config from "@/config.json";
 
 export default {
   name: "Login",
