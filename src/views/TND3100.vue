@@ -9,7 +9,7 @@
     <el-row type="flex" class="row-bg" justify="end">
       <el-col>
         <el-button type="primary" @click="onOpenLog">
-          物流箱進度查詢({{ info.part }}/{{ info.total }})
+          物流箱進度查詢({{ info.total }})
         </el-button>
       </el-col>
       <el-col> </el-col>
@@ -70,8 +70,8 @@
     <el-table :data="details" class="table-container" border>
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="物流箱編號" prop="carrierId"> </el-table-column>
-      <el-table-column label="物流箱內數量" prop="planQty" width="125">
+      <el-table-column label="物流箱編號" prop="carrierId" min-width="180"> </el-table-column>
+      <el-table-column label="物流箱內數量" prop="planQty" min-width="180">
       </el-table-column>
 
       <el-table-column label="已揀數量" prop="prodQty" min-width="180">
@@ -235,8 +235,8 @@ export default {
   },
   async created() {
     this.outStatus = await this.getSelector(SelectTypeEnum.OUTBOUND_STATUS);
-    await this.onLoad();
     this.handleFlow();
+    await this.onLoad();
   },
   methods: {
     onLoad() {
