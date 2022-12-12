@@ -208,6 +208,7 @@ export default {
       });
     },
     onShuttle() {
+      this.onQuery();
       if (this.qty <= 0) {
         this.warning("請填寫箱數，才能進行空箱出庫作業");
         return;
