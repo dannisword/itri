@@ -293,7 +293,8 @@ export default {
         return;
       }
       const isExecute = await this.handleExecute("TND2001");
-      console.log(isExecute);
+    
+      return;
       if (isExecute == true) {
         startInbound(val.sysOrderNo).then((resp) => {
           if (resp.status == "OK") {

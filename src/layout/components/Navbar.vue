@@ -120,9 +120,7 @@ export default {
       this.$router.push(`/login?redirect=${this.$route.fullPath}`);
     },
     onChange(val) {
-      if (val.id == 0) {
-        return;
-      }
+
       changeWorkStation(val.value).then((resp) => {
         if (resp.title == "successful") {
           setStorageItem("currentModel", val);

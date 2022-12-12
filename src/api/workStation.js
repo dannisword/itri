@@ -46,9 +46,24 @@ export function changeWorkStation(currentModel) {
  * @param {*} workStationId
  * @returns
  */
-export function getWorkStationIsRun(workStationId) {
-  return request({
-    url: `/api/workStation/isUnfinished/${workStationId}`,
-    method: "GET",
+export function getWorkStationIsRun(workStationId, path) {
+  return new Promise((resolve) => {
+    request({
+      url: `/api/workStation/isUnfinished/${workStationId}`,
+      method: "GET",
+    }).then((respone) => {
+      parseMessage(respone);
+      if (respone.title == "successful") {
+        const value = Object.keys(respone.message).find(
+          (key) => respone.message[key] === true
+        );
+        if (value == undefined) {
+          return resolve(false);
+        }
+        const isExecute = value == path ? true : false;
+        resolve(isExecute);
+      }
+      resolve(false);
+    });
   });
 }

@@ -8,7 +8,6 @@ import { getSelector } from "@/api/system";
 import { carrierCallback } from "@/api/carrier";
 import { getWorkStationIsRun } from "@/api/workStation";
 import { SelectTypeEnum, RunModelEnum } from "@/utils/enums/index";
-import { isExternal } from "../validate";
 
 export default {
   mixins: [dateMixin, responeMixin],
@@ -269,23 +268,10 @@ export default {
      * @param {*} path
      * @returns
      */
-    handleExecute(path) {
+    async handleExecute(path) {
       // 是否切換到 作業模式
-      return new Promise((resolve) => {
-        getWorkStationIsRun(this.workStation()).then((resp) => {
-          if (resp.title == "successful") {
-            const value = Object.keys(resp.message).find(
-              (key) => resp.message[key] === true
-            );
-            if (value == undefined) {
-              return resolve(false);
-            }
-            const isExecute = value == path ? true : false;
-            resolve(isExecute);
-          }
-          return resolve(false);
-        });
-      });
+      const isExecute = await getWorkStationIsRun(this.workStation(), path);
+      return isExecute;
     },
   },
   beforeDestroy() {

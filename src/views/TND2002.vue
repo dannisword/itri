@@ -146,7 +146,7 @@ export default {
       },
     };
   },
-  created() {
+  async created() {
     this.nowDate = this.toShortDate();
     getWorkStation().then((resp) => {
       if (resp.message) {
@@ -159,6 +159,8 @@ export default {
     }
     // 取得空儲位數量
     this.getEmptyCount();
+
+    //console.log(await this.handleExecute("TND2022"));
   },
   methods: {
     getEmptyCount() {

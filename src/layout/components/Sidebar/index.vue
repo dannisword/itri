@@ -47,8 +47,11 @@
 <script>
 import { mapGetters } from "vuex";
 import Logo from "./Logo";
+import { Message } from "element-ui";
 import variables from "@/styles/variables.scss";
 import { getUserMenus } from "@/api/user";
+import { getWorkStationIsRun } from "@/api/workStation";
+import { getUserInfo } from "@/utils/localStorage";
 
 export default {
   components: { Logo },
@@ -107,9 +110,25 @@ export default {
       this.menus = menus;
     },
     handleSelect(key, keyPath) {},
-    onNav(menu) {
+    async onNav(menu) {
       console.log(menu);
+      const user = getUserInfo();
       // 檢查權限
+      if (user.workStation != null) {
+        const isExecute = await getWorkStationIsRun(
+          user.workStation,
+          menu.index
+        );
+
+        if (isExecute == false) {
+          Message({
+            message: `尚未完成${menu.name}，無法切換功能`,
+            type: "warning",
+            duration: 5000,
+          });
+          return;
+        }
+      }
       this.$router.push(menu.path);
     },
     getIcon(code) {

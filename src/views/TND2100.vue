@@ -373,7 +373,6 @@ export default {
     getInboundDetail(inboundId) {
       this.details = [];
       getInboundDetail(inboundId).then((resp) => {
-        console.log(resp);
         if (resp.status == "OK") {
           this.details = resp.message;
           this.details.sort(function (a, b) {
