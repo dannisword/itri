@@ -218,7 +218,7 @@ export default {
         return;
       }
       // 空箱出庫
-      this.isRunning = true;
+      this.isRunning = false;
       getShuttle(this.qty).then((resp) => {
         if (resp.status == "OK") {
           this.success("指令接收成功，已安排空箱出庫作業");

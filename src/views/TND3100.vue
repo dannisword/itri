@@ -126,7 +126,11 @@
             <el-button @click="onRemove(scope.row)" size="mini" type="danger"
               >取下
             </el-button>
-            <el-button @click="onFinish(scope.row)" size="mini" type="primary"
+            <el-button
+              @click="onFinish(scope.row)"
+              size="mini"
+              type="primary"
+              :disabled="scope.row.prodQty <= 0"
               >放置完成，送回
             </el-button>
           </el-row>
@@ -258,7 +262,6 @@ export default {
       this.getOutBoundDetail(outboundId);
     },
     onRemove(val) {
-      console.log(val);
       takeOutBoundDetail(val).then((resp) => {
         console.log(resp);
       });
@@ -276,7 +279,6 @@ export default {
       }
 
       const resp = await closeOutbound(this.outbound.sysOrderNo);
-
       if (resp.title == "successful") {
         this.onNav("/TND3001");
       } else {
@@ -336,7 +338,7 @@ export default {
       this.dialogs.log.visible = false;
     },
     setBarcode(carrierId) {
-      this.handleFlow();
+      //this.handleFlow();
       //const detail = this.newDetail(carrierId);
       //this.setOutBoundDetail(detail);
     },
