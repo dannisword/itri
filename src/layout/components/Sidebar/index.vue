@@ -50,7 +50,7 @@ import Logo from "./Logo";
 import { Message } from "element-ui";
 import variables from "@/styles/variables.scss";
 import { getUserMenus } from "@/api/user";
-import { getWorkStationIsRun } from "@/api/workStation";
+import { getWorkStation, getWorkStationIsRun } from "@/api/workStation";
 import { getUserInfo, getStorageItem } from "@/utils/localStorage";
 
 export default {
@@ -111,32 +111,55 @@ export default {
     },
     handleSelect(key, keyPath) {},
     async onNav(menu) {
-      const user = getUserInfo();
-      // 作業模式：無
-      const value = getStorageItem("currentModel");
-      console.log(value);
-      if (value == null || value.id == 0) {
+      // 限制選單
+      console.log(menu);
+      const rootName = this.getRootName(menu.index);
+      console.log(rootName);
+      if (rootName == "") {
         this.$router.push(menu.path);
         return;
       }
+     
+      const user = getUserInfo();
+      // 作業模式 限制
+      const resp = await getWorkStation(user.workStation);
+      let currentModel = "";
+      if (resp.title == "successful") {
+        currentModel = resp.message.currentModel;
+        if (resp.message.currentModel != rootName) {
+          this.showMsg("請先切換右上角作業模式，才可進入畫面1");
+          return;
+        }
+      }
+
+      if (currentModel != rootName) {
+        this.showMsg("請先切換右上角作業模式，才可進入畫面1");
+        return;
+      }
       // 檢查權限
-      console.log(user.workStation);
       if (user.workStation != null) {
         const executePage = await getWorkStationIsRun(
           user.workStation,
           menu.index
         );
-        console.log(executePage);
-        if (executePage != menu.index && this.getControlPage(menu.index)) {
-          Message({
-            message: `尚未完成工作，無法切換功能`,
-            type: "warning",
-            duration: 5000,
-          });
+        console.log(executePage.length);
+        if (
+          executePage.length > 0 &&
+          executePage != menu.index &&
+          this.getControlPage(menu.index)
+        ) {
+          this.showMsg("請先切換右上角作業模式，才可進入畫面");
           return;
         }
       }
       this.$router.push(menu.path);
+    },
+    showMsg(msg) {
+      Message({
+        message: msg,
+        type: "warning",
+        duration: 5000,
+      });
     },
     getControlPage(path) {
       switch (path) {
@@ -166,6 +189,26 @@ export default {
           return "el-icon-search";
         case "TND7000":
           return "el-icon-setting";
+        default:
+          return "";
+      }
+    },
+    getRootName(path) {
+      switch (path) {
+        case "TND2001":
+        case "TND2002":
+          return "入庫作業";
+
+        case "TND3001":
+        case "TND3002":
+          return "出庫作業";
+
+        case "TND4001":
+          return "加工作業";
+
+        case "TND5001":
+          return "盤點作業";
+
         default:
           return "";
       }

@@ -70,7 +70,7 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 import { importInBound, setInbound, preInBound } from "@/api/inbound";
-import { getWorkStation } from "@/api/workStation";
+import { getWorkStations } from "@/api/workStation";
 
 export default {
   components: {
@@ -103,7 +103,7 @@ export default {
     };
   },
   created() {
-    getWorkStation().then((resp) => {
+    getWorkStations().then((resp) => {
       if (resp.message) {
         for (let station of resp.message) {
           station.docCount = 0;

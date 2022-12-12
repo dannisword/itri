@@ -169,7 +169,7 @@
 <script>
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
-import { getWorkStation } from "@/api/workStation";
+import { getWorkStations } from "@/api/workStation";
 import { getOutBounds, getOutBoundDetail, startOutbound } from "@/api/outbound";
 import { SelectTypeEnum } from "@/utils/enums/index";
 import { getReceiveInfo } from "@/api/system";
@@ -207,7 +207,7 @@ export default {
     // TODO -7
     this.nowDate.push(this.addDay(-60));
     this.nowDate.push(this.addDay(0));
-    getWorkStation().then((resp) => {
+    getWorkStations().then((resp) => {
       if (resp.message) {
         this.workStations = resp.message;
       }

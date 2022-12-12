@@ -153,6 +153,8 @@ import { getRoles, addRole, setRole } from "@/api/role";
 import { getRolePrivilege, setRolePrivilege } from "@/api/privilege";
 import { getMenus } from "@/utils/app";
 import { validLetters, validEmpty } from "@/utils/validate";
+import { getSelector } from "@/api/system";
+import { SelectTypeEnum } from "@/utils/enums/index";
 
 export default {
   components: {
@@ -203,6 +205,7 @@ export default {
       },
       role: {},
       roles: [],
+      status:[],
       menus: [],
       defaultProps: {
         children: "childrens",
@@ -212,7 +215,14 @@ export default {
   },
   computed: {},
   async created() {
-    this.status = this.source.status;
+    //this.status = this.source.status;
+    // 狀態
+    
+    const resp = await getSelector(SelectTypeEnum.ENABLED_TYPE);
+    if (resp.title == "successful"){
+      this.status = resp.message;
+    }
+
     this.menus = await getMenus();
     this.onLoad();
   },
@@ -339,4 +349,3 @@ export default {
   },
 };
 </script>
-

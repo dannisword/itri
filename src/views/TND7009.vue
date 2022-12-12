@@ -200,6 +200,7 @@ import pageMixin from "@/utils/mixin";
 import { getUsers, setUser, addUser, changPassword } from "@/api/user";
 import { SelectTypeEnum } from "@/utils/enums/index";
 import { validLetters, validEmpty, validPassword } from "@/utils/validate";
+import { getSelector } from "@/api/system";
 
 export default {
   components: {
@@ -270,10 +271,21 @@ export default {
     };
   },
   async created() {
-    this.getSelector(SelectTypeEnum.USER_ROLE).then((resp) => {
-      this.roles = resp;
+    getSelector(SelectTypeEnum.USER_ROLE).then((resp) => {
+      console.log(resp);
+      if (resp.title == "successful") {
+        this.roles = resp.message;
+      }
+      
     });
-    this.status = this.source.status;
+    // 狀態
+    getSelector(SelectTypeEnum.ENABLED_TYPE).then((resp) => {
+      if (resp.title == "successful") {
+        this.status = resp.message;
+      }
+    });
+
+    //this.status = this.source.status;
     await this.onLoad();
   },
   methods: {
@@ -365,7 +377,6 @@ export default {
             });
           } else {
             setUser(this.user.id, user).then((resp) => {
-              console.log(resp);
               this.onLoad();
             });
           }

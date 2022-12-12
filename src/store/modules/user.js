@@ -1,5 +1,3 @@
-//import { login, logout, getInfo } from '@/api/user'
-
 import { login } from "@/api/auth";
 import {
   getUserInfo,
@@ -53,7 +51,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ account: account.trim(), password: password })
         .then((response) => {
-          if (response.status != "OK") {
+          if (response.title != "successful") {
             resolve(false);
             Message({
               message: response.errorMessage,

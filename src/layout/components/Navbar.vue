@@ -62,6 +62,7 @@ import { mapGetters } from "vuex";
 import Breadcrumb from "@/components/Breadcrumb";
 import Hamburger from "@/components/Hamburger";
 import {
+  getUserInfo,
   getStorageItem,
   setStorageItem,
   clearStorageItem,
@@ -69,7 +70,7 @@ import {
 import { logout } from "@/api/auth";
 import { getSelector } from "@/api/system";
 import { SelectTypeEnum } from "@/utils/enums/index";
-import { changeWorkStation } from "@/api/workStation";
+import { changeWorkStation, getWorkStation } from "@/api/workStation";
 
 export default {
   components: {
@@ -97,17 +98,22 @@ export default {
       this.readOnly = this.user.workStation == null ? true : false;
     });
     // 工作模式下拉選單
-    const resp = await getSelector(SelectTypeEnum.OPERATING_MODE);
+    let resp = await getSelector(SelectTypeEnum.OPERATING_MODE);
     if (resp.title == "successful") {
       this.operating = resp.message;
     }
-    // 預設工作模式
-    this.workModel = getStorageItem("currentModel");
-    if (this.workModel != null) {
-      this.$store.dispatch("settings/changeModel", this.workModel);
-    } else {
-      this.workModel = this.operating[0];
-      //this.onChange(this.workModel);
+    // 預設作業模式
+    resp = await getWorkStation(this.user.workStation);
+    if (resp.title == "successful") {
+      const ws = this.operating.find(
+        (x) => x.value == resp.message.currentModel
+      );
+      if (ws != undefined) {
+        this.$store.dispatch("settings/changeModel", ws);
+        this.workModel = ws;
+      } else {
+        this.workModel = this.operating[0];
+      }
     }
   },
   methods: {
@@ -119,7 +125,20 @@ export default {
       clearStorageItem();
       this.$router.push(`/login?redirect=${this.$route.fullPath}`);
     },
-    onChange(val) {
+    async onChange(val) {
+      // 檢查作業模式
+      const resp = await getWorkStation(this.user.workStation);
+      if (resp.title == "successful") {
+        if (resp.message.currentModel != val.value) {
+          const ws = this.operating.find(
+            (x) => x.value == resp.message.currentModel
+          );
+          this.workModel = ws;
+          this.warning(`請先完成${resp.message.currentModel}`);
+          return;
+        }
+      }
+    
       changeWorkStation(val.value).then((resp) => {
         if (resp.title == "successful") {
           setStorageItem("currentModel", val);

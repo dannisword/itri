@@ -105,7 +105,7 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
 
-import { getWorkStation, setWorkStations } from "@/api/workStation";
+import { getWorkStations, setWorkStations } from "@/api/workStation";
 export default {
   components: {
     ModalDialog,
@@ -130,7 +130,7 @@ export default {
   methods: {
     async onLoad() {
       this.workStations = [];
-      getWorkStation().then((resp) => {
+      getWorkStations().then((resp) => {
         if (resp.title == "successful") {
           this.workStations = resp.message;
         } else {

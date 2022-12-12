@@ -18,12 +18,23 @@ export function setWorkStations(data) {
     });
   });
 }
-// A1-21 取得站點
+/**
+ * A1-21 取得站點
+ * @param {*} id 
+ * @returns 
+ */
+export function getWorkStation(id) {
+  return request({
+    url: `/api/workStation/${id}`,
+    method: "GET",
+  });
+}
+
 /**
  * A1-22 查詢站點
  * @returns
  */
-export function getWorkStation() {
+export function getWorkStations() {
   return request({
     url: `/api/workStation/search`,
     method: "GET",

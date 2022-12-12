@@ -520,6 +520,8 @@ export default {
       addCarrier(data).then((resp) => {
         if (resp.status == "OK") {
           this.success("新增物流箱成功！");
+          // TODO 列印提示
+          
           this.onLoad();
         }
       });

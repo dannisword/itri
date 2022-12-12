@@ -107,7 +107,7 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import Dialog from "@/components/ModalDialog/Dialog.vue";
 import pageMixin from "@/utils/mixin";
-import { getWorkStation } from "@/api/workStation";
+import { getWorkStations } from "@/api/workStation";
 import { getEmptyCount } from "@/api/station";
 import { getEmptyRecords, setShuttle } from "@/api/inbound";
 export default {
@@ -148,7 +148,7 @@ export default {
   },
   async created() {
     this.nowDate = this.toShortDate();
-    getWorkStation().then((resp) => {
+    getWorkStations().then((resp) => {
       if (resp.message) {
         this.workStations = resp.message;
       }
