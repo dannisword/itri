@@ -183,7 +183,8 @@
       <el-table-column label="動作" width="180">
         <template slot-scope="scope">
           <div v-if="scope.row.isFinished == false">
-            <el-button @click="onFinish(scope.row)" size="mini" type="success">
+            <el-button @click="onFinish(scope.row)" size="mini" type="success"
+            :disabled="scope.row.prodQty <= 0">
               放置完成，送回
             </el-button>
           </div>
@@ -350,7 +351,7 @@ export default {
       val.prodQty = parseInt(val.inQty) + parseInt(val.prodQty);
       val.inQty = "";
     },
-    async onFinish(val) {
+    onFinish(val) {
       val.isFinished = true;
       if (val.prodQty <= 0) {
         this.warning("實際已入數量等於0，不可入庫！");
@@ -388,6 +389,7 @@ export default {
           let seq = 1;
           for (let detail of this.details) {
             detail.seq = seq++;
+            detail.inQty = "";
           }
         }
       });
