@@ -66,19 +66,19 @@
 
         <el-form-item>
           <el-button type="primary" @click="onLoad()">查詢</el-button>
-          <el-button
-            type="success"
-            @click="onAdd()"
-            :disabled="currentModelId() != 4"
-            >新增盤點單</el-button
-          >
+          <!-- :disabled="currentModelId() != 4" -->
+          <el-button type="success" @click="onAdd()">新增盤點單</el-button>
         </el-form-item>
       </el-form>
     </div>
 
     <!-- 分頁 -->
     <el-row type="flex">
-      <el-col :span="8"> </el-col>
+      <el-col :span="8" align="end">
+        盤點最新收單時間：{{ receiveInfo.lastDateTime }} 盤點最新收單數量：{{
+          receiveInfo.lastCount
+        }}單
+      </el-col>
       <el-col :span="16" align="end">
         <el-pagination
           background
@@ -176,7 +176,7 @@
         sortable="custom"
       >
       </el-table-column>
-
+      <!-- 
       <el-table-column label="動作" width="200" align="center">
         <template slot-scope="scope">
           <div v-if="currentModelId() == 4">
@@ -193,7 +193,7 @@
               v-if="canInvalidAction(scope.row)"
               >失效
             </el-button>
-            <!-- scope.row.docStatus > 2  reduction -->
+
             <el-button
               @click="onReduction(scope.row)"
               size="mini"
@@ -203,6 +203,7 @@
           </div>
         </template>
       </el-table-column>
+    -->
     </el-table>
   </div>
 </template>
@@ -212,6 +213,7 @@ import pageMixin from "@/utils/mixin";
 import { getWorkStations } from "@/api/workStation";
 import { getInventories, setInvEffect, setInvInvalid } from "@/api/inventory";
 import { SelectTypeEnum, InvDocStatusEnum } from "@/utils/enums/index";
+import { getReceiveInfo } from "@/api/system";
 
 export default {
   components: {
@@ -221,6 +223,7 @@ export default {
   data() {
     return {
       loading: false,
+      receiveInfo: {},
       content: [],
       workStations: [],
       nowDate: [],
@@ -260,6 +263,14 @@ export default {
     if (this.workStation().length > 0) {
       this.params.workStnCode.push(this.workStation());
     }
+    // 入庫資訊
+    getReceiveInfo("盤點").then((resp) => {
+      console.log(resp);
+      if (resp.status == "OK") {
+        this.receiveInfo = resp.message;
+      }
+    });
+
     this.onLoad();
   },
   methods: {
@@ -341,19 +352,18 @@ export default {
       this.onLoad();
     },
     ondblClick(val) {
+      console.log(val);
+      if (val.docStatus == InvDocStatusEnum.Received) {
+      }
+      return;
+      //#region  原需求
       if (
         val.docStatus == InvDocStatusEnum.Received ||
         val.docStatus == InvDocStatusEnum.Invalid
       ) {
         return;
       }
-      console.log(val);
-
       let url = "";
-      //if (val.docStatus == InvDocStatusEnum.Received) {
-      //  url = `/TND5100/0/${val.id}`;
-      //}
-      // 已生效, 已完成
       if (
         val.docStatus == InvDocStatusEnum.Progress ||
         val.docStatus == InvDocStatusEnum.Completed
@@ -369,6 +379,7 @@ export default {
         //url = `/TND5102/3/${val.id}`;
       }
       this.onNav(url);
+      //#endregion
     },
     canEffectAction(row) {
       return row.docStatus == InvDocStatusEnum.Received;

@@ -245,10 +245,12 @@ export default {
       const outboundId = this.$route.params.id;
       this.outbound = {};
       this.outbounds = [];
+
       getOutbound(outboundId).then((resp) => {
         if (resp.status == "OK") {
           this.outbound = resp.message;
           this.outbound.seq = 1;
+          /*
           var status = this.outStatus.filter(
             (x) => x.value == this.outbound.docStatus
           );
@@ -257,7 +259,7 @@ export default {
             this.outbound.docStatusName = status[0].label;
           } else {
             this.outbound.docStatusName = "狀態錯誤";
-          }
+          }*/
           this.outbounds.push(this.outbound);
         }
       });
@@ -343,7 +345,7 @@ export default {
       callOutbound(this.outbound.sysOrderNo, carrierId).then((resp) => {
         if (resp.title != "successful") {
           this.warning(resp.message);
-        }else{
+        } else {
           this.details = resp.message;
           let seq = 1;
           for (let detail of this.details) {

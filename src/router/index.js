@@ -80,6 +80,12 @@ export const constantRoutes = [
         meta: { title: "加工工作" },
       },
       {
+        path: "/TND4100/:id",
+        name: "TND4100",
+        component: () => import("@/views/TND4100"),
+        meta: { title: "執行加工工作" },
+      },
+      {
         path: "/TND5001",
         name: "TND5001",
         component: () => import("@/views/TND5001"),

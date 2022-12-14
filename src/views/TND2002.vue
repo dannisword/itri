@@ -159,8 +159,6 @@ export default {
     }
     // 取得空儲位數量
     this.getEmptyCount();
-
-    //console.log(await this.handleExecute("TND2022"));
   },
   methods: {
     getEmptyCount() {

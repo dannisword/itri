@@ -30,7 +30,7 @@ export default {
   data() {
     return {
       title: "特耐第",
-      logo: require("@/assets/logo.png"),
+      logo: require("@/assets/favicon.png"),
     };
   },
 };

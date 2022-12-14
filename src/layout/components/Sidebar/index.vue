@@ -106,38 +106,40 @@ export default {
           id++;
         }
       }
-
       this.menus = menus;
     },
     handleSelect(key, keyPath) {},
     async onNav(menu) {
-      // 限制選單
-      console.log(menu);
+      const user = getUserInfo();
+      // 作業模式限制
+      console.log(`1.作業站點 ${user.workStation}！`);
+      if (user.workStation == null) {
+        this.$router.push(menu.path);
+        return;
+      }
+
       const rootName = this.getRootName(menu.index);
-      console.log(rootName);
+      console.log(`2.使用者，選擇${menu.name}(${rootName})功能！`);
       if (rootName == "") {
         this.$router.push(menu.path);
         return;
       }
 
-      const user = getUserInfo();
-      // 作業模式 限制
-      if (user.workStation == null) {
-        this.$router.push(menu.path);
-        return;
-      }
+      // A1-21
       const resp = await getWorkStation(user.workStation);
       let currentModel = "";
       if (resp.title == "successful") {
         currentModel = resp.message.currentModel;
+        console.log(`3.目前作業模式 ${currentModel}！`);
         if (resp.message.currentModel != rootName) {
           this.showMsg("請先切換右上角作業模式，才可進入畫面1");
+          this.$router.push(menu.path);
           return;
         }
       }
 
       if (currentModel != rootName) {
-        this.showMsg("請先切換右上角作業模式，才可進入畫面1");
+        this.showMsg("請先切換右上角作業模式，才可進入畫面2");
         return;
       }
       // 檢查權限

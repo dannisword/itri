@@ -16,7 +16,6 @@ PORT:1433
 密碼:U100_wms
 
 ## API URL
-http://www.forelog.org.tw/iwms-web/swagger-ui/index.html
 https://www.logistics.org.tw/tenacity/swagger-ui/index.html
 - 文件
 https://drive.google.com/drive/folders/1TbOsjzd-yjzAxxH3xPZWjAXpygIef0Ke

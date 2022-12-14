@@ -51,9 +51,7 @@
         <el-form-item label="料品號">
           <el-input v-model="params.prodCode"></el-input>
         </el-form-item>
-        <!--  
-   <el-divider class="form-divider"></el-divider>
--->
+        <!--  <el-divider class="form-divider"></el-divider> -->
 
         <el-form-item>
           <el-button type="primary" @click="onLoad()">查詢</el-button>
@@ -66,20 +64,27 @@
       <el-col :span="16">
         <el-form class="mt-1" label-width="140px" :inline="true">
           <el-form-item label="請輸入操作單號">
-            <!-- 
-            <el-input v-model="params.sysOrderNo">
-              <el-button slot="append" icon="el-icon-search"> </el-button>
-            </el-input>
-            -->
             <el-autocomplete
               class="inline-input"
               v-model="docNo"
-              :fetch-suggestions="querySearch"
+              :fetch-suggestions="onSearchDocs"
               placeholder="請輸入操作單號"
             >
-              <el-button slot="append" icon="el-icon-search" @click="getProcessDocOption"> </el-button>
+              <el-button
+                slot="append"
+                icon="el-icon-search"
+                @click="getProcessDocs"
+              >
+              </el-button>
             </el-autocomplete>
           </el-form-item>
+          <el-button
+            icon="el-icon-plus"
+            @click="getProcessAssign"
+            type="primary"
+          >
+          </el-button>
+          <el-form-item> </el-form-item>
           加工最新收單時間：{{ receiveInfo.lastDateTime }} 加工最新收單數量：{{
             receiveInfo.lastCount
           }}單
@@ -104,6 +109,7 @@
       border
       stripe
       @sort-change="onSortcChange"
+      @cell-dblclick="ondblClick"
     >
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
@@ -149,16 +155,19 @@
         min-width="120"
       >
       </el-table-column>
-      <!-- 
-      <el-table-column label="動作" width="200" align="center">
+
+      <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
-          <el-button @click="onAction(scope.row)" size="mini" type="primary"
-            >生效
+          <el-button
+            @click="onDelete(scope.row)"
+            size="mini"
+            type="danger"
+            v-if="canDelete(scope.row)"
+          >
+            刪除
           </el-button>
-          <el-button @click="onAction(scope.row)" size="mini">失效 </el-button>
         </template>
       </el-table-column>
-      -->
     </el-table>
   </div>
 </template>
@@ -166,8 +175,14 @@
 import moment from "moment";
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
-import { getProcesses, getProcessDocOption } from "@/api/processing";
-import { SelectTypeEnum } from "@/utils/enums/index";
+import {
+  getProcesses,
+  getProcessDocs,
+  getProcessAssign,
+  startProcess,
+  deleteProcess,
+} from "@/api/processing";
+import { SelectTypeEnum, ProcessingStatusEnum } from "@/utils/enums/index";
 import { getReceiveInfo } from "@/api/system";
 
 export default {
@@ -199,8 +214,10 @@ export default {
     };
   },
   created() {
+    // TODO
     this.nowDate.push(this.addDay(-7));
     this.nowDate.push(this.addDay(0));
+    console.log(ProcessingStatusEnum.Received);
 
     this.getSelector(SelectTypeEnum.WORK_STATION).then((resp) => {
       this.workStations = resp;
@@ -220,7 +237,7 @@ export default {
       }
     });
     this.onLoad();
-    this.getProcessDocOption();
+    this.getProcessDocs();
   },
   methods: {
     onLoad() {
@@ -236,6 +253,7 @@ export default {
           for (let item of this.content) {
             this.page.seq++;
             item.seq = this.page.seq;
+            //item.status = 0;
           }
         }
       });
@@ -248,7 +266,13 @@ export default {
         this.warning("日期查詢間隔勿超過60天");
       }
     },
-    onAction(val) {},
+    onDelete(val) {
+      deleteProcess(val.id).then((resp) => {
+        if (resp.title == "successful") {
+          this.onLoad();
+        }
+      });
+    },
     async onSortcChange(val) {
       if (val.order == null) {
         return;
@@ -261,25 +285,58 @@ export default {
       this.params.page = val;
       this.onLoad();
     },
-    getProcessDocOption() {
-      getProcessDocOption().then((resp) => {
-        if (resp.status == "OK") {
-          this.docs = resp.message;
+    ondblClick(val) {
+      this.onNav(`/TND4100/${val.id}`);
+      return;
+      startProcess(val.sysOrderNo).then((resp) => {
+        if (resp.title == "successful") {
+          this.onNav(`/TND4100/${val.id}`);
         }
-        console.log(resp);
       });
     },
-    querySearch(queryString, cb) {
+    onSearchDocs(queryString, cb) {
       var restaurants = this.docs;
       var results = queryString
         ? restaurants.filter(this.createFilter(queryString))
         : restaurants;
       cb(results);
     },
+    /**
+     * A5-27 取得操作單號的下拉選單選項
+     */
+    getProcessDocs() {
+      getProcessDocs().then((resp) => {
+        if (resp.status == "OK") {
+          this.docs = resp.message;
+        }
+        console.log(resp);
+      });
+    },
+    getProcessAssign() {
+      if (this.docNo.length <= 0) {
+        this.warning("請輸入加工單號碼!");
+        return;
+      }
+      console.log(this.docNo);
+      const data = this.docs.filter((x) => x.value == this.docNo);
+      if (data.length <= 0) {
+        this.warning("查無此加工單號碼!");
+        return;
+      }
+      getProcessAssign(this.docNo).then((resp) => {
+        console.log(resp);
+      });
+    },
     createFilter(val) {
       return (resp) => {
         return resp.value.toLowerCase().indexOf(val.toLowerCase()) === 0;
       };
+    },
+    canDelete(row) {
+      return (
+        row.status == ProcessingStatusEnum.Received ||
+        row.status == ProcessingStatusEnum.Invalid
+      );
     },
   },
 };
