@@ -1,5 +1,9 @@
 <template>
   <div class="mainWrap">
+    <div id="logo-title">
+      <img src="../assets/Tenacity-Logo.png" alt="logo" class="logo-title" />
+    </div>
+
     <div id="registerWrap">
       <el-form
         ref="loginForm"
@@ -59,14 +63,11 @@
         </div>
       </el-form>
     </div>
-    <!-- 
+
     <div id="logo">
-      <img src="../assets/logo-itri.png" alt="logo" class="logo" />
-      <p>Copyright 工業技術研究院 All Rights Reserved.</p>
+      <img src="../assets/IA_LOGO_BIG.png" alt="logo" class="logo" />
+      <p>Copyright © 2022 漢錸科技股份有限公司 All rights reserved.</p>
     </div>
-
-    -->
-
   </div>
 </template>
 
@@ -248,11 +249,11 @@ $cursor: #fff;
 
 #registerWrap {
   position: absolute;
-  width: 400px;
+  width: 480px;
   background-color: #fff;
   box-shadow: 0px 0px 10px 10px #ccc;
-  top: 23%;
-  left: 20%;
+  top: 28%;
+  left: 28%;
   padding: 50px 40px;
   border-radius: 20px;
   z-index: 99999;
@@ -266,6 +267,17 @@ $cursor: #fff;
   margin-bottom: 30px;
 }
 
+#logo-title {
+  position: absolute;
+  top: 20px;
+  left: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+#logo-title img {
+  width: 300px;
+}
 #logo {
   position: absolute;
   bottom: 20px;
@@ -300,7 +312,7 @@ $cursor: #fff;
 
   #registerWrap {
     top: 300px;
-    left: 480px;
+    left: 580px;
     background-color: #fff;
   }
 }

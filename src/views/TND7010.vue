@@ -217,13 +217,13 @@ export default {
   async created() {
     //this.status = this.source.status;
     // 狀態
-    
     const resp = await getSelector(SelectTypeEnum.ENABLED_TYPE);
     if (resp.title == "successful"){
       this.status = resp.message;
     }
 
     this.menus = await getMenus();
+    console.log(this.menus);
     this.onLoad();
   },
   methods: {

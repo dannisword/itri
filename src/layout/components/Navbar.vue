@@ -103,6 +103,9 @@ export default {
       this.operating = resp.message;
     }
     // 預設作業模式
+    if (this.user.workStation == null) {
+      return;
+    }
     resp = await getWorkStation(this.user.workStation);
     if (resp.title == "successful") {
       const ws = this.operating.find(
@@ -133,7 +136,7 @@ export default {
           return;
         }
       }
-    /**
+      /**
      
        const ws = this.operating.find(
             (x) => x.value == resp.message.currentModel

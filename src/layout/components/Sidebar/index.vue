@@ -122,6 +122,10 @@ export default {
 
       const user = getUserInfo();
       // 作業模式 限制
+      if (user.workStation == null) {
+        this.$router.push(menu.path);
+        return;
+      }
       const resp = await getWorkStation(user.workStation);
       let currentModel = "";
       if (resp.title == "successful") {
