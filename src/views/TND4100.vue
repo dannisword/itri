@@ -41,9 +41,107 @@
       </el-table-column>
       <el-table-column label="預計加工數量" prop="totalPlanQty" min-width="180">
       </el-table-column>
-      <el-table-column label="已加工數量" prop="totalProdQty" min-width="180">
+      <el-table-column label="已加工數量" prop="totalProcQty" min-width="180">
       </el-table-column>
       <el-table-column label="總帳差" prop="totalDifferenceQty" min-width="180">
+      </el-table-column>
+    </el-table>
+
+        <!-- 加工後物流箱條碼 -->
+        <el-row>
+      <el-col :span="18">
+        <el-form class="mt-1" label-width="220px" :inline="true">
+          <el-form-item label="請刷讀加工物流箱編號條碼">
+            <el-input
+              v-model="carrier.targetId"
+              @keyup.enter.native="setTargetBarcode(carrier.targetId)"
+            ></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="primary"
+              @click="onCallback(carrier, 'TARGET')"
+              :disabled="this.carrier.targetId.length <= 0"
+            >
+              料盒連動測試
+            </el-button>
+          </el-form-item>
+        </el-form>
+      </el-col>
+      <el-col :span="6" type="flex" justify="end"> </el-col>
+    </el-row>
+
+    <!-- 加工後明細 -->
+    <el-table :data="target" class="table-container" border>
+      <el-table-column label="項次" width="100" prop="seq" fixed>
+      </el-table-column>
+
+      <el-table-column label="物流箱編號" prop="carrierId" min-width="180">
+        <template slot-scope="scope">
+          <span>{{ scope.row.carrierId }}</span>
+          <el-button
+            class="mt-1 ml-1"
+            slot="append"
+            size="mini"
+            type="danger"
+            @click="onDelete(scope.row)"
+            v-if="scope.row.isFinished == false"
+          >
+            刪除
+          </el-button>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="磅秤重量" prop="weight" min-width="180">
+      </el-table-column>
+
+      <el-table-column label="實際加工數量" prop="prodQty" min-width="180">
+        <template slot-scope="scope">
+          <el-input
+            class="cell-button"
+            type="number"
+            v-model="scope.row.prodQty"
+            :disabled="scope.row.prodQtyEdit == false"
+            v-if="scope.row.isFinished == false"
+          >
+            <el-button slot="append" @click="onTargetEdit(scope.row)">{{
+              scope.row.prodQtyEditName
+            }}</el-button>
+          </el-input>
+          <span v-else>{{ scope.row.prodQty }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="輸入取出數量" prop="inQty" min-width="280">
+        <template slot-scope="scope">
+          <el-input
+            class="cell-button"
+            type="number"
+            v-model="scope.row.inQty"
+            min="0"
+            @keyup.enter.native="onAddTarget(scope.row)"
+            v-if="scope.row.isFinished == false"
+          >
+            <el-button slot="append" @click="onAddTarget(scope.row)"
+              >加總數量</el-button
+            >
+          </el-input>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="動作" prop="statusName" width="280">
+        <template slot-scope="scope">
+          <el-row v-if="scope.row.isFinished == false">
+            <el-button
+              @click="onTargetFinish(scope.row)"
+              size="mini"
+              type="primary"
+              :disabled="scope.row.prodQty <= 0"
+            >
+              放置完成，送回
+            </el-button>
+          </el-row>
+        </template>
       </el-table-column>
     </el-table>
 
@@ -152,103 +250,7 @@
       </el-table-column>
     </el-table>
 
-    <!-- 加工後物流箱條碼 -->
-    <el-row>
-      <el-col :span="18">
-        <el-form class="mt-1" label-width="220px" :inline="true">
-          <el-form-item label="請刷讀加工物流箱編號條碼">
-            <el-input
-              v-model="carrier.targetId"
-              @keyup.enter.native="setTargetBarcode(carrier.targetId)"
-            ></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button
-              type="primary"
-              @click="onCallback(carrier, 'TARGET')"
-              :disabled="this.carrier.targetId.length <= 0"
-            >
-              料盒連動測試
-            </el-button>
-          </el-form-item>
-        </el-form>
-      </el-col>
-      <el-col :span="6" type="flex" justify="end"> </el-col>
-    </el-row>
 
-    <!-- 加工後明細 -->
-    <el-table :data="target" class="table-container" border>
-      <el-table-column label="項次" width="100" prop="seq" fixed>
-      </el-table-column>
-
-      <el-table-column label="物流箱編號" prop="carrierId" min-width="180">
-        <template slot-scope="scope">
-          <span>{{ scope.row.carrierId }}</span>
-          <el-button
-            class="mt-1 ml-1"
-            slot="append"
-            size="mini"
-            type="danger"
-            @click="onDelete(scope.row)"
-            v-if="scope.row.isFinished == false"
-          >
-            刪除
-          </el-button>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="磅秤重量" prop="weight" min-width="180">
-      </el-table-column>
-
-      <el-table-column label="實際加工數量" prop="prodQty" min-width="180">
-        <template slot-scope="scope">
-          <el-input
-            class="cell-button"
-            type="number"
-            v-model="scope.row.prodQty"
-            :disabled="scope.row.prodQtyEdit == false"
-            v-if="scope.row.isFinished == false"
-          >
-            <el-button slot="append" @click="onTargetEdit(scope.row)">{{
-              scope.row.prodQtyEditName
-            }}</el-button>
-          </el-input>
-          <span v-else>{{ scope.row.prodQty }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="輸入取出數量" prop="inQty" min-width="280">
-        <template slot-scope="scope">
-          <el-input
-            class="cell-button"
-            type="number"
-            v-model="scope.row.inQty"
-            min="0"
-            @keyup.enter.native="onAddTarget(scope.row)"
-            v-if="scope.row.isFinished == false"
-          >
-            <el-button slot="append" @click="onAddTarget(scope.row)"
-              >加總數量</el-button
-            >
-          </el-input>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="動作" prop="statusName" width="280">
-        <template slot-scope="scope">
-          <el-row v-if="scope.row.isFinished == false">
-            <el-button
-              @click="onTargetFinish(scope.row)"
-              size="mini"
-              type="primary"
-              :disabled="scope.row.prodQty <= 0"
-            >
-              放置完成，送回
-            </el-button>
-          </el-row>
-        </template>
-      </el-table-column>
-    </el-table>
   </div>
 </template>
 <script>
@@ -324,7 +326,7 @@ export default {
     },
     async onClose() {
       //
-      if (this.process.totalProdQty <= 0) {
+      if (this.process.totalProcQty <= 0) {
         let isConfirm = await this.confirm("加工總數小於0，是否結束此單！");
         if (isConfirm == false) {
           return;
@@ -410,7 +412,11 @@ export default {
     // 取下
     onRemove(val) {
       takeProcessingDetail(val).then((resp) => {
-        console.log(resp);
+        if (resp.title = "successful"){
+          this.onLoad();
+          console.log(resp);
+        }
+  
       });
     },
     // 刪除
@@ -426,6 +432,7 @@ export default {
       finishedSourceDetails(this.process.sysOrderNo, val).then((resp) => {
         console.log(resp);
         if (resp.title == "successful") {
+          this.carrier.sourceId = "";
           this.onLoad();
         }
       });
@@ -435,6 +442,7 @@ export default {
       finishedTargetDetails(this.process.sysOrderNo, val).then((resp) => {
         console.log(resp);
         if (resp.title == "successful") {
+          this.carrier.targetId = "";
           this.onLoad();
         }
       });

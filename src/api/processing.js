@@ -201,7 +201,7 @@ export function setTargetDetail(data) {
  * @param {*} workStationId
  * @returns
  */
-export function closeProcess(workStationId) {
+export function closeProcess(docNo) {
   const uri = `/api/processing/finish/${docNo}`;
   const method = "POST";
   return new Promise((resolve) => {
