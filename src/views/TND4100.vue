@@ -4,7 +4,7 @@
       <el-col :span="12">
         <el-form :model="params" label-width="100px" :inline="true">
           <el-form-item label="單據狀態">
-            <el-input v-model="process.docStatus" disabled></el-input>
+            <el-input v-model="process.docStatusName" disabled></el-input>
           </el-form-item>
           <el-button type="primary" @click="onNav('/TND4001')"
             >回列表</el-button
@@ -67,7 +67,7 @@
           <el-form-item>
             <el-button
               type="primary"
-              @click="onCallback()"
+              @click="onCallback(carrier, 'SOURCE')"
               :disabled="this.carrier.sourceId.length <= 0"
             >
               料盒連動測試
@@ -141,7 +141,7 @@
               >取下
             </el-button>
             <el-button
-              @click="onFinish(scope.row)"
+              @click="onSourceFinish(scope.row)"
               size="mini"
               type="primary"
               :disabled="scope.row.prodQty <= 0"
@@ -161,6 +161,15 @@
               v-model="carrier.targetId"
               @keyup.enter.native="setTargetBarcode(carrier.targetId)"
             ></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="primary"
+              @click="onCallback(carrier, 'TARGET')"
+              :disabled="this.carrier.targetId.length <= 0"
+            >
+              料盒連動測試
+            </el-button>
           </el-form-item>
         </el-form>
       </el-col>
@@ -208,12 +217,12 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="輸入取出數量" prop="outQty" min-width="280">
+      <el-table-column label="輸入取出數量" prop="inQty" min-width="280">
         <template slot-scope="scope">
           <el-input
             class="cell-button"
             type="number"
-            v-model="scope.row.outQty"
+            v-model="scope.row.inQty"
             min="0"
             @keyup.enter.native="onAddTarget(scope.row)"
             v-if="scope.row.isFinished == false"
@@ -229,7 +238,7 @@
         <template slot-scope="scope">
           <el-row v-if="scope.row.isFinished == false">
             <el-button
-              @click="onFinish(scope.row)"
+              @click="onTargetFinish(scope.row)"
               size="mini"
               type="primary"
               :disabled="scope.row.prodQty <= 0"
@@ -255,6 +264,8 @@ import {
   setTargetDetail,
   takeProcessingDetail,
   delProcessingDetail,
+  finishedSourceDetails,
+  finishedTargetDetails,
 } from "@/api/processing";
 
 export default {
@@ -290,6 +301,8 @@ export default {
       return this.process.docStatus >= 3 ? true : false;
     },
     canClose() {
+      // 判斷是否能結束
+
       return false;
     },
   },
@@ -325,10 +338,17 @@ export default {
         this.warning(resp.message);
       }
     },
-    onFinish(val) {
+    // 拿取完成
+    onSourceFinish(val) {
       val.isFinished = true;
       this.setSourceDetail(val);
     },
+    // 放置完成
+    onTargetFinish(val) {
+      val.isFinished = true;
+      this.setTargetDetail(val);
+    },
+    // 原料編輯數量
     onSourceEdit(val) {
       if (val.prodQty == null || val.prodQty.length <= 0) {
         val.prodQtyEdit = true;
@@ -344,6 +364,7 @@ export default {
         this.setSourceDetail(val);
       }
     },
+    // 加工編輯數量
     onTargetEdit(val) {
       if (val.prodQty == null || val.prodQty.length <= 0) {
         val.prodQtyEdit = true;
@@ -359,6 +380,7 @@ export default {
         this.setTargetDetail(val);
       }
     },
+    // 原料加總數量
     onAddSource(val) {
       val.prodQtyEdit = false;
       val.prodQtyEditName = "編輯";
@@ -369,7 +391,10 @@ export default {
       }
       val.prodQty = parseInt(val.outQty) + parseInt(val.prodQty);
       val.outQty = "";
+   
+      this.setSourceDetail(val);
     },
+    // 加工加總數量
     onAddTarget(val) {
       val.prodQtyEdit = false;
       val.prodQtyEditName = "編輯";
@@ -380,12 +405,15 @@ export default {
       }
       val.prodQty = parseInt(val.inQty) + parseInt(val.prodQty);
       val.inQty = "";
+      this.setTargetDetail(val);
     },
+    // 取下
     onRemove(val) {
       takeProcessingDetail(val).then((resp) => {
         console.log(resp);
       });
     },
+    // 刪除
     onDelete(val) {
       delProcessingDetail(val).then((resp) => {
         if (resp.title == "successful") {
@@ -393,46 +421,67 @@ export default {
         }
       });
     },
-    setSourceBarcode(val) {},
-    setTargetBarcode(val) {},
-    getProcessDetails(processingId) {
-      getProcessDetails(processingId).then((resp) => {
+    // 請刷讀原料物流箱編號條碼
+    setSourceBarcode(val) {
+      finishedSourceDetails(this.process.sysOrderNo, val).then((resp) => {
+        console.log(resp);
         if (resp.title == "successful") {
-          // source
-          const source = resp.message.docProcessingSourceDetail;
-          let seq = 1;
-          for (let item of source) {
-            item.seq = seq++;
-            item.outQty = "";
-            item.prodQtyEdit = false;
-            item.prodQtyEditName = "編輯";
-            this.source.push(item);
-          }
-          this.source.sort(function (a, b) {
-            if (a.isFinished == true) {
-              return 0;
-            }
-            return -1;
-          });
-
-          // target
-          const target = resp.message.docProcessingTargetDetail;
-          seq = 1;
-          for (let item of target) {
-            item.seq = seq++;
-            item.inQty = "";
-            item.prodQtyEdit = false;
-            item.prodQtyEditName = "編輯";
-            this.target.push(item);
-          }
-          this.target.sort(function (a, b) {
-            if (a.isFinished == true) {
-              return 0;
-            }
-            return -1;
-          });
-          console.log(this.target);
+          this.onLoad();
         }
+      });
+    },
+    // 請刷讀加工物流箱編號條碼
+    setTargetBarcode(val) {
+      finishedTargetDetails(this.process.sysOrderNo, val).then((resp) => {
+        console.log(resp);
+        if (resp.title == "successful") {
+          this.onLoad();
+        }
+      });
+    },
+    onCallback(val, mode) {
+      console.log(val);
+      let carrier = "";
+      if (mode == "SOURCE") {
+        carrier = val.sourceId;
+      } else {
+        carrier = val.targetId;
+      }
+      this.carrierCallback(carrier);
+    },
+    getProcessDetails(processingId) {
+      this.source = [];
+      getProcessDetails(processingId).then((resp) => {
+        if (resp.title != "successful") {
+          return;
+        }
+        // source
+        this.source = resp.message.docProcessingSourceDetail;
+        let seq = 1;
+        for (let item of this.source) {
+          item.seq = seq++;
+          item.outQty = "";
+        }
+        this.source.sort(function (a, b) {
+          if (a.isFinished == true) {
+            return 0;
+          }
+          return -1;
+        });
+
+        // target
+        this.target = resp.message.docProcessingTargetDetail;
+        seq = 1;
+        for (let item of this.target) {
+          item.seq = seq++;
+          item.inQty = "";
+        }
+        this.target.sort(function (a, b) {
+          if (a.isFinished == true) {
+            return 0;
+          }
+          return -1;
+        });
       });
     },
     getProcessTodo() {
@@ -450,11 +499,30 @@ export default {
       });
     },
     setTargetDetail(target) {
-      setTargetDetail(source).then((resp) => {
+      setTargetDetail(target).then((resp) => {
         if (resp.title == "successful") {
           this.onLoad();
         }
       });
+    },
+    newDetail(carrierId) {
+      return {
+        id: null,
+        parentId: 1,
+        sysOrderNo: this.process.sysOrderNo,
+        isFinished: false,
+        roomCode: null,
+        locationCode: null,
+        prodCode: this.process.prodCode,
+        carrierId: carrierId,
+        stockQty: 0,
+        prodQty: 0,
+        planQty: 0,
+        differenceQty: 0,
+        weight: null,
+        status: null,
+        isFinished: false,
+      };
     },
   },
 };

@@ -162,7 +162,7 @@ export function takeProcessingDetail(data) {
  * @returns
  */
 export function setSourceDetail(data) {
-  const uri = `/api/processing/pickingDetail/${data.isFinish}`;
+  const uri = `/api/processing/pickingDetail/${data.isFinished}`;
   const method = "PUT";
 
   return new Promise((resolve) => {
@@ -182,7 +182,7 @@ export function setSourceDetail(data) {
  * @returns
  */
 export function setTargetDetail(data) {
-  const uri = `/api/processing/processingDetail/${data.isFinish}`;
+  const uri = `/api/processing/processingDetail/${data.isFinished}`;
   const method = "PUT";
 
   return new Promise((resolve) => {
@@ -226,9 +226,9 @@ export function getProcessing(processingId) {
   });
 }
 /**
- * 5-24  刪除加工明細 
- * @param {*} data 
- * @returns 
+ * 5-24  刪除加工明細
+ * @param {*} data
+ * @returns
  */
 export function delProcessingDetail(data) {
   const uri = `/api/processing/delProcessingDetail`;
@@ -237,14 +237,13 @@ export function delProcessingDetail(data) {
     request({
       url: uri,
       method: method,
-      data
+      data,
     }).then((resp) => {
       parseMessage(resp);
       resolve(resp);
     });
   });
 }
-
 
 /**
  * A5-25 依操作單號製單，然後產生配箱
@@ -284,6 +283,32 @@ export function getProcessDocs() {
 export function deleteProcess(processingId) {
   return request({
     url: `/api/processing/delProcessingDoc/${processingId}`,
+    method: "GET",
+  });
+}
+
+/**
+ * A5-29  取得已完成的明細 與 指定的物流箱明細
+ * @param {*} docNo 
+ * @param {*} carrierId 
+ * @returns 
+ */
+export function finishedSourceDetails(docNo, carrierId) {
+  return request({
+    url: `/api/processing/finishedSourceDetails/${docNo}/${carrierId}`,
+    method: "GET",
+  });
+}
+
+/**
+ * A5-30 取得已完成的加工明細 與 指定的加工物流箱明細
+ * @param {*} docNo 
+ * @param {*} carrierId 
+ * @returns 
+ */
+export function finishedTargetDetails(docNo, carrierId) {
+  return request({
+    url: `/api/processing/finishedTargetDetails/${docNo}/${carrierId}`,
     method: "GET",
   });
 }

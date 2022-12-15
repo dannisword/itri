@@ -136,14 +136,14 @@
       </el-table-column>
       <el-table-column
         label="數量"
-        prop="totalProcQty"
+        prop="totalPlanQty"
         sortable="custom"
         min-width="100"
       >
       </el-table-column>
       <el-table-column
         label="單據狀態"
-        prop="docStatus"
+        prop="docStatusName"
         sortable="custom"
         min-width="120"
       >
@@ -286,8 +286,8 @@ export default {
       this.onLoad();
     },
     ondblClick(val) {
-      this.onNav(`/TND4100/${val.id}`);
-      return;
+      //this.onNav(`/TND4100/${val.id}`);
+      //return;
       startProcess(val.sysOrderNo).then((resp) => {
         if (resp.title == "successful") {
           this.onNav(`/TND4100/${val.id}`);

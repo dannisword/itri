@@ -161,12 +161,11 @@
       >
         <el-table-column label="項次" prop="seq"> </el-table-column>
         <el-table-column label="物流箱編號" prop="carrierId"> </el-table-column>
-
+        <el-table-column label="命令型態名稱" prop="opTypeName">
+        </el-table-column>
         <el-table-column label="收到指令時間" prop="createTime">
         </el-table-column>
         <el-table-column label="完成指令時間" prop="finishTime">
-        </el-table-column>
-        <el-table-column label="狀態" prop="carrierStatusName">
         </el-table-column>
       </el-table>
     </ModalDialog>
@@ -248,9 +247,10 @@ export default {
 
       getOutbound(outboundId).then((resp) => {
         if (resp.status == "OK") {
+          console.log(resp.message);
           this.outbound = resp.message;
           this.outbound.seq = 1;
-          /*
+
           var status = this.outStatus.filter(
             (x) => x.value == this.outbound.docStatus
           );
@@ -259,11 +259,11 @@ export default {
             this.outbound.docStatusName = status[0].label;
           } else {
             this.outbound.docStatusName = "狀態錯誤";
-          }*/
+          }
           this.outbounds.push(this.outbound);
         }
       });
-      //this.getOutBoundDetail(outboundId);
+      this.getOutBoundDetail(outboundId);
     },
     onRemove(val) {
       takeOutBoundDetail(val).then((resp) => {
@@ -410,7 +410,7 @@ export default {
         this.info.total = resp.message.total;
       }
       // A4-23
-      this.onLoad();
+      //this.onLoad();
       // A4-3
     },
   },

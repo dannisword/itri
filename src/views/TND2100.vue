@@ -403,6 +403,15 @@ export default {
     getInboundImage(sysOrderNo) {
       // TODO
       this.imgs = [];
+      getInboundImage(sysOrderNo).then((resp) => {
+        if (resp.title == "successful") {
+          console.log(resp);
+          const img = `data:image/png;base64, ${resp.message.img1}`;
+          this.imgs.push(img);
+        }
+        //this.imgs = [];
+      });
+      return;
 
       this.imgs.push(config.coming_soon);
       this.imgs.push(config.coming_soon);

@@ -132,12 +132,15 @@ export default {
       // 檢查作業模式
       const resp = await getWorkStation(this.user.workStation);
       if (resp.title == "successful") {
+        console.log(resp);
+
         if (resp.message.currentModel == val.value) {
+          setStorageItem("currentModel", val);
+          this.$store.dispatch("settings/changeModel", val);
           return;
         }
       }
       /**
-     
        const ws = this.operating.find(
             (x) => x.value == resp.message.currentModel
           );
@@ -146,12 +149,6 @@ export default {
      */
       changeWorkStation(val.value).then((resp) => {
         if (resp.title == "successful") {
-          setStorageItem("currentModel", val);
-          this.$store.dispatch("settings/changeModel", val);
-        } else {
-          if (resp.message) {
-            this.warning(resp.message);
-          }
         }
       });
     },
