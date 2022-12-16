@@ -122,6 +122,12 @@ export const constantRoutes = [
         meta: { title: "新增盤點任務" },
       },
       {
+        path: "/TND5200/:id",
+        name: "TND5200",
+        component: () => import("@/views/TND5200"),
+        meta: { title: "執行庫存異動" },
+      },
+      {
         path: "/TND6000",
         name: "TND6000",
         component: () => import("@/views/TND6000"),

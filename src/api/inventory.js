@@ -60,10 +60,10 @@ export function setInvInvalid(docNo, status) {
 
 /**
  * A7-04 回報單據明細盤點資料(編輯/盤點完成)
- * @param {*} detailId 
- * @param {*} isFinish 
- * @param {*} data 
- * @returns 
+ * @param {*} detailId
+ * @param {*} isFinish
+ * @param {*} data
+ * @returns
  */
 export function setInvDetail(detailId, isFinish, data) {
   const uri = `/api/inventory/detail/${detailId}/${isFinish}`;
@@ -72,7 +72,7 @@ export function setInvDetail(detailId, isFinish, data) {
     request({
       url: uri,
       method: method,
-      data
+      data,
     }).then((resp) => {
       parseMessage(resp);
       resolve(resp);
@@ -81,9 +81,9 @@ export function setInvDetail(detailId, isFinish, data) {
 }
 /**
  * A7-05 結束此單作業
- * @param {*} docNo 
- * @param {*} action 
- * @returns 
+ * @param {*} docNo
+ * @param {*} action
+ * @returns
  */
 export function setInvFinished(docNo, action) {
   const uri = `/api/inventory/finish/${docNo}/${action}`;
@@ -91,7 +91,7 @@ export function setInvFinished(docNo, action) {
   return new Promise((resolve) => {
     request({
       url: uri,
-      method: method
+      method: method,
     }).then((resp) => {
       parseMessage(resp);
       resolve(resp);
@@ -129,6 +129,17 @@ export function getInventory(inventoryId) {
 export function getInvDetail(inventoryId) {
   return request({
     url: `/api/inventory/detail/${inventoryId} `,
+    method: "GET",
+  });
+}
+/**
+ * A7-12, 查詢庫存異動單
+ * @param {*} params
+ * @returns
+ */
+export function getAdjustments(params) {
+  return request({
+    url: `/api/inventory/adjustment/search${params}`,
     method: "GET",
   });
 }
@@ -233,11 +244,41 @@ export function getInvAvailables(prodCode) {
     method: "GET",
   });
 }
+
 /**
- * A7-27 取得盤點單明細 
- * @param {*} detailId 
- * @param {*} carrieId 
- * @returns 
+ * A7-25 取得庫存異動單
+ * @param {*} adjustmentId
+ * @returns
+ */
+export function getAdjustment(adjustmentId) {
+  return request({
+    url: `/api/inventory/adjustment/${adjustmentId}`,
+    method: "GET",
+  });
+}
+/**
+ * A7-26 執行庫存異動單
+ * @param {*} docNo
+ * @returns
+ */
+export function startAdjustment(docNo) {
+  const uri = `/api/inventory/adjustment/start/${docNo}`;
+  const method = "POST";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
+  });
+}
+/**
+ * A7-27 取得盤點單明細
+ * @param {*} detailId
+ * @param {*} carrieId
+ * @returns
  */
 export function setInventoryDetail(detailId, carrieId) {
   return request({

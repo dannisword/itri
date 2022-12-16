@@ -242,6 +242,7 @@ export default {
     // 入庫單狀態
     this.inStatus = await this.getSelector(SelectTypeEnum.INBOUND_STATUS);
     this.onLoad();
+    this.getInboundImage(this.$route.params.id);
   },
   computed: {
     isFinished() {
@@ -267,7 +268,6 @@ export default {
           }
           this.inbounds = resp.message;
           this.inbound = this.inbounds[0];
-          this.getInboundImage(this.inbound.sysOrderNo);
         }
       });
       // 明細資料
@@ -395,9 +395,9 @@ export default {
         }
       });
     },
-    getInboundImage(sysOrderNo) {
+    getInboundImage(id) {
       this.imgs = [];
-      getInboundImage(sysOrderNo).then((resp) => {
+      getInboundImage(id).then((resp) => {
         if (resp.title == "successful") {
           for (let item of resp.message.imgList) {
             const img = `data:image/png;base64, ${item}`;

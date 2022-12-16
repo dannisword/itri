@@ -119,13 +119,6 @@
         fixed
       >
       </el-table-column>
-      <el-table-column
-        label="單據狀態"
-        prop="docStatus"
-        width="130"
-        sortable="custom"
-      >
-      </el-table-column>
 
       <el-table-column
         label="盤點類型"

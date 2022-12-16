@@ -3,7 +3,7 @@
     <div class="form-container">
       <!-- 查詢條件 -->
       <el-form :model="params" label-width="100px" :inline="true">
-        <el-form-item label="盤點日期">
+        <el-form-item label="異動日期">
           <el-date-picker
             v-model="nowDate"
             type="daterange"
@@ -55,12 +55,95 @@
           <el-button type="primary" @click="onLoad()">查詢</el-button>
         </el-form-item>
       </el-form>
+
+      <!-- 分頁 -->
+      <el-row type="flex" class="mt-1">
+        <el-col :span="16"> </el-col>
+        <el-col :span="8" align="end">
+          <el-pagination
+            background
+            @current-change="onCurrentChange"
+            :current-page="page.number"
+            :page-size="page.size"
+            layout="total,jumper,prev, pager, next"
+            :total="page.totalElements"
+          ></el-pagination>
+        </el-col>
+      </el-row>
+
+      <!-- 盤點資料-->
+      <el-table
+        :data="content"
+        v-loading="loading"
+        class="table-container"
+        border
+        stripe
+        @sort-change="onSortcChange"
+        @cell-dblclick="ondblClick"
+      >
+        <el-table-column label="項次" width="100" prop="seq" fixed>
+        </el-table-column>
+        <el-table-column
+          label="異動單號碼"
+          prop="sysOrderNo"
+          sortable="custom"
+          min-width="200"
+          fixed
+        >
+        </el-table-column>
+
+        <el-table-column
+          label="盤點單號碼"
+          prop="sysOrderNo"
+          sortable="custom"
+          min-width="200"
+          fixed
+        >
+        </el-table-column>
+
+        <el-table-column
+          label="單據狀態"
+          prop="docStatusLabel"
+          width="130"
+          sortable="custom"
+          fixed
+        >
+        </el-table-column>
+
+        <el-table-column
+          label="盤點時間"
+          prop="inventoryDate"
+          width="180"
+          sortable="custom"
+        >
+        </el-table-column>
+
+        <el-table-column
+          label="料品號"
+          prop="prodCode"
+          min-width="180"
+          sortable="custom"
+        >
+        </el-table-column>
+
+        <el-table-column
+          label="綁定站點"
+          prop="assignWorkStationId"
+          width="130"
+          sortable="custom"
+        >
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
 <script>
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
+import { getWorkStations } from "@/api/workStation";
+import { getAdjustments, startAdjustment } from "@/api/inventory";
+import { SelectTypeEnum } from "@/utils/enums/index";
+
 export default {
   components: {
     ModalDialog,
@@ -68,25 +151,79 @@ export default {
   mixins: [pageMixin],
   data() {
     return {
+      loading: false,
       nowDate: [],
-      status:[],
+      status: [],
       workStations: [],
+      content: [],
       params: {
-        page: 0,
-        size: 50,
         direction: "ASC",
+        docNo: "",
+        docStatus: [],
+        endDate: "",
+        page: 1,
+        prodCode: "",
         properties: "id",
+        size: 50,
+        startDate: "",
+        workStnCode: [],
       },
     };
   },
   created() {
-    this.nowDate.push(this.addDay(-7));
+    this.nowDate.push(this.addDay(-30));
     this.nowDate.push(this.addDay(0));
+    getWorkStations().then((resp) => {
+      if ((resp.title = "successful")) {
+        this.workStations = resp.message;
+      }
+    });
+    this.getSelector(SelectTypeEnum.INVENTORY_STATUS).then((resp) => {
+      this.status = resp;
+    });
+    // 站點綁定
+    if (this.workStation().length > 0) {
+      this.params.workStnCode.push(this.workStation());
+    }
     this.onLoad();
   },
   methods: {
     onLoad() {
-        
+      this.params.startDate = this.toDate(this.nowDate[0]);
+      this.params.endDate = this.toDate(this.nowDate[1]);
+      const query = this.getQuery(this.params);
+      getAdjustments(query).then((resp) => {
+        if (resp.title == "successful") {
+          this.content = resp.message.content;
+          // 分頁設定
+          this.setPagination(resp.message);
+          // 處理項次
+          for (let item of this.content) {
+            this.page.seq++;
+            item.seq = this.page.seq;
+          }
+          console.log(this.content);
+        }
+      });
+    },
+    onCurrentChange(val) {
+      this.params.page = val;
+      this.onLoad();
+    },
+    async onSortcChange(val) {
+      if (val.order == null) {
+        return;
+      }
+      this.params.direction = val.order == "ascending" ? "ASC" : "DESC";
+      this.params.properties = val.prop;
+      await this.onLoad();
+    },
+    ondblClick(val) {
+      startAdjustment(val.sysOrderNo).then((resp) => {
+        if (resp.title == "successful") {
+          this.onNav(`/TND5200/${val.id}`);
+        }
+      });
     },
   },
 };
