@@ -143,7 +143,7 @@
         </el-table-column>
         -->
 
-        <el-table-column label="前一天簽入者" prop="haveSignInBefore">
+        <el-table-column label="上一次簽入者" prop="haveSignInBefore">
           <template slot-scope="scope">
             <el-checkbox
               v-model="scope.row.haveSignInBefore"

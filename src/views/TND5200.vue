@@ -138,7 +138,7 @@ export default {
       if (this.currentModelId() != 4) {
         //return false;
       }
-      return this.adjustment.isFinished;
+      return this.adjustment.docStatus > 3;
     },
   },
   methods: {
