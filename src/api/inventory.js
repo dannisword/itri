@@ -143,6 +143,53 @@ export function getAdjustments(params) {
     method: "GET",
   });
 }
+//
+/**
+ * A7-13 取得庫存異動單明細
+ * @param {*} adjustmentId
+ */
+export function getAdjustmentDetail(adjustmentId) {
+  return request({
+    url: `/api/inventory/adjustment/detail/${adjustmentId} `,
+    method: "GET",
+  });
+}
+
+/**
+ * A7-15 異動單筆明細庫存(異動完成)
+ * @param {*} adjustmentDetailId
+ */
+export function setAdjustmentDetail(adjustmentDetailId) {
+  const uri = `/api/inventory/adjustment/detail/${adjustmentDetailId} `;
+  const method = "POST";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
+  });
+}
+/**
+ * A7-16 結束庫存異動單作業
+ * @param {*} docNo 
+ * @returns 
+ */
+export function setAdjustmentFinish(docNo){
+  const uri = `/api/inventory/adjustment/finish/${docNo} `;
+  const method = "POST";
+  return new Promise((resolve) => {
+    request({
+      url: uri,
+      method: method,
+    }).then((resp) => {
+      parseMessage(resp);
+      resolve(resp);
+    });
+  });
+}
 /**
  * A7-17 收單作業
  * @returns
