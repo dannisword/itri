@@ -6,7 +6,7 @@
         <el-input v-model="adjustment.docStatusLabel" disabled></el-input>
       </el-form-item>
       <el-button type="primary" @click="onNav('/TND5002')">回列表</el-button>
-      <el-button type="success" @click="onClose()">結數此單作業</el-button>
+      <el-button type="success" @click="onClose()">結束此單作業</el-button>
     </el-form>
 
     <!-- 異動單 -->
