@@ -92,6 +92,12 @@ export const constantRoutes = [
         meta: { title: "盤點工作" },
       },
       {
+        path: "/TND5002",
+        name: "TND5002",
+        component: () => import("@/views/TND5002"),
+        meta: { title: "庫存異動工作" },
+      },
+      {
         path: "/TND5100/:type/:id",
         name: "TND5100",
         component: () => import("@/views/TND5100"),

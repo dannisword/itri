@@ -5,16 +5,30 @@
       <el-form-item label="盤點單狀態">
         <el-input v-model="inventory.docStatusLabel" disabled></el-input>
       </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onBack()">回列表</el-button>
+      <el-button type="primary" @click="onNav('/TND5001')">回列表</el-button>
+    </el-form>
+
+    <el-row type="flex" class="row-bg" justify="end">
+      <el-col>
+        <el-button type="primary" @click="onOpenLog">
+          物流箱進度查詢({{ info.total }})
+        </el-button>
+      </el-col>
+      <el-col> </el-col>
+      <el-col>
+        <!-- 
+        尚有{{ info.lastCount }}筆工作
+        -->
         <el-button
           type="success"
-          @click="onFinished('FINISHED')"
+          @click="onClose('CHECK')"
           :disabled="canFinish == false"
-          >結束此單作業</el-button
         >
-      </el-form-item>
-    </el-form>
+          結束此單作業
+        </el-button>
+      </el-col>
+    </el-row>
+
     <!-- 盤點單 -->
     <el-table
       :data="content"
@@ -33,12 +47,19 @@
         fixed
       >
       </el-table-column>
-      <el-table-column label="料品號" prop="prodCode"> </el-table-column>
-      <el-table-column label="盤點類型" prop="type"> </el-table-column>
-      <el-table-column label="盤點時間" prop="inventoryDate"> </el-table-column>
-      <el-table-column label="待盤點物流箱數量" prop="totalPlanQty" width="180">
+      <el-table-column label="料品號" prop="prodCode" min-width="180">
       </el-table-column>
-      <el-table-column label="已盤點總數量" prop="totalProdQty" width="180">
+      <el-table-column label="盤點類型" prop="type" min-width="180">
+      </el-table-column>
+      <el-table-column label="盤點時間" prop="inventoryDate" min-width="180">
+      </el-table-column>
+      <el-table-column
+        label="待盤點物流箱數量"
+        prop="detailUnfinishCount"
+        min-width="180"
+      >
+      </el-table-column>
+      <el-table-column label="已盤點總數量" prop="totalProdQty" min-width="180">
       </el-table-column>
     </el-table>
 
@@ -53,28 +74,35 @@
     </el-form>
     <el-row>
       <el-form :inline="false" style="margin-top: 10px">
-        <el-col :span="24">
-          <el-form-item
-            class="form-item-prev"
-            label="請刷讀盤點前物流箱編號條碼"
-          >
-            <el-input
-              v-model="carrier.inBarcode"
-              placeholder="請刷讀盤點前物流箱編號條碼"
-              @keyup.enter.native="setBarcode(0)"
-              :disabled="isFinished == true"
-            ></el-input>
-          </el-form-item>
-          <el-form-item class="form-item" label="請刷讀盤點後物流箱編號條碼">
-            <el-input
-              v-model="carrier.outBarcode"
-              placeholder="請刷讀盤點後物流箱編號條碼"
-              @keyup.enter.native="setBarcode(1)"
-              :disabled="isFinished == true"
-            ></el-input>
-          </el-form-item>
-        </el-col>
+        <el-form-item class="form-item-prev" label="請刷讀盤點前物流箱編號條碼">
+          <el-input
+            v-model="carrier.inBarcode"
+            placeholder="請刷讀盤點前物流箱編號條碼"
+            @keyup.enter.native="setBarcode(0)"
+            :disabled="isFinished == true"
+          ></el-input>
+        </el-form-item>
       </el-form>
+
+      <el-form class="mt-1" :inline="true">
+        <el-form-item class="form-item" label="請刷讀盤點後物流箱編號條碼">
+          <el-input
+            v-model="carrier.outBarcode"
+            placeholder="請刷讀盤點後物流箱編號條碼"
+            @keyup.enter.native="setBarcode(1)"
+            :disabled="isFinished == true"
+          ></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            @click="onCallback(carrier)"
+            :disabled="carrier.outBarcode <= 0"
+          >
+            料盒連動測試
+          </el-button>
+        </el-form-item></el-form
+      >
     </el-row>
 
     <!-- 盤點單明細 -->
@@ -101,11 +129,9 @@
         width="180"
       >
       </el-table-column>
-      <el-table-column label="料品號" prop="prodCode" min-width="120">
+      <el-table-column label="料品號" prop="prodCode" min-width="180">
       </el-table-column>
-      <el-table-column label="磅秤重量" prop="weight" min-width="120">
-      </el-table-column>
-      <el-table-column label="isFinished" prop="isFinished" min-width="120">
+      <el-table-column label="磅秤重量" prop="weight" min-width="180">
       </el-table-column>
 
       <!-- 已盤點數量 -->
@@ -126,7 +152,7 @@
       </el-table-column>
 
       <!-- 輸入盤點數量  -->
-      <el-table-column label="輸入盤點數量" prop="inQty" width="180">
+      <el-table-column label="輸入盤點數量" prop="inQty" min-width="220">
         <template slot-scope="scope">
           <el-input
             class="cell-button"
@@ -143,9 +169,10 @@
       <el-table-column label="動作" align="center" min-width="120">
         <template slot-scope="scope">
           <el-button
-            @click="onSaveDetail(scope.row)"
+            @click="onFinish(scope.row)"
             type="success"
             v-if="scope.row.isFinished == false"
+            :disabled="scope.row.prodQty <= 0"
             >盤點完成
           </el-button>
           <span v-else>已完成盤點</span>
@@ -153,6 +180,7 @@
       </el-table-column>
     </el-table>
 
+    <!-- 結束此單-->
     <ModalDialog
       :title="dialogs.inv.title"
       :name="dialogs.inv.name"
@@ -163,22 +191,53 @@
       <div class="form-center">
         <el-form :inline="false">
           <el-form-item class="form-button">
-            <el-button type="primary" @click="onFinished('REINVENTORY')"
+            <el-button type="primary" @click="onAction('REINVENTORY')"
               >儲存，並產生複盤單
             </el-button>
           </el-form-item>
           <el-form-item class="form-button">
-            <el-button type="primary" @click="onFinished('ADJUSTMENT')"
+            <el-button type="primary" @click="onAction('ADJUSTMENT')"
               >儲存，並產生庫存異動單
             </el-button>
           </el-form-item>
           <el-form-item class="form-button">
-            <el-button type="info" @click="onFinished('SAVE')"
+            <el-button type="info" @click="onAction('SAVE')"
               >僅儲存盤點結果
             </el-button>
           </el-form-item>
         </el-form>
       </div>
+    </ModalDialog>
+
+    <ModalDialog
+      :title="dialogs.log.title"
+      :name="dialogs.log.name"
+      :visible.sync="dialogs.log.visible"
+      @afterClosed="onModalClose"
+      :optional="Large"
+    >
+      <el-row :gutter="20">
+        <el-col :span="6"> 站點：{{ workStation() }} </el-col>
+      </el-row>
+      <el-row class="mt-1" :gutter="20">
+        <el-col :span="20"> 出庫單號碼{{ inventory.sysOrderNo }} </el-col>
+      </el-row>
+      <el-table
+        :data="records"
+        class="table-container"
+        border
+        stripe
+        height="400px"
+      >
+        <el-table-column label="項次" prop="seq"> </el-table-column>
+        <el-table-column label="物流箱編號" prop="carrierId"> </el-table-column>
+        <el-table-column label="命令型態名稱" prop="opTypeName">
+        </el-table-column>
+        <el-table-column label="收到指令時間" prop="createTime">
+        </el-table-column>
+        <el-table-column label="完成指令時間" prop="finishTime">
+        </el-table-column>
+      </el-table>
     </ModalDialog>
   </div>
 </template>
@@ -191,7 +250,14 @@ import {
   getInvDetail,
   setInvDetail,
   setInvFinished,
+  setInventoryDetail,
 } from "@/api/inventory";
+import {
+  getReceiveInfo,
+  carrierArrived,
+  getCarrierArrived,
+} from "@/api/system";
+
 import { InvDocStatusEnum } from "@/utils/enums/index";
 
 export default {
@@ -202,9 +268,15 @@ export default {
   data() {
     return {
       loading: false,
+      info: {
+        lastCount: 0,
+        part: 0,
+        total: 0,
+      },
       inventory: {},
       content: [],
       details: [],
+      records: [],
       carrier: {
         inBarcode: "",
         outBarcode: "",
@@ -221,36 +293,36 @@ export default {
           name: "INV",
           visible: false,
         },
+        log: {
+          title: "物流箱進度查詢",
+          name: "LOG",
+          visible: false,
+        },
       },
     };
   },
-  created() {
+  async created() {
     // 1: 初盤、2: 已完成有盤差、3: 複盤
-    this.onLoad();
+    await this.onLoad();
   },
   computed: {
     isFinished() {
       // 判斷主檔
-      return this.inventory.docStatus == InvDocStatusEnum.Effective ||
-        this.inventory.docStatus == InvDocStatusEnum.Progress
-        ? false
-        : true;
+      return this.inventory.docStatus >= InvDocStatusEnum.Completed
+        ? true
+        : false;
     },
     canFinish() {
       // 切換盤點作業
       if (this.currentModelId() != 4) {
-        return false;
+        //return false;
       }
-      let finished =
-        this.inventory.docStatus == InvDocStatusEnum.Effective ||
-        this.inventory.docStatus == InvDocStatusEnum.Progress
-          ? true
-          : false;
-      if (finished == true) {
-        var data = this.details.filter((x) => x.isFinished == false);
-        return data.length > 0 ? false : true;
+      if (this.inventory.isFinished == true) {
+        return true;
       }
-      return finished;
+      var data = this.details.filter((x) => x.isFinished == false);
+      console.log(data);
+      return data.length > 0 ? false : true;
     },
   },
   methods: {
@@ -259,11 +331,13 @@ export default {
       this.details = [];
       getInventory(this.$route.params.id).then((resp) => {
         if (resp.status == "OK") {
-          this.inventory = resp.message;
           resp.message.seq = 1;
+          this.inventory = resp.message;
           this.content.push(resp.message);
+          this.handleFlow();
         }
       });
+
       getInvDetail(this.$route.params.id).then((resp) => {
         if (resp.status == "OK") {
           let seq = 1;
@@ -272,7 +346,6 @@ export default {
             detail.prodQtyEdit = false;
             detail.prodQtyEditName = "編輯";
             detail.inQty = "";
-            detail.afterCarrierId = "00012";
             const data = this.clone(detail);
             this.details.push(data);
           }
@@ -285,29 +358,82 @@ export default {
         }
       });
     },
-    setBarcode(archive) {
-      if (archive == 0) {
+    setBarcode(mode) {
+      // 盤點前
+      if (mode == 0) {
         this.details[0].carrierId = this.carrier.inBarcode;
       }
-      if (archive == 1) {
-        this.details[0].afterCarrierId = this.carrier.outBarcode;
+      // 盤點後
+      if (mode == 1) {
+        if (this.carrier.outBarcode.length <= 0) {
+          this.warning("請刷讀盤點後物流箱編號條碼");
+          return;
+        }
+        setInventoryDetail(this.details[0].id, this.carrier.outBarcode).then(
+          (resp) => {
+            if (resp.title == "successful") {
+              this.carrier.outBarcode = "";
+              this.onLoad();
+            }
+          }
+        );
       }
     },
-    onBack() {
-      this.onNav("/TND5001");
+    async onOpenLog() {
+      this.dialogs.log.visible = true;
+      this.Large.showAction = false;
+      const params = {
+        docNo: this.inventory.sysOrderNo,
+        workStn: this.workStation(),
+      };
+      const query = this.getQuery(params);
+      getCarrierArrived(query).then((resp) => {
+        if (resp.title == "successful") {
+          this.records = resp.message.content;
+          let seq = 1;
+          for (let item of this.records) {
+            item.seq = seq++;
+          }
+        }
+      });
+      await this.handleFlow();
     },
-    onFinished(action) {
-      // 開窗 FINISHED
-      if (action == "FINISHED") {
-        this.Small.showAction = false;
-        this.dialogs.inv.visible = true;
+
+    // 結束此單
+    onClose(action) {
+      // 待盤點
+      if (this.inventory.detailUnfinishCount > 0) {
+        this.confirm("尚有待盤點的物流箱，無法結束此單作業", false);
         return;
       }
+
+      // 待盤點的物流箱數量與 已盤點的物流箱數量不符，尚無法結束此單作業
+      const docNo = this.inventory.sysOrderNo;
+      setInvFinished(docNo, action).then((resp) => {
+        if (resp.title == "successful") {
+          // 盤差
+          if (resp.message.isDiffQty == true) {
+            this.Small.showAction = false;
+            this.dialogs.inv.visible = true;
+          }
+        }
+      });
+    },
+    onAction(action) {
       // ADJUSTMENT 儲存並產生庫存異動單
       // REINVENTORY 儲存並產生復盤單
       // SAVE 僅儲存盤點結果
       this.dialogs.inv.visible = false;
-      this.setFinished(action);
+      const docNo = this.inventory.sysOrderNo;
+      setInvFinished(docNo, action).then((resp) => {
+        if (resp.title == "successful") {
+          this.onNav("/TND5001");
+        }
+      });
+    },
+    // 盤點完成
+    onFinish(val) {
+      this.setDetail(val, true);
     },
     onProdQtyEdit(val) {
       val.prodQtyEdit = !val.prodQtyEdit;
@@ -317,9 +443,6 @@ export default {
       } else {
         this.setDetail(val, false);
       }
-    },
-    onSaveDetail(val) {
-      this.setDetail(val, true);
     },
     onAddDetail(val) {
       if (val.afterCarrierId == null) {
@@ -331,21 +454,18 @@ export default {
       }
       val.prodQty = parseInt(val.inQty) + parseInt(val.prodQty);
       val.inQty = "";
+
       this.setDetail(val, false);
     },
     onModalClose(val) {
       this.dialogs.inv.visible = false;
+      this.dialogs.log.visible = false;
     },
-    setFinished(action) {
-      setInvFinished(this.content[0].sysOrderNo, action).then((resp) => {
-        console.log(resp);
-        if (resp.status == "OK") {
-          this.onBack();
-        }
-      });
+    onCallback(val) {
+      this.carrierCallback(val.outBarcode);
     },
     setDetail(val, isFinish) {
-      this.loading = true;
+      //this.loading = true;
       const data = {
         afterCarrierId: val.afterCarrierId,
         prodQty: val.prodQty,
@@ -360,6 +480,39 @@ export default {
           this.warning("執行盤點工作-異常！");
           this.loading = false;
         });
+    },
+    async handleFlow() {
+      // A1-44
+      let resp;
+      this.info.lastCount = 0;
+      this.info.part = 0;
+      this.info.total = 0;
+      /*
+      resp = await getReceiveInfo("出庫");
+      if (resp.title == "successful") {
+        this.info.lastCount = resp.message.lastCount;
+      }*/
+      // A1-46 I,O,PR,IN
+
+      resp = await carrierArrived(this.inventory.sysOrderNo, "盤點");
+      console.log(resp);
+      if (resp.title == "successful") {
+        this.info.part = resp.message.part;
+        this.info.total = resp.message.total;
+      }
+      // A4-23
+      //this.onLoad();
+      // A4-3
+    },
+    setInvFinished(docNo, action) {
+      return new Promise((resolve) => {
+        setInvFinished(docNo, action).then((resp) => {
+          if (resp.title == "successful") {
+            resolve(resp.message.isDiffQty);
+          }
+          resolve(false);
+        });
+      });
     },
   },
 };
@@ -392,5 +545,15 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.cell-button .el-input-group__append {
+  background-color: #67c23a;
+  color: white;
+}
+
+.cell-button .el-button {
+  background-color: #67c23a;
+  color: white;
 }
 </style>

@@ -120,9 +120,7 @@
           <el-button @click="onConfirm('IN')" type="primary"
             >確認簽入</el-button
           >
-          <el-button @click="onSync" type="warning" v-if="isSync == true"
-            >同步員工資料</el-button
-          >
+          <el-button @click="onSync" type="warning">同步員工資料</el-button>
         </div>
       </el-form>
 
@@ -398,7 +396,7 @@ export default {
       this.emps = [];
       const p = {
         empolyeeId: this.empolyeeId,
-        workStationId: this.station.name,
+        workStationId: this.workStation(),
       };
       const query = this.getQuery(p);
       getEmployees(query).then((resp) => {
@@ -409,11 +407,13 @@ export default {
     },
     onOpen(val) {
       this.emps = [];
+      // 簽入
       if (val == "IN") {
         this.isSync = false;
         this.dialogs.IN.visible = true;
         this.onSerach();
       }
+      // 簽出
       if (val == "OUT") {
         this.getSingIn();
         this.dialogs.OUT.visible = true;

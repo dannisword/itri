@@ -17,7 +17,7 @@
     <div v-for="img in imgs">
       <el-image
         class="floated_box"
-        style="width: 150px; height: 100px"
+        style="width: 200px; height: 150px"
         :src="img"
         fit="fit"
       ></el-image>
@@ -260,18 +260,13 @@ export default {
       this.inbounds = [];
       //  主檔資料
       getInbound(inboundId).then((resp) => {
-        if (resp.status == "OK") {
-          this.inbound = resp.message;
-          this.inbound.seq = 1;
-          var status = this.inStatus.filter(
-            (x) => x.value == this.inbound.docStatus
-          );
-          if (status.length > 0) {
-            this.inbound.docStatusName = status[0].label;
-          } else {
-            this.inbound.docStatusName = "狀態錯誤";
+        if (resp.title == "successful") {
+          let seq = 1;
+          for (let item of resp.message) {
+            item.seq = 1;
           }
-          this.inbounds.push(this.inbound);
+          this.inbounds = resp.message;
+          this.inbound = this.inbounds[0];
           this.getInboundImage(this.inbound.sysOrderNo);
         }
       });
@@ -401,27 +396,17 @@ export default {
       });
     },
     getInboundImage(sysOrderNo) {
-      // TODO
       this.imgs = [];
       getInboundImage(sysOrderNo).then((resp) => {
         if (resp.title == "successful") {
-          console.log(resp);
-          const img = `data:image/png;base64, ${resp.message.img1}`;
-          this.imgs.push(img);
+          for (let item of resp.message.imgList) {
+            const img = `data:image/png;base64, ${item}`;
+            this.imgs.push(img);
+            return;
+          }
+        } else {
+          this.imgs.push(config.coming_soon);
         }
-        //this.imgs = [];
-      });
-      return;
-
-      this.imgs.push(config.coming_soon);
-      this.imgs.push(config.coming_soon);
-      this.imgs.push(config.coming_soon);
-      this.imgs.push(config.coming_soon);
-      this.imgs.push(config.coming_soon);
-      return;
-      // 圖檔資料
-      getInboundImage(sysOrderNo).then((resp) => {
-        console.log(resp);
       });
     },
     setInboundDetail(data) {

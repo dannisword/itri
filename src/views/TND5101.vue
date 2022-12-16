@@ -2,7 +2,7 @@
     <div class="app-container"></div>
   </template>
   <script>
-  // 執行盤點工作-j06
+  // 執行盤點工作-
   import ModalDialog from "@/components/ModalDialog/index.vue";
   import pageMixin from "@/utils/mixin";
   export default {

@@ -236,8 +236,9 @@ export default {
   },
   async created() {
     this.outStatus = await this.getSelector(SelectTypeEnum.OUTBOUND_STATUS);
-    this.handleFlow();
+
     await this.onLoad();
+    await this.handleFlow();
   },
   methods: {
     onLoad() {
@@ -246,21 +247,12 @@ export default {
       this.outbounds = [];
 
       getOutbound(outboundId).then((resp) => {
-        if (resp.status == "OK") {
-          console.log(resp.message);
-          this.outbound = resp.message;
-          this.outbound.seq = 1;
-
-          var status = this.outStatus.filter(
-            (x) => x.value == this.outbound.docStatus
-          );
-
-          if (status.length > 0) {
-            this.outbound.docStatusName = status[0].label;
-          } else {
-            this.outbound.docStatusName = "狀態錯誤";
+        if (resp.title == "successful") {
+          for (let item of resp.message) {
+            item.seq = 1;
           }
-          this.outbounds.push(this.outbound);
+          this.outbounds = resp.message;
+          this.outbound = this.outbounds[0];
         }
       });
       this.getOutBoundDetail(outboundId);
@@ -363,13 +355,8 @@ export default {
     //A4-11 回報單據明細出庫資料(編輯/放置完成，回送)
     setOutBoundDetail(detail) {
       setOutBoundDetail(detail).then((resp) => {
-        if (resp.status == "OK") {
+        if (resp.title == "successful") {
           this.onLoad();
-        } else {
-          if (resp.message) {
-            this.warning(resp.message);
-          }
-          this.warning(resp.errorMessage);
         }
       });
     },
@@ -416,3 +403,14 @@ export default {
   },
 };
 </script>
+<style scoped>
+.cell-button .el-input-group__append {
+  background-color: #67c23a;
+  color: white;
+}
+
+.cell-button .el-button {
+  background-color: #67c23a;
+  color: white;
+}
+</style>

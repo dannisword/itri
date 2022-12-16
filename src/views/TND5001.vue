@@ -73,13 +73,13 @@
     </div>
 
     <!-- 分頁 -->
-    <el-row type="flex">
-      <el-col :span="8" align="end">
+    <el-row type="flex" class="mt-1">
+      <el-col :span="16">
         盤點最新收單時間：{{ receiveInfo.lastDateTime }} 盤點最新收單數量：{{
           receiveInfo.lastCount
         }}單
       </el-col>
-      <el-col :span="16" align="end">
+      <el-col :span="8" align="end">
         <el-pagination
           background
           @current-change="onCurrentChange"
@@ -352,9 +352,22 @@ export default {
       this.onLoad();
     },
     ondblClick(val) {
-      console.log(val);
-      if (val.docStatus == InvDocStatusEnum.Received) {
+      let url = "";
+      if (val.type == "初盤") {
+        url = `/TND5100/1/${val.id}`;
       }
+      if (val.type == "複盤") {
+        url = `/TND5100/1/${val.id}`;
+      }
+      if (val.docStatus == InvDocStatusEnum.Received) {
+        setInvEffect(val.sysOrderNo).then((resp) => {
+          if (resp.title == "successful") {
+            this.onNav(url);
+          }
+        });
+        return;
+      }
+      this.onNav(url);
       return;
       //#region  原需求
       if (
@@ -363,7 +376,7 @@ export default {
       ) {
         return;
       }
-      let url = "";
+      //let url = "";
       if (
         val.docStatus == InvDocStatusEnum.Progress ||
         val.docStatus == InvDocStatusEnum.Completed

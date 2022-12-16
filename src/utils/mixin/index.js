@@ -173,13 +173,15 @@ export default {
     /**
      * 提示訊息
      * @param {*} msg
+     * @param {*} showCancelButton
      * @returns
      */
-    confirm(msg) {
+    confirm(msg, showCancelButton = true) {
       return new Promise((resolve) => {
         this.$confirm(msg, "提示", {
           confirmButtonText: "確認",
           cancelButtonText: "取消",
+          showCancelButton: showCancelButton,
           type: "warning",
         })
           .then(() => {
@@ -190,6 +192,7 @@ export default {
           });
       });
     },
+
     /**
      * 導覽頁面
      * @param {*} uri
@@ -275,7 +278,7 @@ export default {
     async handleExecute(path) {
       // 是否切換到 作業模式
       const execPath = await getWorkStationIsRun(this.workStation(), path);
-      console.log(execPath)
+      console.log(execPath);
       return execPath.length > 0;
     },
   },

@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="params" label-width="100px" :inline="true">
-      <el-form-item label="盤點單號碼">
+      <el-form-item label="盤點料品號">
         <el-input
           v-model="params.prodCode"
           @keyup.enter.native="onLoad()"
@@ -60,7 +60,7 @@
       @afterClosed="onModalClose"
     >
       <el-form :model="params" label-width="100px" :inline="true">
-        <el-form-item label="盤點單號碼">
+        <el-form-item label="料品號">
           <el-input
             v-model="params.prodCode"
             @keyup.enter.native="onLoadToday()"

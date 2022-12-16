@@ -66,7 +66,7 @@ export function setInvInvalid(docNo, status) {
  * @returns 
  */
 export function setInvDetail(detailId, isFinish, data) {
-  const uri = `/api/inventory/start/${detailId}/${isFinish}`;
+  const uri = `/api/inventory/detail/${detailId}/${isFinish}`;
   const method = "PUT";
   return new Promise((resolve) => {
     request({
@@ -230,6 +230,18 @@ export function getInvAdjustments(prodCode) {
 export function getInvAvailables(prodCode) {
   return request({
     url: `/api/inventory/available/search?prodCode=${prodCode}`,
+    method: "GET",
+  });
+}
+/**
+ * A7-27 取得盤點單明細 
+ * @param {*} detailId 
+ * @param {*} carrieId 
+ * @returns 
+ */
+export function setInventoryDetail(detailId, carrieId) {
+  return request({
+    url: `/api/inventory/detail/${detailId}/${carrieId}`,
     method: "GET",
   });
 }

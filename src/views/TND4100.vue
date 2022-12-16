@@ -47,8 +47,8 @@
       </el-table-column>
     </el-table>
 
-        <!-- 加工後物流箱條碼 -->
-        <el-row>
+    <!-- 加工後物流箱條碼 -->
+    <el-row>
       <el-col :span="18">
         <el-form class="mt-1" label-width="220px" :inline="true">
           <el-form-item label="請刷讀加工物流箱編號條碼">
@@ -249,8 +249,6 @@
         </template>
       </el-table-column>
     </el-table>
-
-
   </div>
 </template>
 <script>
@@ -304,7 +302,7 @@ export default {
     },
     canClose() {
       // 判斷是否能結束
-
+      // 1.無加工單 不能結束此單 push
       return false;
     },
   },
@@ -336,8 +334,6 @@ export default {
       const resp = await closeProcess(this.process.sysOrderNo);
       if (resp.title == "successful") {
         this.onNav("/TND4001");
-      } else {
-        this.warning(resp.message);
       }
     },
     // 拿取完成
@@ -393,7 +389,7 @@ export default {
       }
       val.prodQty = parseInt(val.outQty) + parseInt(val.prodQty);
       val.outQty = "";
-   
+
       this.setSourceDetail(val);
     },
     // 加工加總數量
@@ -412,11 +408,10 @@ export default {
     // 取下
     onRemove(val) {
       takeProcessingDetail(val).then((resp) => {
-        if (resp.title = "successful"){
+        if ((resp.title = "successful")) {
           this.onLoad();
           console.log(resp);
         }
-  
       });
     },
     // 刪除

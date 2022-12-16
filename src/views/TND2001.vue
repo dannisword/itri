@@ -290,7 +290,7 @@ export default {
       // 確認作業模式
       if (this.currentModel().id != 0 && this.currentModel().id != 1) {
         this.warning("請切換作業模式");
-        return;
+        //return;
       }
       startInbound(val.sysOrderNo).then((resp) => {
         if (resp.status == "OK") {
