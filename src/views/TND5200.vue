@@ -6,7 +6,12 @@
         <el-input v-model="adjustment.docStatusLabel" disabled></el-input>
       </el-form-item>
       <el-button type="primary" @click="onNav('/TND5002')">回列表</el-button>
-      <el-button type="success" @click="onClose()">結束此單作業</el-button>
+      <el-button
+        type="success"
+        @click="onClose()"
+        :disabled="canFinish == false"
+        >結束此單作業</el-button
+      >
     </el-form>
 
     <!-- 異動單 -->
@@ -127,6 +132,15 @@ export default {
   created() {
     this.onLoad();
   },
+  computed: {
+    canFinish() {
+      // 切換盤點作業
+      if (this.currentModelId() != 4) {
+        //return false;
+      }
+      return this.adjustment.isFinished;
+    },
+  },
   methods: {
     onLoad() {
       this.adjustments = [];
@@ -140,6 +154,10 @@ export default {
       getAdjustmentDetail(this.$route.params.id).then((resp) => {
         if (resp.title == "successful") {
           this.details = resp.message;
+          let seq = 1;
+          for (let detail of this.details) {
+            detail.seq = seq++;
+          }
         }
       });
     },
@@ -147,7 +165,8 @@ export default {
       setAdjustmentFinish(this.adjustment.sysOrderNo).then((resp) => {
         console.log(resp);
         if ((resp.title = "successful")) {
-          this.onLoad();
+          //this.onLoad();
+          this.onNav("/TND5002");
         }
       });
     },
