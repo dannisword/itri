@@ -188,6 +188,7 @@
       :optional="Small"
       @afterClosed="onModalClose"
     >
+      <h2>有盤差，請選擇後續作業方式</h2>
       <div class="form-center">
         <el-form :inline="false">
           <el-form-item class="form-button">
@@ -317,11 +318,10 @@ export default {
       if (this.currentModelId() != 4) {
         //return false;
       }
-      if (this.inventory.isFinished == true) {
-        return true;
+      if (this.inventory.docStatus > 3) {
+        return false;
       }
       var data = this.details.filter((x) => x.isFinished == false);
-      console.log(data);
       return data.length > 0 ? false : true;
     },
   },
@@ -495,7 +495,6 @@ export default {
       // A1-46 I,O,PR,IN
 
       resp = await carrierArrived(this.inventory.sysOrderNo, "盤點");
-      console.log(resp);
       if (resp.title == "successful") {
         this.info.part = resp.message.part;
         this.info.total = resp.message.total;

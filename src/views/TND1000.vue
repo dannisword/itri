@@ -135,14 +135,6 @@
       >
         <el-table-column type="selection"></el-table-column>
 
-        <!-- 
-        <el-table-column label="今日簽入" prop="selected">
-          <template slot-scope="scope">
-            <el-checkbox v-model="scope.row.selected"></el-checkbox>
-          </template>
-        </el-table-column>
-        -->
-
         <el-table-column label="上一次簽入者" prop="haveSignInBefore">
           <template slot-scope="scope">
             <el-checkbox
@@ -153,6 +145,8 @@
         </el-table-column>
         <el-table-column label="員工編號" prop="employeeId"> </el-table-column>
         <el-table-column label="員工姓名" prop="employeeName">
+        </el-table-column>
+        <el-table-column label="簽入站點" prop="todaySignInWorkStationId">
         </el-table-column>
       </el-table>
     </ModalDialog>
@@ -199,13 +193,6 @@
         @selection-change="onSelectionOutChange"
       >
         <el-table-column type="selection"></el-table-column>
-        <!-- 
-        <el-table-column label="今日簽出" prop="selected">
-          <template slot-scope="scope">
-            <el-checkbox v-model="scope.row.selected"></el-checkbox>
-          </template>
-        </el-table-column>
-        -->
         <el-table-column label="員工編號" prop="employeeId"></el-table-column>
         <el-table-column label="員工姓名" prop="employeeName">
         </el-table-column>
@@ -400,8 +387,13 @@ export default {
       };
       const query = this.getQuery(p);
       getEmployees(query).then((resp) => {
-        if (resp.status == "OK") {
+        if (resp.title == "successful") {
           this.emps = resp.message;
+          this.$nextTick(function () {
+            for (let emp of this.emps) {
+              this.$refs.signInTable.toggleRowSelection(emp, emp.todaySignIn);
+            }
+          });
         }
       });
     },

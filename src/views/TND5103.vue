@@ -170,10 +170,11 @@ export default {
         });
     },
     onLoadToday() {
+      /*
       if (this.params.prodCode.length <= 0) {
         this.warning(`請輸入盤點料品號！`);
         return;
-      }
+      }*/
       this.params.date = this.toDate(this.nowDate);
       const query = this.getQuery(this.params);
       this.loading = true;
@@ -235,7 +236,8 @@ export default {
         }
         this.success("存盤點單成功！");
         this.dialogs.inv.visible = false;
-        this.onLoad();
+        this.onNav('/TND5001')
+        //this.onLoad();
       });
     },
     onCurrentChange(val) {
