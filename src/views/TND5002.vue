@@ -94,7 +94,7 @@
 
         <el-table-column
           label="盤點單號碼"
-          prop="sysOrderNo"
+          prop="inventoryNo"
           sortable="custom"
           min-width="200"
           fixed
