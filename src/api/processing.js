@@ -247,11 +247,12 @@ export function delProcessingDetail(data) {
 
 /**
  * A5-25 依操作單號製單，然後產生配箱
- * @param {*} docNo
- * @returns
+ * @param {*} docType 
+ * @param {*} docNo 
+ * @returns 
  */
-export function getProcessAssign(docNo) {
-  const uri = `/api/processing/assign/${docNo}`;
+export function getProcessAssign(docType, docNo) {
+  const uri = `/api/processing/assign/${docType}/${docNo}`;
   const method = "POST";
   return new Promise((resolve) => {
     request({

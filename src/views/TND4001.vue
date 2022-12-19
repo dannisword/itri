@@ -322,7 +322,7 @@ export default {
         this.warning("查無此加工單號碼!");
         return;
       }
-      getProcessAssign(this.docNo).then((resp) => {
+      getProcessAssign("OP", this.docNo).then((resp) => {
         console.log(resp);
       });
     },
