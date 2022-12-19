@@ -20,7 +20,7 @@
       </el-form-item>
       <el-divider class="form-divider"></el-divider>
       <el-form-item>
-        <el-button type="success" @click="onLoad()">載入代盤點料件</el-button>
+        <el-button type="success" @click="onLoad()">載入待盤點料件</el-button>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSave()">儲存盤點單</el-button>
