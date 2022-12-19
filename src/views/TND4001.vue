@@ -317,7 +317,6 @@ export default {
         this.warning("請輸入加工單號碼!");
         return;
       }
-      console.log(this.docNo);
       const data = this.docs.filter((x) => x.value == this.docNo);
       if (data.length <= 0) {
         this.warning("查無此加工單號碼!");

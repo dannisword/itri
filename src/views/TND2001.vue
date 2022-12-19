@@ -61,7 +61,11 @@
         </el-form-item>
 
         <el-form-item label="入庫單號碼">
-          <el-input v-model="params.sysOrderNo"></el-input>
+          <el-input v-model="params.refNo"></el-input>
+        </el-form-item>
+
+        <el-form-item label="事務號">
+          <el-input v-model="params.transNo"></el-input>
         </el-form-item>
 
         <el-form-item label="料品號">
@@ -78,12 +82,36 @@
 
     <!-- 分頁 -->
     <el-row class="mt-1" type="flex">
-      <el-col :span="10">
-        入庫最新收單時間：{{ receiveInfo.lastDateTime }} 入庫最新收單數量：{{
-          receiveInfo.lastCount
-        }}單
+      <el-col :span="16">
+        <el-form class="mt-1" label-width="140px" :inline="true">
+          <el-form-item label="請輸入操作單號">
+            <el-autocomplete
+              class="inline-input"
+              v-model="docNo"
+              :fetch-suggestions="onSearchDocs"
+              placeholder="請輸入操作單號"
+            >
+              <el-button
+                slot="append"
+                icon="el-icon-search"
+                @click="getProcessDocs"
+              >
+              </el-button>
+            </el-autocomplete>
+          </el-form-item>
+          <el-button
+            icon="el-icon-plus"
+            @click="getProcessAssign"
+            type="primary"
+          >
+          </el-button>
+          <el-form-item> </el-form-item>
+          入庫最新收單時間：{{ receiveInfo.lastDateTime }} 入庫最新收單數量：{{
+            receiveInfo.lastCount
+          }}單
+        </el-form>
       </el-col>
-      <el-col :span="14" align="end">
+      <el-col :span="8" align="end">
         <el-pagination
           background
           @current-change="onCurrentChange"
@@ -116,7 +144,7 @@
       </el-table-column>
       <el-table-column
         label="入庫單號碼"
-        prop="sysOrderNo"
+        prop="refNo"
         min-width="180"
         sortable="custom"
       >
@@ -175,6 +203,7 @@ import pageMixin from "@/utils/mixin";
 import { getInbounds, startInbound } from "@/api/inbound";
 import { getReceiveInfo } from "@/api/system";
 import { SelectTypeEnum, RunModelEnum } from "@/utils/enums/index";
+import { getProcessDocs, getProcessAssign } from "@/api/processing";
 
 export default {
   components: {
@@ -188,6 +217,8 @@ export default {
       workStations: [],
       nowDate: [],
       receiveInfo: {},
+      docs: [],
+      docNo: "",
       params: {
         assignWorkStationId: "",
         direction: "ASC",
@@ -197,9 +228,11 @@ export default {
         properties: "id",
         receivedEndDateTime: "",
         receivedStartDateTime: "",
-        receiveSource: "",
+        receiveSource: [],
+        refNo: "", // 移轉單號
         size: 50,
-        sysOrderNo: "",
+        sysOrderNo: "", // 入庫單號
+        transNo: "", // 事務單號
       },
       inStatus: [],
       inSource: [],
@@ -243,6 +276,7 @@ export default {
     });
 
     this.onLoad();
+    this.getProcessDocs();
     //this.connect();
   },
   methods: {
@@ -268,6 +302,13 @@ export default {
         .catch((e) => {
           this.loading = false;
         });
+    },
+    onSearchDocs(queryString, cb) {
+      var restaurants = this.docs;
+      var results = queryString
+        ? restaurants.filter(this.createFilter(queryString))
+        : restaurants;
+      cb(results);
     },
     async onSortcChange(val) {
       if (val.order == null) {
@@ -344,6 +385,32 @@ export default {
       } catch (e) {
         console.log("mqtt.connect error", e);
       }
+    },
+    getProcessDocs() {
+      getProcessDocs().then((resp) => {
+        if (resp.status == "OK") {
+          this.docs = resp.message;
+        }
+      });
+    },
+    getProcessAssign() {
+      if (this.docNo.length <= 0) {
+        this.warning("請輸入加工單號碼!");
+        return;
+      }
+      const data = this.docs.filter((x) => x.value == this.docNo);
+      if (data.length <= 0) {
+        this.warning("查無此加工單號碼!");
+        return;
+      }
+      getProcessAssign(this.docNo).then((resp) => {
+        console.log(resp);
+      });
+    },
+    createFilter(val) {
+      return (resp) => {
+        return resp.value.toLowerCase().indexOf(val.toLowerCase()) === 0;
+      };
     },
   },
 };

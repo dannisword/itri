@@ -56,7 +56,11 @@
         </el-form-item>
 
         <el-form-item label="出庫單號碼">
-          <el-input v-model="params.sysOrderNo"></el-input>
+          <el-input v-model="params.refNo"></el-input>
+        </el-form-item>
+
+        <el-form-item label="事務號">
+          <el-input v-model="params.transNo"></el-input>
         </el-form-item>
 
         <el-form-item label="料品號">
@@ -113,7 +117,7 @@
       </el-table-column>
       <el-table-column
         label="出庫單號碼"
-        prop="sysOrderNo"
+        prop="refNo"
         min-width="180"
         sortable="custom"
       >
@@ -198,8 +202,10 @@ export default {
         properties: "id",
         receivedEndDateTime: "",
         receivedStartDateTime: "",
+        refNo: "", // 移轉單號
         size: 50,
         sysOrderNo: "",
+        transNo: "",
       },
     };
   },
@@ -268,7 +274,6 @@ export default {
       await this.onLoad();
     },
     ondblClick(val) {
-      console.log(val)
       startOutbound(val.sysOrderNo).then((resp) => {
         if (resp.title == "successful") {
           this.onNav(`/TND3100/${val.id}`);
