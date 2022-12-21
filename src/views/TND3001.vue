@@ -274,6 +274,11 @@ export default {
       await this.onLoad();
     },
     ondblClick(val) {
+      // 唯讀模式
+      if (this.isReadOnly() == true) {
+        this.onNav(`/TND3100/${val.id}`);
+        return;
+      }
       startOutbound(val.sysOrderNo).then((resp) => {
         if (resp.title == "successful") {
           this.onNav(`/TND3100/${val.id}`);

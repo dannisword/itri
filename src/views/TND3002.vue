@@ -19,7 +19,7 @@
             <el-button
               type="primary"
               @click="onShuttle()"
-              :disabled="isRunning == true"
+              :disabled="isRunning == true || isReadOnly() == true"
               >空箱出庫</el-button
             >
             <el-button type="danger" @click="onStop()" v-if="isRunning == true"

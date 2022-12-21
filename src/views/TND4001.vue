@@ -317,11 +317,12 @@ export default {
         this.warning("請輸入加工單號碼!");
         return;
       }
+      /*
       const data = this.docs.filter((x) => x.value == this.docNo);
       if (data.length <= 0) {
         this.warning("查無此加工單號碼!");
         return;
-      }
+      }*/
       getProcessAssign("OP", this.docNo).then((resp) => {
         console.log(resp);
       });

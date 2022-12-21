@@ -85,6 +85,15 @@
       <el-col :span="16">
         <el-form class="mt-1" label-width="140px" :inline="true">
           <el-form-item label="請輸入操作單號">
+            <el-input v-model="docNo" placeholder="請輸入操作單號">
+              <el-button
+                slot="append"
+                icon="el-icon-plus"
+                @click="getProcessAssign"
+              >
+              </el-button>
+            </el-input>
+            <!-- 
             <el-autocomplete
               class="inline-input"
               v-model="docNo"
@@ -98,13 +107,8 @@
               >
               </el-button>
             </el-autocomplete>
+          -->
           </el-form-item>
-          <el-button
-            icon="el-icon-plus"
-            @click="getProcessAssign"
-            type="primary"
-          >
-          </el-button>
           <el-form-item> </el-form-item>
           入庫最新收單時間：{{ receiveInfo.lastDateTime }} 入庫最新收單數量：{{
             receiveInfo.lastCount
@@ -276,7 +280,7 @@ export default {
     });
 
     this.onLoad();
-    this.getProcessDocs();
+    //this.getProcessDocs();
     //this.connect();
   },
   methods: {
@@ -398,11 +402,12 @@ export default {
         this.warning("請輸入加工單號碼!");
         return;
       }
+      /*
       const data = this.docs.filter((x) => x.value == this.docNo);
       if (data.length <= 0) {
         this.warning("查無此加工單號碼!");
         return;
-      }
+      }*/
       getProcessAssign("IN", this.docNo).then((resp) => {
         console.log(resp);
       });
