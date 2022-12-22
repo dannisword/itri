@@ -125,7 +125,7 @@
           <el-form-item label="姓名">
             <el-input v-model="user.userName"></el-input>
           </el-form-item>
-          <el-form-item label="角色名稱">
+          <el-form-item label="角色名稱" prop="userRoles">
             <el-select v-model="userRoles" multiple placeholder="請選擇">
               <el-option
                 v-for="item in roles"
@@ -160,9 +160,9 @@
             ></el-date-picker>
           </el-form-item>
           <el-form-item v-if="user.id > 0">
-            <el-button type="success" @click="onChangPassword()"
-              >修改密碼</el-button
-            >
+            <el-button type="success" @click="onChangPassword()">
+              修改密碼
+            </el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -224,6 +224,13 @@ export default {
         callback();
       }
     };
+    const validateUserRole = (rule, value, callback) => {
+      console.log(value);
+      callback();
+      if (!value) {
+        callback(new Error("角色名稱，不可有空白格!"));
+      }
+    };
     return {
       rules: {
         account: [
@@ -234,6 +241,9 @@ export default {
         ],
         newPassword: [
           { required: true, trigger: "blur", validator: validatePassword },
+        ],
+        userRoles: [
+          { required: true, trigger: "blur", validator: validateUserRole },
         ],
       },
       loading: false,
@@ -275,7 +285,6 @@ export default {
       if (resp.title == "successful") {
         this.roles = resp.message;
       }
-      
     });
     // 狀態
     getSelector(SelectTypeEnum.ENABLED_TYPE).then((resp) => {

@@ -47,15 +47,15 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button type="warning" @click="onOpenModal('NEW')"
-            >新增物流箱</el-button
-          >
+          <el-button type="warning" @click="onOpenModal('NEW')">
+            新增物流箱
+          </el-button>
         </el-form-item>
 
         <el-form-item>
-          <el-button type="success" @click="onOpenModal('ALLOWED')"
-            >物流箱允入設定</el-button
-          >
+          <el-button type="success" @click="onOpenModal('ALLOWED')">
+            物流箱允入設定
+          </el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -67,9 +67,9 @@
         <el-button type="success" @click="onOpenModal('BATCH')"
           >批次更新狀態</el-button
         >
-        <el-button type="info" @click="onNav('/TND7011')"
-          >物流箱歷程查詢</el-button
-        >
+        <el-button type="info" @click="onNav('/TND7011')">
+          物流箱歷程查詢
+        </el-button>
       </el-col>
       <el-col :span="8" align="end">
         <el-pagination
@@ -168,6 +168,30 @@
       <el-input v-model="newNumber" type="number"></el-input>
     </ModalDialog>
 
+    <!-- 列印物流箱 -->
+    <ModalDialog
+      :title="dialogs.PRINT.title"
+      :name="dialogs.PRINT.name"
+      :visible.sync="dialogs.PRINT.visible"
+      :optional="dialogs.PRINT.optional"
+      @afterClosed="onModalClose"
+    >
+      <h3>您確定要列印 {{ newCarriers.length }} 個物流箱</h3>
+      <el-row class="mt-1">
+        <el-button type="primary" @click="onNewPrint(1)">
+          確定，列印物流箱編號
+        </el-button>
+      </el-row>
+      <el-row class="mt-1">
+        <el-button type="primary" @click="onNewPrint(0)">
+          確定，不列印物流箱編號
+        </el-button>
+      </el-row>
+      <el-row class="mt-1">
+        <el-button type="info" @click="onNewPrint(0)"> 取消 </el-button>
+      </el-row>
+    </ModalDialog>
+
     <!-- 物流箱允入設定 -->
     <ModalDialog
       :title="dialogs.ALLOWED.title"
@@ -239,7 +263,6 @@
       :optional="dialogs.BATCH.optional"
       @afterClosed="onBatch"
     >
-      <p>共選擇{{ selected.carriers.length }}個物流箱，請點擊按鍵以更新狀態</p>
     </ModalDialog>
   </div>
 </template>
@@ -273,6 +296,7 @@ export default {
       enabledTyps: [],
       carrier: {},
       carriers: [],
+      newCarriers: [],
       allowed: {
         emptyWeight: 0,
         tolerance: 0,
@@ -337,13 +361,22 @@ export default {
             showAction: true,
           },
         },
+        PRINT: {
+          title: "列印物流箱條碼",
+          name: "PRINT",
+          visible: false,
+          optional: {
+            size: "Small",
+            showAction: false,
+          },
+        },
       },
       newNumber: 0,
     };
   },
   created() {
-    this.nowDate.push(this.addDay(-30));
-    this.nowDate.push(this.addDay(0));
+    //this.nowDate.push(this.addDay(-30));
+    //this.nowDate.push(this.addDay(0));
     // 物流箱動作
     getSelector(SelectTypeEnum.CARRIER_STATUS).then((resp) => {
       this.carrierStatus = resp.message;
@@ -357,10 +390,12 @@ export default {
   methods: {
     onLoad() {
       this.loading = true;
-      this.params.startDate = this.toDate(this.nowDate[0]);
-      this.params.endDate = this.toDate(this.nowDate[1]);
+      this.params.page = 1;
+      if (this.nowDate[0] != null) {
+        this.params.startDate = this.toDate(this.nowDate[0]);
+        this.params.endDate = this.toDate(this.nowDate[1]);
+      }
       const query = this.getQuery(this.params);
-
       getCarriers(query)
         .then((resp) => {
           if (resp.status == "OK") {
@@ -457,6 +492,25 @@ export default {
         }
       });
     },
+    onModalClose(val) {
+      if (val.success == undefined) {
+        this.dialogs.PRINT.visible = false;
+      }
+    },
+    onNewPrint(val) {
+      this.dialogs.PRINT.visible = false;
+      // 列印條碼
+      const data = [];
+      if (val == 1) {
+        for (let item of this.newCarriers) {
+          data.push({
+            id: item,
+            printCounts: 1,
+          });
+        }
+        this.printBarcode(data);
+      }
+    },
     onPrint() {
       if (this.selected.carriers.length <= 0) {
         this.warning("您尚未勾選欲列印的項目");
@@ -469,6 +523,10 @@ export default {
           printCounts: 1,
         });
       });
+      this.printBarcode(data);
+    },
+    printBarcode(data) {
+      console.log(data)
       // 下載檔案
       const url = process.env.VUE_APP_BASE_API + "/api/carrier/barcode";
       const config = {
@@ -495,12 +553,6 @@ export default {
           link.click();
           URL.revokeObjectURL(link.href);
         });
-      /*
-      printBarcode(data).then((resp) => {
-        if (resp.status == "OK") {
-          this.success("列印物流箱條碼成功！");
-        }
-      });*/
     },
     blobToFile(theBlob, fileName) {
       //A Blob() is almost a File() - it's just missing the two properties below which we will add
@@ -518,10 +570,12 @@ export default {
       };
       const data = this.getQuery(param);
       addCarrier(data).then((resp) => {
-        if (resp.status == "OK") {
+        if (resp.title == "successful") {
           this.success("新增物流箱成功！");
           // TODO 列印提示
-          
+          this.newCarriers = resp.message.carrierIds;
+          console.log(this.newCarriers)
+          this.dialogs.PRINT.visible = true;
           this.onLoad();
         }
       });

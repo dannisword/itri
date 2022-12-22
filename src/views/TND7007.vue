@@ -210,16 +210,26 @@
       :optional="dialogs.assign.optional"
       @afterClosed="onModalClose"
     >
-      <el-form :model="assign" label-width="100px">
-        <el-form-item label="走道">
+      <el-form :model="assign" label-width="100px" :rules="rules">
+        <el-form-item label="走道" prop="aisle">
           <el-input v-model="assign.aisle"></el-input>
         </el-form-item>
-        <el-form-item label="層">
+        <el-form-item label="層" prop="level">
           <el-input v-model="assign.level"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onAssign()">保留</el-button>
-          <el-button type="primary" @click="onAssign()">可用</el-button>
+          <el-button
+            type="primary"
+            @click="onAssign(1)"
+            :disabled="assign.aisle.length <= 0 || assign.level.length <= 0"
+            >保留</el-button
+          >
+          <el-button
+            type="primary"
+            @click="onAssign(0)"
+            :disabled="assign.aisle.length <= 0 || assign.level.length <= 0"
+            >可用</el-button
+          >
         </el-form-item>
       </el-form>
     </ModalDialog>
@@ -249,7 +259,17 @@ export default {
   },
   mixins: [pageMixin],
   data() {
+    const validateValue = (rule, value, callback) => {
+      if (value == "") {
+        callback(new Error("此欄位為必填值"));
+      }
+      callback();
+    };
     return {
+      rules: {
+        aisle: [{ required: true, trigger: "blur", validator: validateValue }],
+        level: [{ required: true, trigger: "blur", validator: validateValue }],
+      },
       locationStatus: [],
       loading: false,
       checkOnLock: true,
@@ -299,7 +319,7 @@ export default {
           },
         },
         LOCK: {
-          title: "物流箱允入設定",
+          title: "有儲位鎖定中",
           name: "LOCK",
           visible: false,
           optional: {
@@ -430,8 +450,14 @@ export default {
         this.setAssign(this.assign);
       }
     },
-    onAssign(){
-
+    onAssign(val) {
+      this.dialogs.assign.visible = false;
+      if (this.assign.aisle == "" || this.assign.level == "") {
+        this.warning("更新指定層，未輸入完整！");
+        return;
+      }
+      this.assign.status = val;
+      this.setAssign(this.assign);
     },
     onMessage(dialogRef) {
       this.dialogs.LOCK.visible = false;
@@ -462,6 +488,20 @@ export default {
       this.loading = true;
       setRange(this.checkOnLock, query)
         .then((resp) => {
+      
+          this.loading = false;
+          if (resp.title != "successful") {
+            this.checkOnLock = false;
+            this.message = resp.errorMessage;
+            this.dialogs.LOCK.visible = true;
+            return;
+          }
+          this.checkOnLock = true;
+          this.success("更新指定層完成");
+          this.onLoad();
+          this.assign.aisle = "";
+          this.assign.level = "";
+          /*
           this.checkOnLock = resp.status == 200 ? false : true;
           this.loading = false;
           if (resp.status == 200) {
@@ -473,7 +513,9 @@ export default {
             this.checkOnLock = true;
             this.success("更新指定層完成");
             this.onLoad();
-          }
+            this.assign.aisle = "";
+            this.assign.level = "";
+          }*/
         })
         .catch((e) => {
           this.loading = false;
