@@ -211,7 +211,7 @@ export function getEmptyRecords(params) {
 }
 
 /**
- * 停止空箱出庫
+ * A4-26 物流箱空箱出庫，未生效命令的停止
  * @param {*} station
  * @returns
  */
@@ -230,7 +230,7 @@ export function stopOutbound(station) {
 }
 
 /**
- * A4-27
+ * A4-27 取得出庫單明細
  * @param {*} docNo 
  * @param {*} carrieId 
  * @returns 

@@ -93,21 +93,6 @@
               >
               </el-button>
             </el-input>
-            <!-- 
-            <el-autocomplete
-              class="inline-input"
-              v-model="docNo"
-              :fetch-suggestions="onSearchDocs"
-              placeholder="請輸入操作單號"
-            >
-              <el-button
-                slot="append"
-                icon="el-icon-search"
-                @click="getProcessDocs"
-              >
-              </el-button>
-            </el-autocomplete>
-          -->
           </el-form-item>
           <el-form-item> </el-form-item>
           入庫最新收單時間：{{ receiveInfo.lastDateTime }} 入庫最新收單數量：{{
@@ -280,7 +265,6 @@ export default {
     });
 
     this.onLoad();
-    //this.getProcessDocs();
     //this.connect();
   },
   methods: {
@@ -306,13 +290,6 @@ export default {
         .catch((e) => {
           this.loading = false;
         });
-    },
-    onSearchDocs(queryString, cb) {
-      var restaurants = this.docs;
-      var results = queryString
-        ? restaurants.filter(this.createFilter(queryString))
-        : restaurants;
-      cb(results);
     },
     async onSortcChange(val) {
       if (val.order == null) {
@@ -389,13 +366,6 @@ export default {
       } catch (e) {
         console.log("mqtt.connect error", e);
       }
-    },
-    getProcessDocs() {
-      getProcessDocs().then((resp) => {
-        if (resp.status == "OK") {
-          this.docs = resp.message;
-        }
-      });
     },
     getProcessAssign() {
       if (this.docNo.length <= 0) {

@@ -177,7 +177,6 @@ export default {
       const query = this.getQuery(this.params);
       getEmptyRecords(query)
         .then((resp) => {
-          console.log(resp);
           if (resp.status == "OK") {
             this.content = resp.message.content;
             // 分頁設定

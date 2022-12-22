@@ -169,34 +169,7 @@
         sortable="custom"
       >
       </el-table-column>
-      <!-- 
-      <el-table-column label="動作" width="200" align="center">
-        <template slot-scope="scope">
-          <div v-if="currentModelId() == 4">
-            <el-button
-              @click="onEffect(scope.row)"
-              size="mini"
-              type="primary"
-              v-if="canEffectAction(scope.row)"
-              >生效
-            </el-button>
-            <el-button
-              @click="onInvalid(scope.row)"
-              size="mini"
-              v-if="canInvalidAction(scope.row)"
-              >失效
-            </el-button>
-
-            <el-button
-              @click="onReduction(scope.row)"
-              size="mini"
-              v-if="canReductionAction(scope.row)"
-              >還原
-            </el-button>
-          </div>
-        </template>
-      </el-table-column>
-    -->
+     
     </el-table>
   </div>
 </template>
@@ -284,9 +257,7 @@ export default {
               this.page.seq++;
               item.seq = this.page.seq;
             }
-            setTimeout(() => {
-              this.loading = false;
-            }, 300);
+            this.loading = false;
           }
         })
         .catch((e) => {
@@ -295,42 +266,6 @@ export default {
     },
     onAdd() {
       this.onNav("TND5103");
-    },
-    onEffect(val) {
-      setInvEffect(val.sysOrderNo).then((resp) => {
-        if (resp.status == "OK") {
-          if (resp.message == false) {
-            this.warning(`設定生效，${val.sysOrderNo}盤點單失敗！`);
-          } else {
-            this.onNav(`/TND5100/0/${val.id}`);
-          }
-        }
-      });
-    },
-    onInvalid(val) {
-      //狀態(0:還原, 2:工作執行中, 5:失效)
-      setInvInvalid(val.sysOrderNo, 5).then((resp) => {
-        if (resp.status == "OK") {
-          if (resp.message == false) {
-            this.warning(`設定失效，${val.sysOrderNo}盤點單失敗！`);
-          } else {
-            this.success(`設定失效，${val.sysOrderNo}盤點單成功！`);
-          }
-        }
-        this.onLoad();
-      });
-    },
-    onReduction(val) {
-      setInvInvalid(val.sysOrderNo, 0).then((resp) => {
-        if (resp.status == "OK") {
-          if (resp.message == false) {
-            this.warning(`設定還原，${val.sysOrderNo}盤點單失敗！`);
-          } else {
-            this.success(`設定還原，${val.sysOrderNo}盤點單成功！`);
-          }
-        }
-        this.onLoad();
-      });
     },
     async onSortcChange(val) {
       if (val.order == null) {
@@ -362,39 +297,6 @@ export default {
       }
       this.onNav(url);
       return;
-      //#region  原需求
-      if (
-        val.docStatus == InvDocStatusEnum.Received ||
-        val.docStatus == InvDocStatusEnum.Invalid
-      ) {
-        return;
-      }
-      //let url = "";
-      if (
-        val.docStatus == InvDocStatusEnum.Progress ||
-        val.docStatus == InvDocStatusEnum.Completed
-      ) {
-        url = `/TND5100/1/${val.id}`;
-      }
-      // 完成
-      if (val.docStatus == InvDocStatusEnum.Finished) {
-        url = `/TND5101/2/${val.id}`;
-      }
-
-      if (val.docStatus == InvDocStatusEnum.Completed) {
-        //url = `/TND5102/3/${val.id}`;
-      }
-      this.onNav(url);
-      //#endregion
-    },
-    canEffectAction(row) {
-      return row.docStatus == InvDocStatusEnum.Received;
-    },
-    canInvalidAction(row) {
-      return row.docStatus == InvDocStatusEnum.Received;
-    },
-    canReductionAction(row) {
-      return row.docStatus == InvDocStatusEnum.Invalid;
     },
   },
 };

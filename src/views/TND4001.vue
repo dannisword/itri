@@ -72,21 +72,7 @@
               >
               </el-button>
             </el-input>
-            <!-- 
-            <el-autocomplete
-              class="inline-input"
-              v-model="docNo"
-              :fetch-suggestions="onSearchDocs"
-              placeholder="請輸入操作單號"
-            >
-              <el-button
-                slot="append"
-                icon="el-icon-search"
-                @click="getProcessDocs"
-              >
-              </el-button>
-            </el-autocomplete>
--->
+   
           </el-form-item>
           <el-form-item> </el-form-item>
           加工最新收單時間：{{ receiveInfo.lastDateTime }} 加工最新收單數量：{{
@@ -221,7 +207,6 @@ export default {
     // TODO
     this.nowDate.push(this.addDay(-7));
     this.nowDate.push(this.addDay(0));
-    console.log(ProcessingStatusEnum.Received);
 
     this.getSelector(SelectTypeEnum.WORK_STATION).then((resp) => {
       this.workStations = resp;
@@ -241,7 +226,6 @@ export default {
       }
     });
     this.onLoad();
-    //this.getProcessDocs();
   },
   methods: {
     onLoad() {
@@ -257,7 +241,6 @@ export default {
           for (let item of this.content) {
             this.page.seq++;
             item.seq = this.page.seq;
-            //item.status = 0;
           }
         }
       });
@@ -290,30 +273,15 @@ export default {
       this.onLoad();
     },
     ondblClick(val) {
-      //this.onNav(`/TND4100/${val.id}`);
-      //return;
+     // 唯讀模式
+     if (this.isReadOnly() == true) {
+        this.onNav(`/TND4100/${val.id}`);
+        return;
+      }
       startProcess(val.sysOrderNo).then((resp) => {
         if (resp.title == "successful") {
           this.onNav(`/TND4100/${val.id}`);
         }
-      });
-    },
-    onSearchDocs(queryString, cb) {
-      var restaurants = this.docs;
-      var results = queryString
-        ? restaurants.filter(this.createFilter(queryString))
-        : restaurants;
-      cb(results);
-    },
-    /**
-     * A5-27 取得操作單號的下拉選單選項
-     */
-    getProcessDocs() {
-      getProcessDocs().then((resp) => {
-        if (resp.status == "OK") {
-          this.docs = resp.message;
-        }
-        console.log(resp);
       });
     },
     getProcessAssign() {
@@ -338,8 +306,8 @@ export default {
     },
     canDelete(row) {
       return (
-        row.status == ProcessingStatusEnum.Received ||
-        row.status == ProcessingStatusEnum.Invalid
+        row.docStatus == ProcessingStatusEnum.Received ||
+        row.docStatus == ProcessingStatusEnum.Invalid ? true: false
       );
     },
   },
