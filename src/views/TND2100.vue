@@ -40,7 +40,7 @@
 
       <el-table-column
         label="入庫單號碼"
-        prop="sysOrderNo"
+        prop="refNo"
         min-width="180"
       ></el-table-column>
 
@@ -81,14 +81,14 @@
         <el-input
           v-model="carrierId"
           @keyup.enter.native="setBarcode(carrierId)"
-          :disabled="isFinished == true"
+          :disabled="isFinished == true || isReadOnly() == true"
         ></el-input>
       </el-form-item>
       <el-form-item>
         <el-button
           type="primary"
           @click="onCallback()"
-          :disabled="this.carrierId.length <= 0"
+          :disabled="this.carrierId.length <= 0 || isReadOnly() == true"
         >
           料盒連動測試
         </el-button>
@@ -157,7 +157,7 @@
             class="cell-button"
             type="number"
             v-model="scope.row.inQty"
-            min="0"
+            min="0.0"
             @keyup.enter.native="onAddProdQty(scope.row)"
             v-if="scope.row.isFinished == false"
           >
@@ -168,12 +168,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="帳差" prop="differenceQty">
+      <el-table-column label="帳差" prop="differenceQty" min-width="180">
         <template slot-scope="scope">
           <el-input
             class="cell-button"
             type="number"
             v-model="scope.row.differenceQty"
+            min="0.0"
             v-if="scope.row.isFinished == false"
           ></el-input>
           <span v-else>{{ scope.row.differenceQty }}</span>
@@ -257,17 +258,17 @@ export default {
   methods: {
     onLoad() {
       const inboundId = this.$route.params.id;
-      this.inbound = {};
-      this.inbounds = [];
       //  主檔資料
       getInbound(inboundId).then((resp) => {
         if (resp.title == "successful") {
-          let seq = 1;
           for (let item of resp.message) {
             item.seq = 1;
           }
           this.inbounds = resp.message;
           this.inbound = this.inbounds[0];
+        } else {
+          this.inbound = {};
+          this.inbounds = [];
         }
       });
       // 明細資料
@@ -349,7 +350,7 @@ export default {
         this.warning("請輸入數量");
         return;
       }
-      val.prodQty = parseInt(val.inQty) + parseInt(val.prodQty);
+      val.prodQty = parseFloat(val.inQty) + parseFloat(val.prodQty);
       val.inQty = "";
     },
     onFinish(val) {
@@ -368,10 +369,10 @@ export default {
         sysOrderNo: this.inbound.sysOrderNo,
         prodCode: this.inbound.prodCode,
         prodInboundDate: this.addDay(0),
-        weightPlanQty: 0,
-        prodQty: 0,
-        differenceQty: 0,
-        weight: 0,
+        weightPlanQty: 0.0,
+        prodQty: 0.0,
+        differenceQty: 0.0,
+        weight: 0.0,
         carrierId: carrierId,
         isFinished: false,
       };
@@ -399,6 +400,10 @@ export default {
       this.imgs = [];
       getInboundImage(id).then((resp) => {
         if (resp.title == "successful") {
+          if (resp.message.imgList.length <= 0) {
+            this.imgs.push(config.coming_soon);
+            return;
+          }
           for (let item of resp.message.imgList) {
             const img = `data:image/png;base64, ${item}`;
             this.imgs.push(img);
@@ -410,7 +415,7 @@ export default {
       });
     },
     setInboundDetail(data) {
-      data.prodQty = parseInt(data.prodQty);
+      data.prodQty = parseFloat(data.prodQty);
       setInboundDetail(data).then((resp) => {
         if (resp.status == "OK") {
           this.onLoad();

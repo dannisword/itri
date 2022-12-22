@@ -44,7 +44,7 @@
         </el-form-item>
 
         <el-form-item label="異動單號碼">
-          <el-input v-model="params.sysOrderNo"></el-input>
+          <el-input v-model="params.docNo"></el-input>
         </el-form-item>
 
         <el-form-item label="料品號">
@@ -159,7 +159,7 @@ export default {
       params: {
         direction: "ASC",
         docNo: "",
-        docStatus: [],
+        docStatus: [0, 1, 2],
         endDate: "",
         page: 1,
         prodCode: "",

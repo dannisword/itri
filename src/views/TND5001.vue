@@ -3,7 +3,7 @@
     <div class="form-container">
       <!-- 查詢條件 -->
       <el-form :model="params" label-width="100px" :inline="true">
-        <el-form-item label="盤點日期">
+        <el-form-item label="單據建立日期">
           <el-date-picker
             v-model="nowDate"
             type="daterange"
@@ -56,7 +56,7 @@
         </el-form-item>
 
         <el-form-item label="盤點單號碼">
-          <el-input v-model="params.sysOrderNo"></el-input>
+          <el-input v-model="params.docNo"></el-input>
         </el-form-item>
 
         <el-form-item label="料品號">
@@ -196,7 +196,7 @@ export default {
       params: {
         direction: "ASC",
         docNo: "",
-        docStatus: [],
+        docStatus: [0, 1, 2],
         endDate: "",
         page: 1,
         prodCode: "",
@@ -285,7 +285,7 @@ export default {
         url = `/TND5100/1/${val.id}`;
       }
       if (val.type == "複盤") {
-        url = `/TND5100/1/${val.id}`;
+        url = `/TND5102/1/${val.id}`;
       }
       if (val.docStatus == InvDocStatusEnum.Received) {
         setInvEffect(val.sysOrderNo).then((resp) => {

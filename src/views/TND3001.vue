@@ -111,21 +111,28 @@
       <el-table-column
         label="出貨模式"
         prop="docType"
-        min-width="180"
+        min-width="160"
         sortable="custom"
       >
       </el-table-column>
       <el-table-column
         label="出庫單號碼"
         prop="refNo"
-        min-width="180"
+        min-width="160"
+        sortable="custom"
+      >
+      </el-table-column>
+      <el-table-column
+        label="事務號"
+        prop="transNo"
+        min-width="160"
         sortable="custom"
       >
       </el-table-column>
       <el-table-column
         label="料品號"
         prop="prodCode"
-        min-width="180"
+        min-width="160"
         sortable="custom"
       >
       </el-table-column>
@@ -147,7 +154,7 @@
         label="出庫單狀態"
         prop="docStatusName"
         sortable="custom"
-        min-width="180"
+        min-width="160"
       >
       </el-table-column>
       <el-table-column
@@ -195,7 +202,7 @@ export default {
       params: {
         assignWorkStationId: [],
         direction: "ASC",
-        docStatus: 0,
+        docStatus: [0, 1, 2],
         docType: "0",
         page: 1,
         prodCode: "",
@@ -269,8 +276,12 @@ export default {
       if (val.order == null) {
         return;
       }
+      let prop = val.prop;
+      if (prop == "docStatusName") {
+        prop = "docStatus";
+      }
       this.params.direction = val.order == "ascending" ? "ASC" : "DESC";
-      this.params.properties = val.prop;
+      this.params.properties = prop;
       await this.onLoad();
     },
     ondblClick(val) {
@@ -279,11 +290,17 @@ export default {
         this.onNav(`/TND3100/${val.id}`);
         return;
       }
-      startOutbound(val.sysOrderNo).then((resp) => {
-        if (resp.title == "successful") {
-          this.onNav(`/TND3100/${val.id}`);
-        }
-      });
+      this.loading = true;
+      startOutbound(val.sysOrderNo)
+        .then((resp) => {
+          this.loading = false;
+          if (resp.title == "successful") {
+            this.onNav(`/TND3100/${val.id}`);
+          }
+        })
+        .catch((e) => {
+          this.loading = false;
+        });
     },
     onCurrentChange(val) {},
   },

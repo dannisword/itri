@@ -532,7 +532,7 @@ export default {
         return;
       }
       // 轉型
-      this.allowed.weightLimit = parseInt(this.allowed.weightLimit);
+      this.allowed.weightLimit = parseFloat(this.allowed.weightLimit);
       configCarrier(this.allowed).then((resp) => {
         if (resp.status == "OK") {
           this.success("物流箱允入設定成功！");

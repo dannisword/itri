@@ -210,11 +210,11 @@ export default {
       docNo: "",
       params: {
         assignWorkStationId: "",
-        direction: "ASC",
-        docStatus: 0,
+        direction: "DESC",
+        docStatus: [0, 1],
         page: 1,
         prodCode: "",
-        properties: "id",
+        properties: "docStatus",
         receivedEndDateTime: "",
         receivedStartDateTime: "",
         receiveSource: [],
@@ -295,8 +295,12 @@ export default {
       if (val.order == null) {
         return;
       }
+      let prop = val.prop;
+      if (prop == "docStatusName") {
+        prop = "docStatus";
+      }
       this.params.direction = val.order == "ascending" ? "ASC" : "DESC";
-      this.params.properties = val.prop;
+      this.params.properties = prop;
       await this.onLoad();
     },
     onCurrentChange(val) {

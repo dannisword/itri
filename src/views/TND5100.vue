@@ -16,13 +16,10 @@
       </el-col>
       <el-col> </el-col>
       <el-col>
-        <!-- 
-        尚有{{ info.lastCount }}筆工作
-        -->
         <el-button
           type="success"
           @click="onClose('CHECK')"
-          :disabled="canFinish == false"
+          :disabled="canFinish == false || isReadOnly() == true"
         >
           結束此單作業
         </el-button>
@@ -79,7 +76,7 @@
             v-model="carrier.inBarcode"
             placeholder="請刷讀盤點前物流箱編號條碼"
             @keyup.enter.native="setBarcode(0)"
-            :disabled="isFinished == true"
+            :disabled="isFinished == true || isReadOnly() == true"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -90,7 +87,7 @@
             v-model="carrier.outBarcode"
             placeholder="請刷讀盤點後物流箱編號條碼"
             @keyup.enter.native="setBarcode(1)"
-            :disabled="isFinished == true"
+            :disabled="isFinished == true || isReadOnly() == true"
           ></el-input>
         </el-form-item>
         <el-form-item>
@@ -218,7 +215,7 @@
       :optional="Large"
     >
       <el-row :gutter="20">
-        <el-col :span="6"> 站點：{{ workStation() }} </el-col>
+        <el-col :span="6"> 站點：{{ inventory.assignWorkStationId }} </el-col>
       </el-row>
       <el-row class="mt-1" :gutter="20">
         <el-col :span="20"> 出庫單號碼{{ inventory.sysOrderNo }} </el-col>
@@ -260,6 +257,7 @@ import {
 } from "@/api/system";
 
 import { InvDocStatusEnum } from "@/utils/enums/index";
+import { f } from "diagram-vue";
 
 export default {
   components: {
@@ -321,6 +319,10 @@ export default {
       if (this.inventory.docStatus > 3) {
         return false;
       }
+      var data = this.details.filter((x) => x.isFinished == false);
+      return data.length > 0 ? false : true;
+    },
+    canClose() {
       var data = this.details.filter((x) => x.isFinished == false);
       return data.length > 0 ? false : true;
     },
@@ -398,7 +400,6 @@ export default {
       });
       await this.handleFlow();
     },
-
     // 結束此單
     onClose(action) {
       // 待盤點
@@ -406,7 +407,6 @@ export default {
         this.confirm("尚有待盤點的物流箱，無法結束此單作業", false);
         return;
       }
-
       // 待盤點的物流箱數量與 已盤點的物流箱數量不符，尚無法結束此單作業
       const docNo = this.inventory.sysOrderNo;
       setInvFinished(docNo, action).then((resp) => {
@@ -449,10 +449,10 @@ export default {
         this.warning(`請刷讀盤點後物流箱編號條碼`);
         return;
       }
-      if (parseInt(val.inQty) == NaN) {
+      if (parseFloat(val.inQty) == NaN) {
         return;
       }
-      val.prodQty = parseInt(val.inQty) + parseInt(val.prodQty);
+      val.prodQty = parseFloat(val.inQty) + parseFloat(val.prodQty);
       val.inQty = "";
 
       this.setDetail(val, false);
@@ -492,8 +492,6 @@ export default {
       if (resp.title == "successful") {
         this.info.lastCount = resp.message.lastCount;
       }*/
-      // A1-46 I,O,PR,IN
-
       resp = await carrierArrived(this.inventory.sysOrderNo, "盤點");
       if (resp.title == "successful") {
         this.info.part = resp.message.part;

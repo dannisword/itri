@@ -51,6 +51,7 @@
     <el-table
       :data="stocks"
       class="table-container"
+      v-loading="loading"
       border
       stripe
       @sort-change="onSortChange"
@@ -72,20 +73,30 @@
         sortable="custom"
       >
       </el-table-column>
-      <el-table-column label="供應商" prop="supplier" sortable="custom">
+      <el-table-column
+        label="供應商"
+        prop="supplier"
+        sortable="custom"
+        min-width="180"
+      >
       </el-table-column>
-      <el-table-column label="數量" prop="closingStock" sortable="custom">
+      <el-table-column
+        label="數量"
+        prop="closingStock"
+        sortable="custom"
+        min-width="180"
+      >
       </el-table-column>
       <el-table-column
         label="儲位編號"
-        width="150"
+        min-width="180"
         prop="stationId"
         sortable="custom"
       >
       </el-table-column>
       <el-table-column
         label="物流箱編號"
-        width="150"
+        min-width="180"
         prop="carrierId"
         sortable="custom"
       >
@@ -106,6 +117,7 @@ export default {
   mixins: [pageMixin],
   data() {
     return {
+      loading: false,
       nowDate: [],
       params: {
         carrierCode: "", // 物流箱編號
@@ -122,25 +134,33 @@ export default {
     };
   },
   created() {
-    this.nowDate.push(this.addDay(-60));
-    this.nowDate.push(this.addDay(0));
+    //this.nowDate.push(this.addDay(-60));
+    //this.nowDate.push(this.addDay(0));
     this.onLoad();
   },
   methods: {
     onLoad() {
-      this.params.startDate = this.toDate(this.nowDate[0]);
-      this.params.endDate = this.toDate(this.nowDate[1]);
+      this.loading = true;
+      if (this.nowDate[0] != null) {
+        this.params.startDate = this.toDate(this.nowDate[0]);
+        this.params.endDate = this.toDate(this.nowDate[1]);
+      }
       const query = this.getQuery(this.params);
-      getStocks(query).then((respone) => {
-        this.stocks = respone.message.content;
-        // 分頁設定
-        this.setPagination(respone.message);
-        // 處理項次
-        for (let stock of this.stocks) {
-          this.page.seq++;
-          stock.seq = this.page.seq;
-        }
-      });
+      getStocks(query)
+        .then((respone) => {
+          this.loading = false;
+          this.stocks = respone.message.content;
+          // 分頁設定
+          this.setPagination(respone.message);
+          // 處理項次
+          for (let stock of this.stocks) {
+            this.page.seq++;
+            stock.seq = this.page.seq;
+          }
+        })
+        .catch((e) => {
+          this.loading = false;
+        });
     },
     onChang(val) {
       const diff = moment(val[1]).diff(val[0], "days");

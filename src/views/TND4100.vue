@@ -7,8 +7,8 @@
             <el-input v-model="process.docStatusName" disabled></el-input>
           </el-form-item>
           <el-button type="primary" @click="onNav('/TND4001')"
-            >回列表</el-button
-          >
+            >回列表
+          </el-button>
         </el-form>
       </el-col>
       <el-col type="flex" justify="end" :span="12" style="text-align: right">
@@ -55,6 +55,7 @@
             <el-input
               v-model="carrier.targetId"
               @keyup.enter.native="setTargetBarcode(carrier.targetId)"
+              :disabled="isFinished == true || isReadOnly() == true"
             ></el-input>
           </el-form-item>
           <el-form-item>
@@ -153,10 +154,16 @@
             <el-input
               v-model="carrier.sourceId"
               @keyup.enter.native="setSourceBarcode(carrier.sourceId)"
+              :disabled="isFinished == true || isReadOnly() == true"
             ></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary"> 補料 </el-button>
+            <el-button
+              type="primary"
+              :disabled="isFinished == true || isReadOnly() == true"
+            >
+              補料
+            </el-button>
           </el-form-item>
         </el-form>
       </el-col>
@@ -214,8 +221,8 @@
             v-if="scope.row.isFinished == false"
           >
             <el-button slot="append" @click="onAddSource(scope.row)"
-              >加總數量</el-button
-            >
+              >加總數量
+            </el-button>
           </el-input>
         </template>
       </el-table-column>
@@ -387,7 +394,7 @@ export default {
         this.warning("請輸入數量");
         return;
       }
-      val.prodQty = parseInt(val.outQty) + parseInt(val.prodQty);
+      val.prodQty = parseFloat(val.outQty) + parseFloat(val.prodQty);
       val.outQty = "";
 
       this.setSourceDetail(val);
@@ -401,7 +408,7 @@ export default {
         this.warning("請輸入數量");
         return;
       }
-      val.prodQty = parseInt(val.inQty) + parseInt(val.prodQty);
+      val.prodQty = parseFloat(val.inQty) + parseFloat(val.prodQty);
       val.inQty = "";
       this.setTargetDetail(val);
     },

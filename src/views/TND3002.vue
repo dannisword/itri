@@ -13,6 +13,7 @@
               type="number"
               min="1"
               @keyup.enter.native="onShuttle"
+              :disabled="isReadOnly() == true"
             ></el-input>
           </el-form-item>
           <el-form-item>
@@ -20,23 +21,21 @@
               type="primary"
               @click="onShuttle()"
               :disabled="isRunning == true || isReadOnly() == true"
-              >空箱出庫</el-button
-            >
-            <el-button type="danger" @click="onStop()" v-if="isRunning == true"
-              >後續中止</el-button
-            >
+              >空箱出庫
+            </el-button>
+            <el-button type="danger" @click="onStop()" v-if="isRunning == true">
+              後續中止
+            </el-button>
           </el-form-item>
         </el-form>
       </el-col>
       <el-col :span="20">
         <p style="font-size: 30px; color: crimson">
-          自動倉可用的總儲位數：{{ emptyCount }}個
+          自動倉內可叫用空箱數:{{ emptyCount }}個
         </p>
       </el-col>
       <el-col :span="20">
-        <el-button type="primary" @click="onOpen"
-          >空箱出庫進度查詢</el-button
-        >
+        <el-button type="primary" @click="onOpen">空箱出庫進度查詢</el-button>
       </el-col>
     </el-row>
 
@@ -97,7 +96,8 @@
         </el-table-column>
         <el-table-column label="站點" prop="stationCode" width="180">
         </el-table-column>
-        <el-table-column label="物流箱編號" prop="carrierId" min-width="180"> </el-table-column>
+        <el-table-column label="物流箱編號" prop="carrierId" min-width="180">
+        </el-table-column>
         <el-table-column label="儲位編號" prop="storageCode" min-width="180">
         </el-table-column>
         <el-table-column label="收到指令時間" prop="createTime" min-width="125">
@@ -131,7 +131,7 @@ export default {
       content: [],
       workStations: [],
       emptyCount: "",
-      qty: 0,
+      qty: 1,
       isRunning: false,
       params: {
         direction: "ASC",
@@ -193,7 +193,7 @@ export default {
           this.loading = false;
         });
     },
-    onOpen(){
+    onOpen() {
       this.dialogs.carrier.visible = true;
       this.onLoad();
     },
@@ -207,7 +207,6 @@ export default {
       });
     },
     onShuttle() {
-      this.onQuery();
       if (this.qty <= 0) {
         this.warning("請填寫箱數，才能進行空箱出庫作業");
         return;
@@ -222,6 +221,7 @@ export default {
       getShuttle(this.qty).then((resp) => {
         if (resp.status == "OK") {
           this.success("指令接收成功，已安排空箱出庫作業");
+          this.onQuery();
         }
       });
     },

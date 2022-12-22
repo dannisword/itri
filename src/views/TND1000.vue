@@ -32,12 +32,20 @@
         <el-divider class="form-divider"></el-divider>
         <el-form-item>
           <el-button type="primary" @click="onLoad()">查詢</el-button>
-          <el-button type="success" @click="onOpen('IN')"
-            >執行今日簽入</el-button
+          <el-button
+            type="success"
+            @click="onOpen('IN')"
+            :disabled="isReadOnly() == true"
           >
-          <el-button type="warning" @click="onOpen('OUT')"
-            >執行今日簽出</el-button
-          >
+            執行今日簽入
+          </el-button>
+          <el-button
+            type="warning"
+            @click="onOpen('OUT')"
+            :disabled="isReadOnly() == true"
+            >執行今日簽出
+          </el-button>
+          <el-button @click="onSync" type="info">同步員工資料</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -117,10 +125,13 @@
         </el-input>
         <div class="mt-1">
           <el-button @click="onDefaultLast()">勾選上一次簽入者</el-button>
-          <el-button @click="onConfirm('IN')" type="primary"
-            >確認簽入</el-button
+          <el-button
+            @click="onConfirm('IN')"
+            type="primary"
+            :disabled="isReadOnly() == true"
           >
-          <el-button @click="onSync" type="warning">同步員工資料</el-button>
+            確認簽入
+          </el-button>
         </div>
       </el-form>
 
@@ -133,7 +144,10 @@
         height="480px"
         @selection-change="onSelectionInChange"
       >
-        <el-table-column type="selection"></el-table-column>
+        <el-table-column
+          type="selection"
+          :selectable="checkSelectable"
+        ></el-table-column>
 
         <el-table-column label="上一次簽入者" prop="haveSignInBefore">
           <template slot-scope="scope">
@@ -177,9 +191,13 @@
           </el-input>
           <div>
             <el-button @click="onSelectAll()">勾選全部簽入者</el-button>
-            <el-button @click="onConfirm('OUT')" type="danger"
-              >確認簽出</el-button
+            <el-button
+              @click="onConfirm('OUT')"
+              type="danger"
+              :disabled="isReadOnly() == true"
             >
+              確認簽出
+            </el-button>
           </div>
         </el-form>
       </div>
@@ -210,6 +228,9 @@
       <div>
         <el-row :gutter="20">
           <el-col :span="6"> 站點：{{ station.name }} </el-col>
+          <el-col :span="13" type="flex" justify="end" style="color: red">
+            每天23:59:59 自動簽出人員，並記錄簽出時間為23:59:59
+          </el-col>
         </el-row>
 
         <el-row :gutter="20">
@@ -270,8 +291,8 @@ export default {
         workStationId: [],
         page: 0,
         size: 50,
-        direction: "ASC",
-        properties: "id",
+        direction: "DESC",
+        properties: "signInDate",
       },
       station: {
         name: "",
@@ -391,6 +412,12 @@ export default {
           this.emps = resp.message;
           this.$nextTick(function () {
             for (let emp of this.emps) {
+              if (
+                emp.todaySignInWorkStationId != null &&
+                emp.todaySignInWorkStationId != this.workStation()
+              ) {
+                continue;
+              }
               this.$refs.signInTable.toggleRowSelection(emp, emp.todaySignIn);
             }
           });
@@ -436,9 +463,15 @@ export default {
       }
       if (val == "IN") {
         const data = [];
+
         for (let item of this.station.signIns) {
+          // 排除簽入過的
+          if (item.todaySignInWorkStationId != null) {
+            continue;
+          }
           data.push(item.employeeId);
         }
+
         setSignIn(data).then((resp) => {
           if (resp.status == "OK") {
             this.success("簽入成功");
@@ -491,6 +524,15 @@ export default {
     onSelectionOutChange(val) {
       this.station.signOutCount = val.length;
       this.station.signOuts = val;
+    },
+    checkSelectable(val) {
+      if (
+        val.todaySignInWorkStationId != null &&
+        val.todaySignInWorkStationId != this.workStation()
+      ) {
+        return false;
+      }
+      return !val.todaySignIn;
     },
   },
 };

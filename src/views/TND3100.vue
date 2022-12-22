@@ -47,6 +47,7 @@
           <el-form-item label="請刷讀物流箱編號條碼">
             <el-input
               v-model="carrierId"
+              :disabled="isFinished == true || isReadOnly() == true"
               @keyup.enter.native="setBarcode(carrierId)"
             ></el-input>
           </el-form-item>
@@ -75,7 +76,7 @@
       <el-table-column label="物流箱內數量" prop="planQty" min-width="180">
       </el-table-column>
 
-      <el-table-column label="已揀數量" prop="prodQty" min-width="180">
+      <el-table-column label="應揀數量" prop="stockQty" min-width="180">
         <template slot-scope="scope">
           <el-input
             class="cell-button"
@@ -147,7 +148,10 @@
       :optional="Large"
     >
       <el-row :gutter="20">
+        <!-- TODO
         <el-col :span="6"> 站點：{{ workStation() }} </el-col>
+        -->
+        <el-col :span="6"> 站點：{{ outbound.assignWorkStationId }} </el-col>
       </el-row>
       <el-row class="mt-1" :gutter="20">
         <el-col :span="20"> 出庫單號碼{{ outbound.sysOrderNo }} </el-col>
@@ -159,13 +163,13 @@
         stripe
         height="400px"
       >
-        <el-table-column label="項次" prop="seq"> </el-table-column>
-        <el-table-column label="物流箱編號" prop="carrierId"> </el-table-column>
-        <el-table-column label="命令型態名稱" prop="opTypeName">
+        <el-table-column label="項次" prop="seq" fixed> </el-table-column>
+        <el-table-column label="物流箱編號" prop="carrierId" min-width="160" fixed> </el-table-column>
+        <el-table-column label="命令型態名稱" prop="opTypeName" min-width="160">
         </el-table-column>
-        <el-table-column label="收到指令時間" prop="createTime">
+        <el-table-column label="收到指令時間" prop="createTime" min-width="180">
         </el-table-column>
-        <el-table-column label="完成指令時間" prop="finishTime">
+        <el-table-column label="完成指令時間" prop="finishTime" min-width="180">
         </el-table-column>
       </el-table>
     </ModalDialog>
@@ -237,7 +241,7 @@ export default {
   async created() {
     this.outStatus = await this.getSelector(SelectTypeEnum.OUTBOUND_STATUS);
 
-    await this.onLoad();
+    //await this.onLoad();
     await this.handleFlow();
   },
   methods: {
@@ -253,9 +257,11 @@ export default {
           }
           this.outbounds = resp.message;
           this.outbound = this.outbounds[0];
+          // A4-27 carrierId 帶空值
+          this.setBarcode("empty");
         }
       });
-      this.getOutBoundDetail(outboundId);
+      //this.getOutBoundDetail(outboundId);
     },
     onRemove(val) {
       takeOutBoundDetail(val).then((resp) => {
@@ -308,7 +314,7 @@ export default {
         this.warning("請輸入數量");
         return;
       }
-      val.prodQty = parseInt(val.outQty) + parseInt(val.prodQty);
+      val.prodQty = parseFloat(val.outQty) + parseFloat(val.prodQty);
       val.outQty = "";
     },
     onOpenLog() {
@@ -344,10 +350,14 @@ export default {
             detail.seq = seq++;
             detail.outQty = "";
           }
+          this.details.sort(function (a, b) {
+            if (a.isFinished == true) {
+              return 0;
+            }
+            return -1;
+          });
         }
       });
-
-      //this.handleFlow();
     },
     onCallback() {
       this.carrierCallback(this.carrierId);
@@ -388,7 +398,8 @@ export default {
       this.info.total = 0;
       resp = await getReceiveInfo("出庫");
       if (resp.title == "successful") {
-        this.info.lastCount = resp.message.lastCount;
+        this.info.lastCount =
+          resp.message.lastCount == null ? 0 : resp.message.lastCount;
       }
       // A1-46 I,O,PR,IN
       resp = await carrierArrived(this.outbound.sysOrderNo, "出庫");
@@ -397,7 +408,7 @@ export default {
         this.info.total = resp.message.total;
       }
       // A4-23
-      //this.onLoad();
+      await this.onLoad();
       // A4-3
     },
   },

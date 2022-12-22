@@ -22,7 +22,7 @@ export const constantRoutes = [
   {
     path: "/",
     component: Layout,
-    redirect: "/dashboard",
+    redirect: "/TND1000",
     children: [
       {
         path: "dashboard",

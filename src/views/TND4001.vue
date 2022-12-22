@@ -72,7 +72,6 @@
               >
               </el-button>
             </el-input>
-   
           </el-form-item>
           <el-form-item> </el-form-item>
           加工最新收單時間：{{ receiveInfo.lastDateTime }} 加工最新收單數量：{{
@@ -95,6 +94,7 @@
     <!-- 資料-->
     <el-table
       :data="content"
+      v-loading="loading"
       class="table-container"
       border
       stripe
@@ -132,15 +132,15 @@
       >
       </el-table-column>
       <el-table-column
-        label="單據狀態"
+        label="加工單狀態"
         prop="docStatusName"
         sortable="custom"
-        min-width="120"
+        min-width="180"
       >
       </el-table-column>
       <el-table-column
         label="綁定站點"
-        prop="statusName"
+        prop="assignWorkStationId"
         sortable="custom"
         min-width="120"
       >
@@ -182,6 +182,7 @@ export default {
   mixins: [pageMixin],
   data() {
     return {
+      loading: false,
       content: [],
       workStations: [],
       nowDate: [],
@@ -190,7 +191,7 @@ export default {
       docNo: "",
       params: {
         direction: "ASC",
-        docStatus: 0,
+        docStatus: [0, 1, 2],
         page: 1,
         prodCode: "",
         properties: "id",
@@ -229,10 +230,12 @@ export default {
   },
   methods: {
     onLoad() {
+      this.loading = true;
       this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);
       this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params);
       getProcesses(query).then((respone) => {
+        this.loading = false;
         if (respone.status == "OK") {
           this.content = respone.message.content;
           // 分頁設定
@@ -264,8 +267,12 @@ export default {
       if (val.order == null) {
         return;
       }
+      let prop = val.prop;
+      if (prop == "docStatusName") {
+        prop = "docStatus";
+      }
       this.params.direction = val.order == "ascending" ? "ASC" : "DESC";
-      this.params.properties = val.prop;
+      this.params.properties = prop;
       await this.onLoad();
     },
     onCurrentChange(val) {
@@ -273,16 +280,22 @@ export default {
       this.onLoad();
     },
     ondblClick(val) {
-     // 唯讀模式
-     if (this.isReadOnly() == true) {
+      // 唯讀模式
+      if (this.isReadOnly() == true) {
         this.onNav(`/TND4100/${val.id}`);
         return;
       }
-      startProcess(val.sysOrderNo).then((resp) => {
-        if (resp.title == "successful") {
-          this.onNav(`/TND4100/${val.id}`);
-        }
-      });
+      this.loading = true;
+      startProcess(val.sysOrderNo)
+        .then((resp) => {
+          this.loading = false;
+          if (resp.title == "successful") {
+            this.onNav(`/TND4100/${val.id}`);
+          }
+        })
+        .catch((e) => {
+          this.loading = false;
+        });
     },
     getProcessAssign() {
       if (this.docNo.length <= 0) {
@@ -305,10 +318,10 @@ export default {
       };
     },
     canDelete(row) {
-      return (
-        row.docStatus == ProcessingStatusEnum.Received ||
-        row.docStatus == ProcessingStatusEnum.Invalid ? true: false
-      );
+      return row.docStatus == ProcessingStatusEnum.Received ||
+        row.docStatus == ProcessingStatusEnum.Invalid
+        ? true
+        : false;
     },
   },
 };

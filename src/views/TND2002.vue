@@ -11,6 +11,7 @@
               v-model="carrierId"
               placeholder="系統刷讀物流箱條碼"
               @keyup.enter.native="onShuttle"
+              :disabled="isReadOnly() == true"
             ></el-input>
           </el-form-item>
           <el-form-item>
@@ -18,8 +19,9 @@
               type="primary"
               @click="onCallback()"
               :disabled="this.carrierId.length <= 0"
-              >料盒連動測試</el-button
             >
+              料盒連動測試
+            </el-button>
           </el-form-item>
         </el-form>
       </el-col>
@@ -87,17 +89,17 @@
       >
         <el-table-column label="項次" width="100" prop="seq" fixed>
         </el-table-column>
-        <el-table-column label="站點" prop="stationCode" width="180" fixed>
+        <el-table-column label="站點" prop="stationCode" min-width="180" fixed>
         </el-table-column>
         <el-table-column label="物流箱編號" prop="carrierId" min-width="180">
         </el-table-column>
-        <el-table-column label="儲位編號" prop="storageCode" width="125">
+        <el-table-column label="儲位編號" prop="storageCode" min-width="180">
         </el-table-column>
-        <el-table-column label="收到指令時間" prop="createTime" width="125">
+        <el-table-column label="收到指令時間" prop="createTime" min-width="180">
         </el-table-column>
-        <el-table-column label="完成指令時間" prop="finishTime" width="125">
+        <el-table-column label="完成指令時間" prop="finishTime" min-width="180">
         </el-table-column>
-        <el-table-column label="進度" prop="carrierStatusName" width="125">
+        <el-table-column label="進度" prop="carrierStatusName" min-width="180">
         </el-table-column>
       </el-table>
     </Dialog>
@@ -198,6 +200,7 @@ export default {
         if (resp.status == "OK") {
           this.success("指令接收成功，已安排空箱入庫作業");
           this.carrierId = "";
+          this.getEmptyCount();
         }
       });
     },
