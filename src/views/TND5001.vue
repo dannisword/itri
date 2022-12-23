@@ -3,7 +3,7 @@
     <div class="form-container">
       <!-- 查詢條件 -->
       <el-form :model="params" label-width="100px" :inline="true">
-        <el-form-item label="單據建立日期">
+        <el-form-item label="盤點時間">
           <el-date-picker
             v-model="nowDate"
             type="daterange"

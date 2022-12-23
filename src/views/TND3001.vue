@@ -218,7 +218,7 @@ export default {
   },
   async created() {
     // TODO -7
-    this.nowDate.push(this.addDay(-30));
+    this.nowDate.push(this.addDay(-60));
     this.nowDate.push(this.addDay(0));
     getWorkStations().then((resp) => {
       if (resp.message) {

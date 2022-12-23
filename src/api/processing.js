@@ -284,7 +284,7 @@ export function getProcessDocs() {
 export function deleteProcess(processingId) {
   return request({
     url: `/api/processing/delProcessingDoc/${processingId}`,
-    method: "GET",
+    method: "DELETE",
   });
 }
 

@@ -1,18 +1,20 @@
 <template>
   <div class="app-container">
-    <el-row>
-      <el-col :span="12">
-        <el-form :model="params" label-width="100px" :inline="true">
-          <el-form-item label="單據狀態">
-            <el-input v-model="process.docStatusName" disabled></el-input>
-          </el-form-item>
-          <el-button type="primary" @click="onNav('/TND4001')"
-            >回列表
-          </el-button>
-        </el-form>
+    <el-form :model="params" label-width="100px" :inline="true">
+      <el-form-item label="單據狀態">
+        <el-input v-model="process.docStatusName" disabled></el-input>
+      </el-form-item>
+      <el-button type="primary" @click="onNav('/TND4001')">回列表 </el-button>
+    </el-form>
+
+    <el-row type="flex" class="row-bg" justify="end">
+      <el-col>
+        <el-button type="primary" @click="onOpenLog">
+          物流箱進度查詢({{ info.total }})
+        </el-button>
       </el-col>
       <el-col type="flex" justify="end" :span="12" style="text-align: right">
-        尚有{{ lastCount }}筆工作
+        尚有{{ info.lastCount }}筆工作
         <el-button
           type="success"
           @click="onClose()"
@@ -77,7 +79,7 @@
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
 
-      <el-table-column label="物流箱編號" prop="carrierId" min-width="180">
+      <el-table-column label="物流箱編號" prop="carrierId" min-width="200">
         <template slot-scope="scope">
           <span>{{ scope.row.carrierId }}</span>
           <el-button
@@ -188,8 +190,10 @@
       </el-table-column>
       <el-table-column label="物流箱編號" prop="carrierId" min-width="180">
       </el-table-column>
+      <!--
       <el-table-column label="磅秤重量" prop="weight" min-width="180">
       </el-table-column>
+      -->
       <el-table-column label="物流箱內數量" prop="planQty" min-width="180">
       </el-table-column>
 
@@ -256,6 +260,46 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <ModalDialog
+      :title="dialogs.log.title"
+      :name="dialogs.log.name"
+      :visible.sync="dialogs.log.visible"
+      @afterClosed="dialogs.log.visible = false"
+      :optional="Large"
+    >
+      <el-row :gutter="20">
+        <!-- TODO
+        <el-col :span="6"> 站點：{{ workStation() }} </el-col>
+        -->
+        <el-col :span="6"> 站點：{{ process.assignWorkStationId }} </el-col>
+      </el-row>
+      <el-row class="mt-1" :gutter="20">
+        <el-col :span="20"> 出庫單號碼{{ process.sysOrderNo }} </el-col>
+      </el-row>
+      <el-table
+        :data="carrierRecords"
+        class="table-container"
+        border
+        stripe
+        height="400px"
+      >
+        <el-table-column label="項次" prop="seq" fixed> </el-table-column>
+        <el-table-column
+          label="物流箱編號"
+          prop="carrierId"
+          min-width="160"
+          fixed
+        >
+        </el-table-column>
+        <el-table-column label="命令型態名稱" prop="opTypeName" min-width="160">
+        </el-table-column>
+        <el-table-column label="收到指令時間" prop="createTime" min-width="180">
+        </el-table-column>
+        <el-table-column label="完成指令時間" prop="finishTime" min-width="180">
+        </el-table-column>
+      </el-table>
+    </ModalDialog>
   </div>
 </template>
 <script>
@@ -275,6 +319,12 @@ import {
   finishedTargetDetails,
 } from "@/api/processing";
 
+import {
+  getReceiveInfo,
+  carrierArrived,
+  getCarrierArrived,
+} from "@/api/system";
+
 export default {
   components: {
     ModalDialog,
@@ -282,11 +332,16 @@ export default {
   mixins: [pageMixin],
   data() {
     return {
-      lastCount: 0,
+      info: {
+        lastCount: 0,
+        part: 0,
+        total: 0,
+      },
       process: {},
       processing: [],
       source: [],
       target: [],
+      carrierRecords: [],
       carrier: {
         sourceId: "",
         targetId: "",
@@ -297,10 +352,17 @@ export default {
         direction: "ASC",
         properties: "id",
       },
+      dialogs: {
+        log: {
+          title: "物流箱進度查詢",
+          name: "LOG",
+          visible: false,
+        },
+      },
     };
   },
-  created() {
-    this.onLoad();
+  async created() {
+    await this.onLoad();
   },
   computed: {
     isFinished() {
@@ -325,6 +387,7 @@ export default {
           this.process = resp.message;
           this.process.seq = 1;
           this.processing.push(this.process);
+          this.handleFlow();
         }
       });
       this.getProcessDetails(processingId);
@@ -428,6 +491,45 @@ export default {
           this.onLoad();
         }
       });
+    },
+    onOpenLog() {
+      this.dialogs.log.visible = true;
+      this.Large.showAction = false;
+      const params = {
+        docNo: this.process.sysOrderNo,
+        workStn: this.workStation(),
+      };
+      const query = this.getQuery(params);
+      getCarrierArrived(query).then((resp) => {
+        if (resp.title == "successful") {
+          this.carrierRecords = resp.message.content;
+          let seq = 1;
+          for (let item of this.carrierRecords) {
+            item.seq = seq++;
+          }
+        }
+      });
+      this.handleFlow();
+    },
+    async handleFlow() {
+      // A1-44
+      let resp;
+      this.info.lastCount = 0;
+      this.info.part = 0;
+      this.info.total = 0;
+      resp = await getReceiveInfo("加工");
+      if (resp.title == "successful") {
+        this.info.lastCount =
+          resp.message.lastCount == null ? 0 : resp.message.lastCount;
+      }
+      // A1-46 I,O,PR,IN
+      resp = await carrierArrived(this.process.sysOrderNo, "加工");
+      if (resp.title == "successful") {
+        this.info.part = resp.message.part;
+        this.info.total = resp.message.total;
+      }
+      //await this.onLoad();
+      // A4-3
     },
     // 請刷讀原料物流箱編號條碼
     setSourceBarcode(val) {

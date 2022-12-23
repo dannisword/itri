@@ -138,11 +138,11 @@
             class="cell-button"
             v-model="scope.row.prodQty"
             :disabled="scope.row.prodQtyEdit == false"
-            v-if="scope.row.isFinished == false"
+            v-if="isReadOnly() == true"
           >
-            <el-button slot="append" @click="onProdQtyEdit(scope.row)">{{
-              scope.row.prodQtyEditName
-            }}</el-button>
+            <el-button slot="append" @click="onProdQtyEdit(scope.row)">
+              {{ scope.row.prodQtyEditName }}
+            </el-button>
           </el-input>
           <span v-else>{{ scope.row.prodQty }}</span>
         </template>
@@ -155,11 +155,11 @@
             class="cell-button"
             v-model="scope.row.inQty"
             @keyup.enter.native="onAddDetail(scope.row)"
-            v-if="scope.row.isFinished == false"
+            v-if="isReadOnly() == true"
           >
-            <el-button slot="append" @click="onAddDetail(scope.row)"
-              >加總數量</el-button
-            >
+            <el-button slot="append" @click="onAddDetail(scope.row)">
+              加總數量
+            </el-button>
           </el-input>
         </template>
       </el-table-column>
@@ -168,9 +168,10 @@
           <el-button
             @click="onFinish(scope.row)"
             type="success"
-            v-if="scope.row.isFinished == false"
+            v-if="isReadOnly() == true"
             :disabled="scope.row.prodQty <= 0"
-            >盤點完成
+          >
+            盤點完成
           </el-button>
           <span v-else>已完成盤點</span>
         </template>

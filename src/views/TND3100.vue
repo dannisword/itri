@@ -6,6 +6,7 @@
       </el-form-item>
       <el-button type="primary" @click="onNav('/TND3001')">回列表</el-button>
     </el-form>
+
     <el-row type="flex" class="row-bg" justify="end">
       <el-col>
         <el-button type="primary" @click="onOpenLog">
@@ -29,7 +30,7 @@
     <el-table :data="outbounds" class="table-container" border>
       <el-table-column label="項次" width="100" prop="seq" fixed>
       </el-table-column>
-      <el-table-column label="出庫單號碼" prop="sysOrderNo" min-width="180">
+      <el-table-column label="出庫單號碼" prop="refNo" min-width="180">
       </el-table-column>
       <el-table-column label="料品號" prop="prodCode" min-width="180">
       </el-table-column>
@@ -73,10 +74,11 @@
       </el-table-column>
       <el-table-column label="物流箱編號" prop="carrierId" min-width="180">
       </el-table-column>
-      <el-table-column label="物流箱內數量" prop="planQty" min-width="180">
+      <el-table-column label="物流箱內數量" prop="stockQty" min-width="180">
       </el-table-column>
-
-      <el-table-column label="應揀數量" prop="stockQty" min-width="180">
+      <el-table-column label="應揀數量" prop="planQty" min-width="180">
+      </el-table-column>
+      <el-table-column label="已揀數量" prop="prodQty" min-width="180">
         <template slot-scope="scope">
           <el-input
             class="cell-button"
@@ -157,14 +159,20 @@
         <el-col :span="20"> 出庫單號碼{{ outbound.sysOrderNo }} </el-col>
       </el-row>
       <el-table
-        :data="outRecords"
+        :data="carrierRecords"
         class="table-container"
         border
         stripe
         height="400px"
       >
         <el-table-column label="項次" prop="seq" fixed> </el-table-column>
-        <el-table-column label="物流箱編號" prop="carrierId" min-width="160" fixed> </el-table-column>
+        <el-table-column
+          label="物流箱編號"
+          prop="carrierId"
+          min-width="160"
+          fixed
+        >
+        </el-table-column>
         <el-table-column label="命令型態名稱" prop="opTypeName" min-width="160">
         </el-table-column>
         <el-table-column label="收到指令時間" prop="createTime" min-width="180">
@@ -212,7 +220,7 @@ export default {
       outbounds: [],
       details: [],
       outStatus: [],
-      outRecords: [],
+      carrierRecords: [],
       params: {
         page: 0,
         size: 50,
@@ -241,8 +249,8 @@ export default {
   async created() {
     this.outStatus = await this.getSelector(SelectTypeEnum.OUTBOUND_STATUS);
 
-    //await this.onLoad();
-    await this.handleFlow();
+    await this.onLoad();
+    //await this.handleFlow();
   },
   methods: {
     onLoad() {
@@ -259,6 +267,7 @@ export default {
           this.outbound = this.outbounds[0];
           // A4-27 carrierId 帶空值
           this.setBarcode("empty");
+          this.handleFlow();
         }
       });
       //this.getOutBoundDetail(outboundId);
@@ -327,9 +336,9 @@ export default {
       const query = this.getQuery(params);
       getCarrierArrived(query).then((resp) => {
         if (resp.title == "successful") {
-          this.outRecords = resp.message.content;
+          this.carrierRecords = resp.message.content;
           let seq = 1;
-          for (let item of this.outRecords) {
+          for (let item of this.carrierRecords) {
             item.seq = seq++;
           }
         }
@@ -406,9 +415,12 @@ export default {
       if (resp.title == "successful") {
         this.info.part = resp.message.part;
         this.info.total = resp.message.total;
+      } else {
+        // 07250002.1
+        this.warning(resp.message);
       }
       // A4-23
-      await this.onLoad();
+      //await this.onLoad();
       // A4-3
     },
   },

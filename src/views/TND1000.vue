@@ -107,8 +107,8 @@
       :optional="Medium"
     >
       <el-row :gutter="20">
-        <el-col :span="8"> 站點：{{ workStation() }} </el-col>
-        <el-col :span="8"> 已勾選人員：{{ station.signInCount }} </el-col>
+        <el-col :span="12"> 站點：{{ workStation() }} </el-col>
+        <el-col :span="12"> 已勾選人員：{{ station.signInCount }} </el-col>
       </el-row>
 
       <el-form label-width="80px" :inline="true">
@@ -175,7 +175,7 @@
     >
       <div>
         <el-row :gutter="20">
-          <el-col :span="6"> 站點：{{ workStation() }} </el-col>
+          <el-col :span="12"> 站點：{{ workStation() }} </el-col>
         </el-row>
         <el-form label-width="80px" :inline="true">
           <el-input
@@ -501,7 +501,15 @@ export default {
     getSingIn() {
       getTodaySignIn().then((resp) => {
         if (resp.status == "OK") {
-          this.emps = resp.message;
+          if (this.empolyeeId.length > 0) {
+            this.emps = resp.message.filter(
+              (x) => x.employeeId == this.empolyeeId
+            );
+            console.log(this.empolyeeId);
+            //this.emps = emps;
+          } else {
+            this.emps = resp.message;
+          }
         }
       });
     },
