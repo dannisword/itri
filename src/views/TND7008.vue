@@ -390,7 +390,7 @@ export default {
   methods: {
     onLoad() {
       this.loading = true;
-      this.params.page = 1;
+      
       if (this.nowDate[0] != null) {
         this.params.startDate = this.toDate(this.nowDate[0]);
         this.params.endDate = this.toDate(this.nowDate[1]);
