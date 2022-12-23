@@ -211,7 +211,7 @@ export default {
       params: {
         assignWorkStationId: "",
         direction: "DESC",
-        docStatus: [0, 1],
+        docStatus: [0, 2],
         page: 1,
         prodCode: "",
         properties: "docStatus",
