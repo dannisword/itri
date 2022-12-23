@@ -190,10 +190,7 @@
       </el-table-column>
       <el-table-column label="物流箱編號" prop="carrierId" min-width="180">
       </el-table-column>
-      <!--
-      <el-table-column label="磅秤重量" prop="weight" min-width="180">
-      </el-table-column>
-      -->
+
       <el-table-column label="物流箱內數量" prop="planQty" min-width="180">
       </el-table-column>
 
@@ -246,14 +243,14 @@
       <el-table-column label="動作" prop="statusName" width="280">
         <template slot-scope="scope">
           <el-row v-if="scope.row.isFinished == false">
-            <el-button @click="onRemove(scope.row)" size="mini" type="danger"
-              >取下
+            <el-button @click="onRemove(scope.row)" size="mini" type="danger">
+              取下
             </el-button>
             <el-button
               @click="onSourceFinish(scope.row)"
               size="mini"
               type="primary"
-              :disabled="scope.row.prodQty <= 0"
+              :disabled="scope.row.prodQty <= 0 || canRemove == true"
               >拿取完成，送回
             </el-button>
           </el-row>
@@ -374,12 +371,16 @@ export default {
       // 1.無加工單 不能結束此單 push
       return false;
     },
+    canRemove() {
+      // 未加工完成
+      const data = this.target.filter((x) => x.isFinished == false);
+      return data.length > 0 ? true : false;
+    },
   },
   methods: {
     onLoad() {
       const processingId = this.$route.params.id;
-      this.process = {};
-      this.processing = [];
+
       this.getProcessTodo();
 
       getProcessing(processingId).then((resp) => {
@@ -388,6 +389,9 @@ export default {
           this.process.seq = 1;
           this.processing.push(this.process);
           this.handleFlow();
+        } else {
+          this.process = {};
+          this.processing = [];
         }
       });
       this.getProcessDetails(processingId);
@@ -544,7 +548,6 @@ export default {
     // 請刷讀加工物流箱編號條碼
     setTargetBarcode(val) {
       finishedTargetDetails(this.process.sysOrderNo, val).then((resp) => {
-        console.log(resp);
         if (resp.title == "successful") {
           this.carrier.targetId = "";
           this.onLoad();
@@ -552,7 +555,6 @@ export default {
       });
     },
     onCallback(val, mode) {
-      console.log(val);
       let carrier = "";
       if (mode == "SOURCE") {
         carrier = val.sourceId;
@@ -583,6 +585,7 @@ export default {
 
         // target
         this.target = resp.message.docProcessingTargetDetail;
+
         seq = 1;
         for (let item of this.target) {
           item.seq = seq++;
