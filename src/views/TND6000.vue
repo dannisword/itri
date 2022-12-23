@@ -180,6 +180,7 @@ export default {
       await this.onLoad();
     },
     onCurrentChange(val) {
+      console.log(val)
       this.params.page = val;
       this.onLoad();
     },

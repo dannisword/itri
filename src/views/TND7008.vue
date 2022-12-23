@@ -62,7 +62,7 @@
 
     <!-- 功能鍵及分頁-->
     <el-row type="flex" class="mt-1">
-      <el-col :span="16">
+      <el-col :span="14">
         <el-button type="primary" @click="onPrint()">列印勾選項目</el-button>
         <el-button type="success" @click="onOpenModal('BATCH')"
           >批次更新狀態</el-button
@@ -71,7 +71,7 @@
           物流箱歷程查詢
         </el-button>
       </el-col>
-      <el-col :span="8" align="end">
+      <el-col :span="10" align="end">
         <el-pagination
           background
           @current-change="onCurrentChange"

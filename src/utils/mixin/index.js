@@ -145,6 +145,8 @@ export default {
 
       const pageable = val.pageable;
       this.page.seq = pageable.pageNumber * val.size;
+
+      this.params.page = 1;
     },
     /**
      * 成功訊息
