@@ -165,6 +165,7 @@
 import moment from "moment";
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
+import mqtt_message from "@/utils/mixin/mqtt_message";
 import {
   getProcesses,
   getProcessDocs,
@@ -179,7 +180,7 @@ export default {
   components: {
     ModalDialog,
   },
-  mixins: [pageMixin],
+  mixins: [pageMixin, mqtt_message],
   data() {
     return {
       loading: false,

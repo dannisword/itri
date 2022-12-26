@@ -109,6 +109,7 @@
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import Dialog from "@/components/ModalDialog/Dialog.vue";
 import pageMixin from "@/utils/mixin";
+import mqtt_message from "@/utils/mixin/mqtt_message";
 import { getWorkStations } from "@/api/workStation";
 import { getEmptyCount } from "@/api/station";
 import { getEmptyRecords, setShuttle } from "@/api/inbound";
@@ -117,7 +118,7 @@ export default {
     ModalDialog,
     Dialog,
   },
-  mixins: [pageMixin],
+  mixins: [pageMixin, mqtt_message],
   data() {
     return {
       nowDate: "",
@@ -158,6 +159,9 @@ export default {
     // 站點綁定
     if (this.workStation().length > 0) {
       this.params.stationCode.push(this.workStation());
+      // mqtt
+      this.connect();
+      this.client.on("message", this.handleMessage);
     }
     // 取得空儲位數量
     this.getEmptyCount();
@@ -196,13 +200,17 @@ export default {
         });
     },
     onShuttle() {
-      setShuttle(this.carrierId).then((resp) => {
-        if (resp.status == "OK") {
-          this.success("指令接收成功，已安排空箱入庫作業");
+      setShuttle(this.carrierId)
+        .then((resp) => {
+          if (resp.status == "OK") {
+            this.success("指令接收成功，已安排空箱入庫作業");
+            this.getEmptyCount();
+          }
           this.carrierId = "";
-          this.getEmptyCount();
-        }
-      });
+        })
+        .catch((e) => {
+          //this.carrierId = "";
+        });
     },
     onModalClose(val) {
       if (val.success == undefined) {
@@ -215,6 +223,13 @@ export default {
     },
     onCallback() {
       this.carrierCallback(this.carrierId);
+    },
+    handleMessage(topic, message) {
+      const val = JSON.parse(message);
+      console.log(`2.訂閱主旨: ${topic}`);
+      console.log(`3.訂閱內容: ${message}`);
+      this.carrierId = val.carrier;
+      this.onShuttle();
     },
   },
 };

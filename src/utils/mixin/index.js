@@ -36,6 +36,19 @@ export default {
         cancel: "",
         showAction: true,
       },
+      client: {},
+      connection: {
+        protocol: "tcp",
+        host: "210.242.68.168",
+        port: 1883,
+        endpoint: "",
+        clean: true,
+        connectTimeout: 30 * 1000, // ms
+        reconnectPeriod: 4000, // ms
+        clientId: "itri_" + Math.random().toString(16).substring(2, 8),
+        username: "",
+        password: "",
+      },
     };
   },
   created() {
@@ -48,9 +61,6 @@ export default {
     },
     isDevelopment() {
       return process.env.NODE_ENV == "development";
-    },
-    mqtt_path() {
-      return process.env.VUE_APP_MQTT_ENTRY_POINT;
     },
     getQuery() {
       return function (params, num = true) {
@@ -79,7 +89,7 @@ export default {
             }
           }
         }
-        console.log(query);
+        //console.log(query);
         return query;
       };
     },
@@ -194,7 +204,6 @@ export default {
           });
       });
     },
-
     /**
      * 導覽頁面
      * @param {*} uri
