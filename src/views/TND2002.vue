@@ -121,6 +121,7 @@ export default {
   mixins: [pageMixin, mqtt_message],
   data() {
     return {
+      funcName: "空箱入庫",
       nowDate: "",
       carrierId: "",
       loading: false,
@@ -160,7 +161,7 @@ export default {
     if (this.workStation().length > 0) {
       this.params.stationCode.push(this.workStation());
       // mqtt
-      this.connect();
+      this.connect(this.funcName);
       this.client.on("message", this.handleMessage);
     }
     // 取得空儲位數量
@@ -226,10 +227,15 @@ export default {
     },
     handleMessage(topic, message) {
       const val = JSON.parse(message);
-      console.log(`2.訂閱主旨: ${topic}`);
-      console.log(`3.訂閱內容: ${message}`);
+      const dt = this.toDateTime(Date());
+      //console.log(`2.訂閱主旨: ${topic}`);
+      //console.log(`3.訂閱內容: ${message}`);
+      const sub = `[${this.funcName} (${dt})] subscribe to topics res${topic}`;
+      //[XXX作業 (2022/12/22 16:17:01)] subscribe to topics res [{…}]0: {topic: 'itri/t12345/wcs3x/t12345/STN102', qos: 1}length: 1[[Prototype]]: Array(0)
+      console.log(sub);
+      console.log(message.toString());
       this.carrierId = val.carrier;
-      this.onShuttle();
+      //this.onShuttle();
     },
   },
 };

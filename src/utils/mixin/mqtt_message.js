@@ -1,4 +1,5 @@
 import mqtt from "mqtt";
+import moment from "moment";
 import { getUserInfo } from "@/utils/localStorage";
 
 export default {
@@ -17,7 +18,7 @@ export default {
     },
   },
   methods: {
-    connect() {
+    connect(mode) {
       try {
         // 連線
         this.client = mqtt.connect(process.env.VUE_APP_MQTT_ENTRY_POINT, {
@@ -29,15 +30,14 @@ export default {
           username: "",
           password: "",
         });
-
         const { topic, qos } = this.subscription;
         this.client.subscribe(topic, { qos }, (error, res) => {
           if (error) {
-            console.log(`訂閱${topic}失敗`);
+            console.log(`subscribe to topics failed`);
             console.log(error);
             return;
           }
-          console.log("1.訂閱成功");
+          console.log(`[${mode} (${moment().format("YYYY-MM-DD hh:mm:ss")})] mqtt connect success`);
         });
       } catch (e) {
         console.log("mqtt.connect error", e);
