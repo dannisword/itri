@@ -27,11 +27,11 @@ const actions = {
     commit("CHANGE_SETTING", data);
   },
   changeModel({ commit }, data) {
+    //console.log(data);
+    localStorage.setItem('currentModel', JSON.stringify(data));
     commit("CHANGE_MODEL", data);
   },
-  getCurrentModel({commit}, state){
-    return "12"
-  }
+
 };
 
 export default {

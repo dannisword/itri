@@ -50,7 +50,11 @@ import Logo from "./Logo";
 import { Message } from "element-ui";
 import variables from "@/styles/variables.scss";
 import { getUserMenus } from "@/api/user";
-import { getWorkStation, getWorkStationIsRun } from "@/api/workStation";
+import {
+  getWorkStation,
+  getWorkStationIsRun,
+  changeWorkStation,
+} from "@/api/workStation";
 import { getUserInfo, getStorageItem } from "@/utils/localStorage";
 
 export default {
@@ -112,51 +116,40 @@ export default {
     async onNav(menu) {
       const user = getUserInfo();
       // 作業模式限制
-      console.log(`1.作業站點 ${user.workStation}！`);
       if (user.workStation == null) {
         this.$router.push(menu.path);
         return;
       }
+      console.log(`1.作業站點 ${user.workStation}！`);
+      // 切換作業模式
+      const executePage = await getWorkStationIsRun(
+        user.workStation,
+        menu.index
+      );
+      const model = this.getCurrentModel(executePage);
+      const selectedModel = this.getCurrentModel(menu.index);
+      console.log(`2.未執行完成功能，${model.value}-${executePage} 功能！`);
+      console.log(`3.使用者點選，${selectedModel.value}-${menu.index} 功能！`);
 
-      const rootName = this.getRootName(menu.index);
-      console.log(`2.使用者，選擇${menu.name}(${rootName})功能！`);
-      if (rootName == "") {
+      // 狀態無
+      if (selectedModel.value == "無") {
+        console.log(selectedModel)
+        this.$store.dispatch("settings/changeModel", selectedModel);
         this.$router.push(menu.path);
         return;
       }
-
-      // A1-21
-      const resp = await getWorkStation(user.workStation);
-      let currentModel = "";
-      if (resp.title == "successful") {
-        currentModel = resp.message.currentModel;
-        console.log(`3.目前作業模式 ${currentModel}！`);
-        if (resp.message.currentModel != rootName) {
-          this.showMsg("請先切換右上角作業模式，才可進入畫面1");
-          this.$router.push(menu.path);
-          return;
-        }
-      }
-
-      if (currentModel != rootName) {
-        this.showMsg("請先切換右上角作業模式，才可進入畫面2");
+      //this.$store.dispatch("settings/changeModel", selectedModel);
+      // 未執行完工作
+      if (model.value != selectedModel.value && model.id > 0) {
+        this.showMsg(`${model.value}尚有，未執行完成工作`);
         return;
       }
-      // 檢查權限
-      if (user.workStation != null) {
-        const executePage = await getWorkStationIsRun(
-          user.workStation,
-          menu.index
-        );
-        if (
-          executePage.length > 0 &&
-          executePage != menu.index &&
-          this.getControlPage(menu.index)
-        ) {
-          this.showMsg("請先切換右上角作業模式，才可進入畫面");
-          return;
+      // 變更狀態
+      changeWorkStation(selectedModel.value).then((resp) => {
+        if (resp.title == "successful") {
+          this.$store.dispatch("settings/changeModel", selectedModel);
         }
-      }
+      });
       this.$router.push(menu.path);
     },
     showMsg(msg) {
@@ -196,6 +189,50 @@ export default {
           return "el-icon-setting";
         default:
           return "";
+      }
+    },
+    getCurrentModel(path) {
+      let ws = {
+        id: 0,
+        label: "無",
+        value: "無",
+      };
+      switch (path) {
+        case "TND2001":
+        case "TND2002":
+          return {
+            id: 1,
+            label: "入庫作業",
+            value: "入庫作業",
+          };
+
+        case "TND3001":
+        case "TND3002":
+          return {
+            id: 2,
+            label: "出庫作業",
+            value: "出庫作業",
+          };
+
+        case "TND4001":
+          return {
+            id: 3,
+            label: "加工作業",
+            value: "加工作業",
+          };
+
+        case "TND5001":
+          return {
+            id: 4,
+            label: "盤點作業",
+            value: "盤點作業",
+          };
+        default:
+          return {
+            id: 0,
+            label: "無",
+            value: "無",
+          };
       }
     },
     getRootName(path) {

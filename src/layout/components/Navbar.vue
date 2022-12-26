@@ -17,6 +17,7 @@
         placeholder="請選擇"
         style="margin-right: 10px"
         @change="onChange(workModel)"
+        :disabled="true"
       >
         <el-option
           class="zh-input"
@@ -118,6 +119,13 @@ export default {
         this.workModel = this.operating[0];
       }
     }
+  },
+  watch: {
+    "$store.state.settings.currentModel": function (newValue, oldValue) {
+      if (newValue) {
+        this.workModel = newValue;
+      }
+    },
   },
   methods: {
     toggleSideBar() {
