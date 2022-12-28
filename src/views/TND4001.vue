@@ -1,7 +1,6 @@
 <template>
   <el-container
     v-loading="loading.isLoading"
-    element-loading-background="rgba(255, 255,255, 0.8)"
     :element-loading-text="loading.message"
   >
     <div class="app-container">
@@ -242,11 +241,12 @@ export default {
     onLoad() {
       this.loading.isLoading = true;
       this.loading.message = "載入中，請稍候...";
+      
       this.params.receivedStartDateTime = this.toDate(this.nowDate[0]);
       this.params.receivedEndDateTime = this.toDate(this.nowDate[1]);
       const query = this.getQuery(this.params);
       getProcesses(query).then((respone) => {
-        setTimeout(()=>{
+        setTimeout(() => {
           this.loading.isLoading = false;
         }, 1000);
         if (respone.status == "OK") {
@@ -307,7 +307,7 @@ export default {
             if (resp.title == "successful") {
               this.onNav(`/TND4100/${val.id}`);
             }
-          }, 500);
+          }, 300);
         })
         .catch((e) => {
           this.loading.isLoading = false;

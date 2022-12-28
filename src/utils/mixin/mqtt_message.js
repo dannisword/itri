@@ -44,9 +44,4 @@ export default {
       }
     },
   },
-  beforeDestroy() {
-    if (this.client) {
-      this.client.end();
-    }
-  },
 };
