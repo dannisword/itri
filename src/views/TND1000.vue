@@ -204,6 +204,7 @@
 
       <el-table
         :data="emps"
+        ref="signOutTable"
         class="table-container"
         border
         stripe
@@ -426,6 +427,7 @@ export default {
     },
     onOpen(val) {
       this.emps = [];
+      this.empolyeeId = "";
       // 簽入
       if (val == "IN") {
         this.isSync = false;
@@ -445,11 +447,9 @@ export default {
       });
     },
     onSelectAll() {
-      const data = this.clone(this.emps);
-      data.forEach((elm) => {
-        elm.selected = true;
+      this.emps.forEach((element) => {
+        this.$refs.signOutTable.toggleRowSelection(element, true);
       });
-      this.emps = data;
     },
     async onConfirm(val) {
       let msg = "請問是否簽入？";

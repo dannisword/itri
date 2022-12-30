@@ -238,7 +238,7 @@ export default {
     },
   },
   beforeDestroy() {
-    if (this.client) {
+    if (this.client && this.workStation().length > 0) {
       this.client.end();
     }
   },

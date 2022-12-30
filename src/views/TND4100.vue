@@ -272,7 +272,7 @@
         <el-col :span="6"> 站點：{{ process.assignWorkStationId }} </el-col>
       </el-row>
       <el-row class="mt-1" :gutter="20">
-        <el-col :span="20"> 出庫單號碼{{ process.sysOrderNo }} </el-col>
+        <el-col :span="20"> 加工單號碼：{{ process.sysOrderNo }} </el-col>
       </el-row>
       <el-table
         :data="carrierRecords"

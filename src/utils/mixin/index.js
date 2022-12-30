@@ -117,12 +117,13 @@ export default {
     isReadOnly() {
       return function () {
         const user = getUserInfo();
-        // 作業模式:無
-        if (this.currentModelId() == 0) {
-          return true;
-        }
+
         // 無綁定站點
         if (user == null) {
+          return true;
+        }
+        // 作業模式:無
+        if (this.currentModelId() == 0 && user.workStation == null) {
           return true;
         }
         return user.workStation == null ? true : false;

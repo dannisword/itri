@@ -55,6 +55,9 @@ import {
   getWorkStationIsRun,
   changeWorkStation,
 } from "@/api/workStation";
+
+import { getTodaySignIn } from "@/api/station";
+
 import { getUserInfo, getStorageItem } from "@/utils/localStorage";
 
 export default {
@@ -120,7 +123,14 @@ export default {
         this.$router.push(menu.path);
         return;
       }
-      console.log(`1.作業站點 ${user.workStation}！`);
+      // 檢查當日有簽入紀錄
+      const signins = await getTodaySignIn();
+      let isSignin = false;
+      if (signins.title == "successful") {
+        isSignin = signins.message.length > 0;
+      }
+      //this.showMsg(`請先簽入站點人員，才可開始執行工作！`);
+      //console.log(`1.作業站點 ${user.workStation}！`);
       // 切換作業模式
       const executePage = await getWorkStationIsRun(
         user.workStation,
@@ -128,12 +138,19 @@ export default {
       );
       const model = this.getCurrentModel(executePage);
       const selectedModel = this.getCurrentModel(menu.index);
-      console.log(`2.未執行完成功能，${model.value}-${executePage} 功能！`);
-      console.log(`3.使用者點選，${selectedModel.value}-${menu.index} 功能！`);
-
+      //console.log(`2.未執行完成功能，${model.value}-${executePage} 功能！`);
+      //console.log(`3.使用者點選，${selectedModel.value}-${menu.index} 功能！`);
+      if (isSignin == false && selectedModel.value == "無") {
+        this.$store.dispatch("settings/changeModel", selectedModel);
+        this.$router.push(menu.path);
+        return;
+      }
+      if (isSignin == false && selectedModel.value != "無") {
+        this.showMsg(`請先簽入站點人員，才可開始執行工作！`);
+        return;
+      }
       // 狀態無
       if (selectedModel.value == "無") {
-        console.log(selectedModel)
         this.$store.dispatch("settings/changeModel", selectedModel);
         this.$router.push(menu.path);
         return;

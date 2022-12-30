@@ -156,7 +156,7 @@
         <el-col :span="6"> 站點：{{ outbound.assignWorkStationId }} </el-col>
       </el-row>
       <el-row class="mt-1" :gutter="20">
-        <el-col :span="20"> 出庫單號碼{{ outbound.sysOrderNo }} </el-col>
+        <el-col :span="20"> 出庫單號碼：{{ outbound.refNo }} </el-col>
       </el-row>
       <el-table
         :data="carrierRecords"
