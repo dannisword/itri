@@ -441,7 +441,11 @@ export default {
       }
     },
     onDefaultLast() {
-      const data = this.emps.filter((x) => x.haveSignInBefore == true);
+      const data = this.emps.filter(
+        (x) =>
+          x.haveSignInBefore == true &&
+          x.todaySignInWorkStationId != this.workStation()
+      );
       data.forEach((element) => {
         this.$refs.signInTable.toggleRowSelection(element, true);
       });
