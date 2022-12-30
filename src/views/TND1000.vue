@@ -441,13 +441,13 @@ export default {
       }
     },
     onDefaultLast() {
-      const data = this.emps.filter(
-        (x) =>
-          x.haveSignInBefore == true &&
-          x.todaySignInWorkStationId != this.workStation()
-      );
-      data.forEach((element) => {
-        this.$refs.signInTable.toggleRowSelection(element, true);
+      this.emps.forEach((element) => {
+        if (
+          element.haveSignInBefore == true &&
+          element.todaySignInWorkStationId == this.workStation()
+        ) {
+          this.$refs.signInTable.toggleRowSelection(element, true);
+        }
       });
     },
     onSelectAll() {
