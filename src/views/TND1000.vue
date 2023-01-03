@@ -444,7 +444,7 @@ export default {
       this.emps.forEach((element) => {
         if (
           element.haveSignInBefore == true &&
-          element.todaySignInWorkStationId == this.workStation()
+          element.todaySignInWorkStationId == null
         ) {
           this.$refs.signInTable.toggleRowSelection(element, true);
         }
