@@ -337,7 +337,6 @@ export default {
         }
       }
     },
-    connect() {},
     getProcessAssign() {
       if (this.docNo.length <= 0) {
         this.warning("請輸入加工單號碼!");

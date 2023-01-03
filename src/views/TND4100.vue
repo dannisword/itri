@@ -380,7 +380,9 @@ export default {
   methods: {
     onLoad() {
       const processingId = this.$route.params.id;
-
+      this.process = {};
+      this.processing = [];
+      
       this.getProcessTodo();
 
       getProcessing(processingId).then((resp) => {
