@@ -382,7 +382,7 @@ export default {
       const processingId = this.$route.params.id;
       this.process = {};
       this.processing = [];
-      
+
       this.getProcessTodo();
 
       getProcessing(processingId).then((resp) => {
@@ -391,10 +391,7 @@ export default {
           this.process.seq = 1;
           this.processing.push(this.process);
           this.handleFlow();
-        } else {
-          this.process = {};
-          this.processing = [];
-        }
+        } 
       });
       this.getProcessDetails(processingId);
     },
