@@ -227,18 +227,22 @@ export default {
     },
     handleMessage(topic, message) {
       const val = JSON.parse(message);
+
       const dt = this.toDateTime(Date());
       //console.log(`2.訂閱主旨: ${topic}`);
       //console.log(`3.訂閱內容: ${message}`);
-      const sub = `[${this.funcName} (${dt})] subscribe to topics res${topic}`;
+      const sub = `[${this.funcName} (${dt})] subscribe to topics ${topic}`;
       console.log(sub);
       console.log(message.toString());
       this.carrierId = val.carrier;
-      //this.onShuttle();
+      this.onShuttle();
     },
   },
   beforeDestroy() {
+    const dt = this.toDateTime(Date());
     if (this.client && this.workStation().length > 0) {
+      const sub = `[${this.funcName} (${dt})] mqtt disconnect success`;
+      console.log(sub);
       this.client.end();
     }
   },

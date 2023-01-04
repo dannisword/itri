@@ -75,7 +75,7 @@
           <el-input
             v-model="carrier.inBarcode"
             placeholder="請刷讀盤點前物流箱編號條碼"
-            @keyup.enter.native="setBarcode(0)"
+            @keyup.enter.native="setBarcode('IN')"
             :disabled="isFinished == true || isReadOnly() == true"
           ></el-input>
         </el-form-item>
@@ -86,7 +86,7 @@
           <el-input
             v-model="carrier.outBarcode"
             placeholder="請刷讀盤點後物流箱編號條碼"
-            @keyup.enter.native="setBarcode(1)"
+            @keyup.enter.native="setBarcode('OUT')"
             :disabled="isFinished == true || isReadOnly() == true"
           ></el-input>
         </el-form-item>
@@ -244,6 +244,8 @@
 // name:"執行盤點工作",
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
+import mqtt_message from "@/utils/mixin/mqtt_message";
+
 import {
   getInventory,
   getInvDetail,
@@ -258,15 +260,15 @@ import {
 } from "@/api/system";
 
 import { InvDocStatusEnum } from "@/utils/enums/index";
-import { f } from "diagram-vue";
 
 export default {
   components: {
     ModalDialog,
   },
-  mixins: [pageMixin],
+  mixins: [pageMixin, mqtt_message],
   data() {
     return {
+      funcName: "執行盤點工作",
       loading: false,
       info: {
         lastCount: 0,
@@ -302,6 +304,13 @@ export default {
     };
   },
   async created() {
+    // 站點綁定
+    if (this.workStation().length > 0) {
+      // mqtt connect
+      this.connect(this.funcName);
+      this.client.on("message", this.handleMqtt);
+    }
+
     // 1: 初盤、2: 已完成有盤差、3: 複盤
     await this.onLoad();
   },
@@ -363,11 +372,11 @@ export default {
     },
     setBarcode(mode) {
       // 盤點前
-      if (mode == 0) {
+      if (mode == "IN") {
         this.details[0].carrierId = this.carrier.inBarcode;
       }
       // 盤點後
-      if (mode == 1) {
+      if (mode == "OUT") {
         if (this.carrier.outBarcode.length <= 0) {
           this.warning("請刷讀盤點後物流箱編號條碼");
           return;
@@ -512,6 +521,31 @@ export default {
         });
       });
     },
+    handleMqtt(topic, message) {
+      const val = JSON.parse(message);
+      const dt = Date(); //this.toDateTime(Date());
+      const sub = `[${this.funcName} (${dt})] subscribe to topics ${topic}`;
+      console.log(sub);
+      console.log(message.toString());
+      // 判斷BCR
+      const mode = this.carrierMap(val.sensor);
+      console.log(mode);
+      // IN 盤點後  OUT 盤點前
+      if (mode == "IN") {
+        this.carrier.inBarcode = val.carrier;
+      } else {
+        this.carrier.outBarcode = val.carrier;
+      }
+      this.setBarcode(mode);
+    },
+  },
+  beforeDestroy() {
+    const dt = this.toDateTime(Date());
+    if (this.client && this.workStation().length > 0) {
+      const sub = `[${this.funcName} (${dt})] mqtt disconnect success`;
+      console.log(sub);
+      this.client.end();
+    }
   },
 };
 </script>

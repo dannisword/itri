@@ -13,7 +13,7 @@ export default {
       const user = getUserInfo();
       return {
         topic: `${process.env.VUE_APP_MQTT_TOPIC_TAG}/${user.workStation}`,
-        qos: 0,
+        qos: 1,
       };
     },
   },
@@ -31,6 +31,7 @@ export default {
           password: "",
         });
         const { topic, qos } = this.subscription;
+
         this.client.subscribe(topic, { qos }, (error, res) => {
           if (error) {
             console.log(`subscribe to topics failed`);
@@ -38,6 +39,7 @@ export default {
             return;
           }
           console.log(`[${mode} (${moment().format("YYYY-MM-DD hh:mm:ss")})] mqtt connect success`);
+          console.log(`[${mode} (${moment().format("YYYY-MM-DD hh:mm:ss")})] topic: ${topic}, qos: ${qos}`);
         });
       } catch (e) {
         console.log("mqtt.connect error", e);

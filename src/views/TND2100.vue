@@ -202,6 +202,8 @@
 // 執行入庫工作
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
+import mqtt_message from "@/utils/mixin/mqtt_message";
+
 import config from "@/config.json";
 
 import {
@@ -215,13 +217,15 @@ import {
 
 import { SelectTypeEnum } from "@/utils/enums/index";
 
+
 export default {
   components: {
     ModalDialog,
   },
-  mixins: [pageMixin],
+  mixins: [pageMixin, mqtt_message],
   data() {
     return {
+      funcName: "執行入庫工作",
       carrierId: "",
       inbound: {},
       inbounds: [],
@@ -244,6 +248,13 @@ export default {
     this.inStatus = await this.getSelector(SelectTypeEnum.INBOUND_STATUS);
     this.onLoad();
     this.getInboundImage(this.$route.params.id);
+
+    // 站點綁定
+    if (this.workStation().length > 0) {
+      // mqtt connect
+      this.connect(this.funcName);
+      this.client.on("message", this.handleMqtt);
+    }
   },
   computed: {
     isFinished() {
@@ -418,6 +429,7 @@ export default {
       data.prodQty = parseFloat(data.prodQty);
       setInboundDetail(data).then((resp) => {
         if (resp.status == "OK") {
+          this.carrierId = "";
           this.onLoad();
         } else {
           if (resp.message) {
@@ -427,6 +439,23 @@ export default {
         }
       });
     },
+    handleMqtt(topic, message) {
+      const val = JSON.parse(message);
+      const dt = Date();//this.toDateTime(Date());
+      const sub = `[${this.funcName} (${dt})] subscribe to topics ${topic}`;
+      console.log(sub);
+      console.log(message.toString());
+      this.carrierId = val.carrier;
+      this.setBarcode(this.carrierId);
+    },
+  },
+  beforeDestroy() {
+    const dt = this.toDateTime(Date());
+    if (this.client && this.workStation().length > 0) {
+      const sub = `[${this.funcName} (${dt})] mqtt disconnect success`;
+      console.log(sub);
+      this.client.end();
+    }
   },
 };
 </script>

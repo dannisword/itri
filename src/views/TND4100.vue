@@ -303,6 +303,8 @@
 //
 import ModalDialog from "@/components/ModalDialog/index.vue";
 import pageMixin from "@/utils/mixin";
+import mqtt_message from "@/utils/mixin/mqtt_message";
+
 import {
   getProcessing,
   getProcessTodo,
@@ -326,9 +328,10 @@ export default {
   components: {
     ModalDialog,
   },
-  mixins: [pageMixin],
+  mixins: [pageMixin, mqtt_message],
   data() {
     return {
+      funcName: "執行加工工作",
       info: {
         lastCount: 0,
         part: 0,
@@ -359,6 +362,13 @@ export default {
     };
   },
   async created() {
+    // 站點綁定
+    if (this.workStation().length > 0) {
+      // mqtt connect
+      this.connect(this.funcName);
+      this.client.on("message", this.handleMqtt);
+    }
+
     await this.onLoad();
   },
   computed: {
@@ -391,7 +401,7 @@ export default {
           this.process.seq = 1;
           this.processing.push(this.process);
           this.handleFlow();
-        } 
+        }
       });
       this.getProcessDetails(processingId);
     },
@@ -641,6 +651,34 @@ export default {
         isFinished: false,
       };
     },
+    handleMqtt(topic, message) {
+      const val = JSON.parse(message);
+      const dt = Date(); //this.toDateTime(Date());
+      const sub = `[${this.funcName} (${dt})] subscribe to topics ${topic}`;
+      console.log(sub);
+      console.log(message.toString());
+      // 判斷BCR
+      const mode = this.carrierMap(val.sensor);
+      // OUT 原物料  IN 加工後
+      this.carrier.sourceId = "";
+      this.carrier.targetId = "";
+    
+      if (mode == "OUT") {
+        this.carrier.sourceId = val.carrier;
+        this.setSourceBarcode(val.carrier);
+      }else{
+        this.carrier.targetId = val.carrier;
+        this.setTargetBarcode(val.carrier);
+      }
+    },
+  },
+  beforeDestroy() {
+    const dt = this.toDateTime(Date());
+    if (this.client && this.workStation().length > 0) {
+      const sub = `[${this.funcName} (${dt})] mqtt disconnect success`;
+      console.log(sub);
+      this.client.end();
+    }
   },
 };
 </script>

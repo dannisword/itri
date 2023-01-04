@@ -293,6 +293,24 @@ export default {
       console.log(execPath);
       return execPath.length > 0;
     },
+    carrierMap(bcr) {
+      let mode = "";
+      switch (this.workStation()) {
+        case "STN101":
+          mode = bcr == "BCR111" ? "IN" : "OUT";
+          break;
+        case "STN102":
+          mode = bcr == "BCR121" ? "IN" : "OUT";
+          break;
+        case "STN102":
+          mode = bcr == "BCR131" ? "IN" : "OUT";
+          break;
+        case "STN102":
+          mode = bcr == "BCR141" ? "IN" : "OUT";
+          break;
+      }
+      return mode;
+    },
   },
   beforeDestroy() {
     //console.log("beforeDestroy");
