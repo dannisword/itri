@@ -446,6 +446,7 @@ export default {
           element.haveSignInBefore == true &&
           element.todaySignInWorkStationId == null
         ) {
+          console.log(element);
           this.$refs.signInTable.toggleRowSelection(element, true);
         }
       });
