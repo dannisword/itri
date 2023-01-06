@@ -384,7 +384,7 @@ export default {
         setInventoryDetail(this.details[0].id, this.carrier.outBarcode).then(
           (resp) => {
             if (resp.title == "successful") {
-              this.carrier.outBarcode = "";
+              //this.carrier.outBarcode = "";
               this.onLoad();
             }
           }
@@ -532,9 +532,9 @@ export default {
       console.log(mode);
       // IN 盤點後  OUT 盤點前
       if (mode == "IN") {
-        this.carrier.inBarcode = val.carrier;
-      } else {
         this.carrier.outBarcode = val.carrier;
+      } else {
+        this.carrier.inBarcode = val.carrier;
       }
       this.setBarcode(mode);
     },

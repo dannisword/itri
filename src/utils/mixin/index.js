@@ -308,6 +308,18 @@ export default {
         case "STN102":
           mode = bcr == "BCR141" ? "IN" : "OUT";
           break;
+        case "STN201":
+          mode = bcr == "BCR211" ? "IN" : "OUT";
+          break;
+        case "STN202":
+          mode = bcr == "BCR221" ? "IN" : "OUT";
+          break;
+        case "STN203":
+          mode = bcr == "BCR231" ? "IN" : "OUT";
+          break;
+        case "STN204":
+          mode = bcr == "BCR241" ? "IN" : "OUT";
+          break;
       }
       return mode;
     },

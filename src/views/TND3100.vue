@@ -436,8 +436,11 @@ export default {
       const sub = `[${this.funcName} (${dt})] subscribe to topics ${topic}`;
       console.log(sub);
       console.log(message.toString());
-      this.carrierId = val.carrier;
-      this.setBarcode(this.carrierId);
+      const mode = this.carrierMap(val.sensor);
+      if (mode == "IN") {
+        this.carrierId = val.carrier;
+        this.setBarcode(this.carrierId);
+      }
     },
   },
   beforeDestroy() {

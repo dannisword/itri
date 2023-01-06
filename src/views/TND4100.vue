@@ -549,7 +549,7 @@ export default {
       finishedSourceDetails(this.process.sysOrderNo, val).then((resp) => {
         console.log(resp);
         if (resp.title == "successful") {
-          this.carrier.sourceId = "";
+          //this.carrier.sourceId = "";
           this.onLoad();
         }
       });
@@ -558,7 +558,7 @@ export default {
     setTargetBarcode(val) {
       finishedTargetDetails(this.process.sysOrderNo, val).then((resp) => {
         if (resp.title == "successful") {
-          this.carrier.targetId = "";
+          //this.carrier.targetId = "";
           this.onLoad();
         }
       });
@@ -660,8 +660,8 @@ export default {
       // 判斷BCR
       const mode = this.carrierMap(val.sensor);
       // OUT 原物料  IN 加工後
-      this.carrier.sourceId = "";
-      this.carrier.targetId = "";
+      // this.carrier.sourceId = "";
+      // this.carrier.targetId = "";
     
       if (mode == "OUT") {
         this.carrier.sourceId = val.carrier;

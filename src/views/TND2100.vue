@@ -217,7 +217,6 @@ import {
 
 import { SelectTypeEnum } from "@/utils/enums/index";
 
-
 export default {
   components: {
     ModalDialog,
@@ -429,7 +428,7 @@ export default {
       data.prodQty = parseFloat(data.prodQty);
       setInboundDetail(data).then((resp) => {
         if (resp.status == "OK") {
-          this.carrierId = "";
+          //this.carrierId = "";
           this.onLoad();
         } else {
           if (resp.message) {
@@ -441,12 +440,15 @@ export default {
     },
     handleMqtt(topic, message) {
       const val = JSON.parse(message);
-      const dt = Date();//this.toDateTime(Date());
+      const dt = Date(); //this.toDateTime(Date());
       const sub = `[${this.funcName} (${dt})] subscribe to topics ${topic}`;
       console.log(sub);
       console.log(message.toString());
-      this.carrierId = val.carrier;
-      this.setBarcode(this.carrierId);
+      const mode = this.carrierMap(val.sensor);
+      if (mode == "IN") {
+        this.carrierId = val.carrier;
+        this.setBarcode(this.carrierId);
+      }
     },
   },
   beforeDestroy() {

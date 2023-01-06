@@ -51,3 +51,7 @@ https://vrwbdo.axshare.com
 - TND7008, 物流箱管理,
 - TND7009, 使用者帳號管理,
 - TND7010, 角色權限設定,
+
+Mqtt 處理
+topic
+itri/t12345/wcs3x/t12345/STN101
