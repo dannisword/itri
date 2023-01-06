@@ -251,7 +251,7 @@ import {
   getInvDetail,
   setInvDetail,
   setInvFinished,
-  setInventoryDetail,
+  getInventoryDetail,
 } from "@/api/inventory";
 import {
   getReceiveInfo,
@@ -347,9 +347,19 @@ export default {
           this.inventory = resp.message;
           this.content.push(resp.message);
           this.handleFlow();
+          getInventoryDetail(this.inventory.sysOrderNo, "empty").then(
+            (resp) => {
+              if (resp.title == "successful") {
+                this.details = resp.message;
+                //this.carrier.outBarcode = "";
+                //this.onLoad();
+              }
+            }
+          );
         }
       });
 
+      /*
       getInvDetail(this.$route.params.id).then((resp) => {
         if (resp.status == "OK") {
           let seq = 1;
@@ -369,6 +379,7 @@ export default {
           });
         }
       });
+      */
     },
     setBarcode(mode) {
       // 盤點前
@@ -381,14 +392,15 @@ export default {
           this.warning("請刷讀盤點後物流箱編號條碼");
           return;
         }
-        setInventoryDetail(this.details[0].id, this.carrier.outBarcode).then(
-          (resp) => {
-            if (resp.title == "successful") {
-              //this.carrier.outBarcode = "";
-              this.onLoad();
-            }
+        getInventoryDetail(
+          this.details[0].sysOrderNo,
+          this.carrier.outBarcode
+        ).then((resp) => {
+          if (resp.title == "successful") {
+            //this.carrier.outBarcode = "";
+            this.onLoad();
           }
-        );
+        });
       }
     },
     async onOpenLog() {

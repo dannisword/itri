@@ -1,13 +1,3 @@
-# 
-- A1 系統管理
-- A2 主檔管理
-- A3 入庫管理
-- A4 出庫管理
-- A5 加工管理
-- A6 庫存模組
-- A7 盤點模組
-- A8 訊息通知模組？
-
 ## 資料庫
 IP:1
 PORT:1433
@@ -15,8 +5,23 @@ PORT:1433
 帳號:wms_itri
 密碼:U100_wms
 
+## VPN
+IP:210.242.68.163
+帳號:zhtech
+密碼:503cjodkru4
+連線軟體下載
+https://210.242.68.163/global-protect/login.esp
+
+## Git Path 
+ssh://dannis@10.248.82.2/volume1/git/tenacity-iwms-frontend
+Git 密碼為dannisdannis
+
 ## API URL
 https://www.logistics.org.tw/tenacity/swagger-ui/index.html
+
+## 前端測試網址
+https://www.logistics.org.tw/tenacity-web/
+
 - 文件
 https://drive.google.com/drive/folders/1TbOsjzd-yjzAxxH3xPZWjAXpygIef0Ke
 ## 畫面
@@ -52,6 +57,22 @@ https://vrwbdo.axshare.com
 - TND7009, 使用者帳號管理,
 - TND7010, 角色權限設定,
 
-Mqtt 處理
+## Mqtt 處理
 topic
 itri/t12345/wcs3x/t12345/STN101
+json data
+{
+  "carrier": "00026",
+  "location": "STN101",
+  "sensor": "BCR111"
+}
+
+dev: (目前是56那台)
+itri/t12345/wcs2x/t12345/{station_code}
+test: (目前是109那台)
+itri/t12345/wcs3x/t12345/{station_code}
+prod: (目前是外整那台)
+itri/t12345/wcs4x/t12345/{station_code}
+
+## 開發
+npm run serve

@@ -323,13 +323,13 @@ export function startAdjustment(docNo) {
 }
 /**
  * A7-27 取得盤點單明細
- * @param {*} detailId
+ * @param {*} docNo
  * @param {*} carrieId
  * @returns
  */
-export function setInventoryDetail(detailId, carrieId) {
+export function getInventoryDetail(docNo, carrieId) {
   return request({
-    url: `/api/inventory/detail/${detailId}/${carrieId}`,
+    url: `/api/inventory/details/${docNo}/${carrieId}`,
     method: "GET",
   });
 }
